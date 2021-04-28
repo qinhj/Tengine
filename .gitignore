@@ -1,3 +1,7 @@
+# imilab files
+/output
+imilab.sh
+
 # clion debug directory
 cmake-build*
 .idea
