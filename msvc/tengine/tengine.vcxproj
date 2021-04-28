@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{5577D43D-984E-4A15-A588-829824DE84B1}</ProjectGuid>
+    <RootNamespace>tengine</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\dev\acl\acl_device.cpp" />
+    <ClCompile Include="..\..\src\dev\acl\acl_executor.cpp" />
+    <ClCompile Include="..\..\src\dev\acl\acl_graph.cpp" />
+    <ClCompile Include="..\..\src\dev\acl\op\acl_bn.cpp" />
+    <ClCompile Include="..\..\src\dev\acl\op\acl_cast.cpp" />
+    <ClCompile Include="..\..\src\dev\acl\op\acl_clip.cpp" />
+    <ClCompile Include="..\..\src\dev\acl\op\acl_concat.cpp" />
+    <ClCompile Include="..\..\src\dev\acl\op\acl_convolution.cpp" />
+    <ClCompile Include="..\..\src\dev\acl\op\acl_crop.cpp" />
+    <ClCompile Include="..\..\src\dev\acl\op\acl_dropout.cpp" />
+    <ClCompile Include="..\..\src\dev\acl\op\acl_eltwise.cpp" />
+    <ClCompile Include="..\..\src\dev\acl\op\acl_fc.cpp" />
+    <ClCompile Include="..\..\src\dev\acl\op\acl_input.cpp" />
+    <ClCompile Include="..\..\src\dev\acl\op\acl_interp.cpp" />
+    <ClCompile Include="..\..\src\dev\acl\op\acl_pooling.cpp" />
+    <ClCompile Include="..\..\src\dev\acl\op\acl_relu.cpp" />
+    <ClCompile Include="..\..\src\dev\acl\op\acl_reshape.cpp" />
+    <ClCompile Include="..\..\src\dev\acl\op\acl_resize.cpp" />
+    <ClCompile Include="..\..\src\dev\acl\op\acl_softmax.cpp" />
+    <ClCompile Include="..\..\src\dev\cpu\cpu_allocator.c" />
+    <ClCompile Include="..\..\src\dev\cpu\cpu_device.c" />
+    <ClCompile Include="..\..\src\dev\cpu\cpu_module.c" />
+    <ClCompile Include="..\..\src\dev\cpu\cpu_node_ops.c" />
+    <ClCompile Include="..\..\src\dev\cpu\cpu_probe.c" />
+    <ClCompile Include="..\..\src\lib\cpu.c" />
+    <ClCompile Include="..\..\src\lib\dev_allocator.c" />
+    <ClCompile Include="..\..\src\lib\exec_graph.c" />
+    <ClCompile Include="..\..\src\lib\exec_scheduler.c" />
+    <ClCompile Include="..\..\src\lib\hash.c" />
+    <ClCompile Include="..\..\src\lib\hash_impl.c" />
+    <ClCompile Include="..\..\src\lib\hcl_version.c" />
+    <ClCompile Include="..\..\src\lib\map.c" />
+    <ClCompile Include="..\..\src\lib\mem_stat.c" />
+    <ClCompile Include="..\..\src\lib\module.c" />
+    <ClCompile Include="..\..\src\lib\nn_device.c" />
+    <ClCompile Include="..\..\src\lib\sys_port.c" />
+    <ClCompile Include="..\..\src\lib\tengine_cpp_api.cpp" />
+    <ClCompile Include="..\..\src\lib\tengine_c_api.c" />
+    <ClCompile Include="..\..\src\lib\tengine_errno.c" />
+    <ClCompile Include="..\..\src\lib\tengine_exec.c" />
+    <ClCompile Include="..\..\src\lib\tengine_ir.c" />
+    <ClCompile Include="..\..\src\lib\tengine_ir_pack.c" />
+    <ClCompile Include="..\..\src\lib\tengine_log.c" />
+    <ClCompile Include="..\..\src\lib\tengine_op.c" />
+    <ClCompile Include="..\..\src\lib\tengine_plugin.c" />
+    <ClCompile Include="..\..\src\lib\tengine_serializer.c" />
+    <ClCompile Include="..\..\src\lib\tengine_utils.c" />
+    <ClCompile Include="..\..\src\lib\vector.c" />
+    <ClCompile Include="..\..\src\op\absval.c" />
+    <ClCompile Include="..\..\src\op\add_n.c" />
+    <ClCompile Include="..\..\src\op\argmax.c" />
+    <ClCompile Include="..\..\src\op\argmin.c" />
+    <ClCompile Include="..\..\src\op\batchnorm.c" />
+    <ClCompile Include="..\..\src\op\batchtospacend.c" />
+    <ClCompile Include="..\..\src\op\bias.c" />
+    <ClCompile Include="..\..\src\op\broadmul.c" />
+    <ClCompile Include="..\..\src\op\cast.c" />
+    <ClCompile Include="..\..\src\op\ceil.c" />
+    <ClCompile Include="..\..\src\op\clip.c" />
+    <ClCompile Include="..\..\src\op\comparison.c" />
+    <ClCompile Include="..\..\src\op\concat.c" />
+    <ClCompile Include="..\..\src\op\const.c" />
+    <ClCompile Include="..\..\src\op\convolution.c" />
+    <ClCompile Include="..\..\src\op\crop.c" />
+    <ClCompile Include="..\..\src\op\deconvolution.c" />
+    <ClCompile Include="..\..\src\op\depthtospace.c" />
+    <ClCompile Include="..\..\src\op\detection_output.c" />
+    <ClCompile Include="..\..\src\op\detection_postprocess.c" />
+    <ClCompile Include="..\..\src\op\dropout.c" />
+    <ClCompile Include="..\..\src\op\eltwise.c" />
+    <ClCompile Include="..\..\src\op\elu.c" />
+    <ClCompile Include="..\..\src\op\embedding.c" />
+    <ClCompile Include="..\..\src\op\expanddims.c" />
+    <ClCompile Include="..\..\src\op\fc.c" />
+    <ClCompile Include="..\..\src\op\flatten.c" />
+    <ClCompile Include="..\..\src\op\gather.c" />
+    <ClCompile Include="..\..\src\op\gemm.c" />
+    <ClCompile Include="..\..\src\op\generic.c" />
+    <ClCompile Include="..\..\src\op\gru.c" />
+    <ClCompile Include="..\..\src\op\hardsigmoid.c" />
+    <ClCompile Include="..\..\src\op\hardswish.c" />
+    <ClCompile Include="..\..\src\op\input.c" />
+    <ClCompile Include="..\..\src\op\instancenorm.c" />
+    <ClCompile Include="..\..\src\op\interp.c" />
+    <ClCompile Include="..\..\src\op\l2normalization.c" />
+    <ClCompile Include="..\..\src\op\l2pool.c" />
+    <ClCompile Include="..\..\src\op\logical.c" />
+    <ClCompile Include="..\..\src\op\logsoftmax.c" />
+    <ClCompile Include="..\..\src\op\lrn.c" />
+    <ClCompile Include="..\..\src\op\lstm.c" />
+    <ClCompile Include="..\..\src\op\matmul.c" />
+    <ClCompile Include="..\..\src\op\maximum.c" />
+    <ClCompile Include="..\..\src\op\mean.c" />
+    <ClCompile Include="..\..\src\op\minimum.c" />
+    <ClCompile Include="..\..\src\op\mish.c" />
+    <ClCompile Include="..\..\src\op\mvn.c" />
+    <ClCompile Include="..\..\src\op\noop.c" />
+    <ClCompile Include="..\..\src\op\normalize.c" />
+    <ClCompile Include="..\..\src\op\pad.c" />
+    <ClCompile Include="..\..\src\op\permute.c" />
+    <ClCompile Include="..\..\src\op\pooling.c" />
+    <ClCompile Include="..\..\src\op\prelu.c" />
+    <ClCompile Include="..\..\src\op\priorbox.c" />
+    <ClCompile Include="..\..\src\op\psroipooling.c" />
+    <ClCompile Include="..\..\src\op\reciprocal.c" />
+    <ClCompile Include="..\..\src\op\reducel2.c" />
+    <ClCompile Include="..\..\src\op\reduction.c" />
+    <ClCompile Include="..\..\src\op\region.c" />
+    <ClCompile Include="..\..\src\op\relu.c" />
+    <ClCompile Include="..\..\src\op\relu1.c" />
+    <ClCompile Include="..\..\src\op\relu6.c" />
+    <ClCompile Include="..\..\src\op\reorg.c" />
+    <ClCompile Include="..\..\src\op\reshape.c" />
+    <ClCompile Include="..\..\src\op\resize.c" />
+    <ClCompile Include="..\..\src\op\reverse.c" />
+    <ClCompile Include="..\..\src\op\rnn.c" />
+    <ClCompile Include="..\..\src\op\roialign.c" />
+    <ClCompile Include="..\..\src\op\roipooling.c" />
+    <ClCompile Include="..\..\src\op\round.c" />
+    <ClCompile Include="..\..\src\op\rpn.c" />
+    <ClCompile Include="..\..\src\op\scale.c" />
+    <ClCompile Include="..\..\src\op\scatter.c" />
+    <ClCompile Include="..\..\src\op\selu.c" />
+    <ClCompile Include="..\..\src\op\shape.c" />
+    <ClCompile Include="..\..\src\op\shuffle_channel.c" />
+    <ClCompile Include="..\..\src\op\sigmoid.c" />
+    <ClCompile Include="..\..\src\op\slice.c" />
+    <ClCompile Include="..\..\src\op\softmax.c" />
+    <ClCompile Include="..\..\src\op\softplus.c" />
+    <ClCompile Include="..\..\src\op\spacetobatchnd.c" />
+    <ClCompile Include="..\..\src\op\spacetodepth.c" />
+    <ClCompile Include="..\..\src\op\sparsetodense.c" />
+    <ClCompile Include="..\..\src\op\split.c" />
+    <ClCompile Include="..\..\src\op\squareddifference.c" />
+    <ClCompile Include="..\..\src\op\squeeze.c" />
+    <ClCompile Include="..\..\src\op\strided_slice.c" />
+    <ClCompile Include="..\..\src\op\swap_axis.c" />
+    <ClCompile Include="..\..\src\op\tanh.c" />
+    <ClCompile Include="..\..\src\op\threshold.c" />
+    <ClCompile Include="..\..\src\op\tile.c" />
+    <ClCompile Include="..\..\src\op\topkv2.c" />
+    <ClCompile Include="..\..\src\op\transpose.c" />
+    <ClCompile Include="..\..\src\op\unary.c" />
+    <ClCompile Include="..\..\src\op\unsqueeze.c" />
+    <ClCompile Include="..\..\src\op\upsample.c" />
+    <ClCompile Include="..\..\src\op\where.c" />
+    <ClCompile Include="..\..\src\op\zeroslike.c" />
+    <ClCompile Include="..\..\src\serializer\tiny\tiny_serializer.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_add_n.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_argmax.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_argmin.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_batchnorm.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_batchtospacend.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_bias.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_broadmul.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_cast.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_ceil.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_clip.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_comparison.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_concat.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_conv.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_crop.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_deconv.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_depthtospace.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_detection_output.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_detection_postprocess.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_dropout.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_eltwise.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_elu.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_embedding.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_expanddims.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_fc.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_flatten.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_gather.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_gemm.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_generic.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_gru.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_hardsigmoid.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_hardswish.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_instancenrom.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_interp.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_l2normalization.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_l2pool.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_logical.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_logistic.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_logsoftmax.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_lrn.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_lstm.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_matmul.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_maximum.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_mean.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_mish.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_mvn.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_noop.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_normalize.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_pad.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_permute.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_pool.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_prelu.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_priorbox.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_psroipooling.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_reciprocal.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_reducel2.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_reduction.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_region.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_relu.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_relu1.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_relu6.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_reorg.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_reshape.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_resize.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_reverse.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_rnn.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_roialign.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_roipooling.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_round.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_rpn.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_scale.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_scatter.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_shape.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_shuffle_channel.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_sigmoid.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_slice.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_softmax.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_softplus.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_spacetobatchnd.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_spacetodepth.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_sparsetodense.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_split.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_squareddifference.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_squeeze.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_strided_slice.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_swap_axis.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_tanh.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_threshold.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_tile.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_topkv2.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_transpose.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_unary.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_unsqueeze.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_upsample.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_where.c" />
+    <ClCompile Include="..\..\src\serializer\tm\op\tm2_zeroslike.c" />
+    <ClCompile Include="..\..\src\serializer\tm\tm2_serializer.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\dev\acl\acl_device.hpp" />
+    <ClInclude Include="..\..\src\dev\acl\acl_executor.hpp" />
+    <ClInclude Include="..\..\src\dev\acl\acl_graph.hpp" />
+    <ClInclude Include="..\..\src\dev\acl\acl_helper.hpp" />
+    <ClInclude Include="..\..\src\dev\acl\acl_limit.hpp" />
+    <ClInclude Include="..\..\src\dev\cpu\cpu_allocator.h" />
+    <ClInclude Include="..\..\src\dev\cpu\cpu_device.h" />
+    <ClInclude Include="..\..\src\dev\cpu\cpu_model.h" />
+    <ClInclude Include="..\..\src\dev\cpu\cpu_node_ops.h" />
+    <ClInclude Include="..\..\src\dev\cpu\cpu_probe.h" />
+    <ClInclude Include="..\..\src\op\argmax_param.h" />
+    <ClInclude Include="..\..\src\op\argmin_param.h" />
+    <ClInclude Include="..\..\src\op\batchnorm_param.h" />
+    <ClInclude Include="..\..\src\op\batchtospacend_param.h" />
+    <ClInclude Include="..\..\src\op\cast_param.h" />
+    <ClInclude Include="..\..\src\op\clip_param.h" />
+    <ClInclude Include="..\..\src\op\comparison_param.h" />
+    <ClInclude Include="..\..\src\op\concat_param.h" />
+    <ClInclude Include="..\..\src\op\convolution_param.h" />
+    <ClInclude Include="..\..\src\op\crop_param.h" />
+    <ClInclude Include="..\..\src\op\deconv_param.h" />
+    <ClInclude Include="..\..\src\op\depthtospace_param.h" />
+    <ClInclude Include="..\..\src\op\detection_output_param.h" />
+    <ClInclude Include="..\..\src\op\detection_postprocess_param.h" />
+    <ClInclude Include="..\..\src\op\eltwise_param.h" />
+    <ClInclude Include="..\..\src\op\elu_param.h" />
+    <ClInclude Include="..\..\src\op\embedding_param.h" />
+    <ClInclude Include="..\..\src\op\expanddims_param.h" />
+    <ClInclude Include="..\..\src\op\fc_param.h" />
+    <ClInclude Include="..\..\src\op\flatten_param.h" />
+    <ClInclude Include="..\..\src\op\gather_param.h" />
+    <ClInclude Include="..\..\src\op\gemm_param.h" />
+    <ClInclude Include="..\..\src\op\generic_param.h" />
+    <ClInclude Include="..\..\src\op\gru_param.h" />
+    <ClInclude Include="..\..\src\op\hardsigmoid_param.h" />
+    <ClInclude Include="..\..\src\op\instancenorm_param.h" />
+    <ClInclude Include="..\..\src\op\interp_param.h" />
+    <ClInclude Include="..\..\src\op\l2pool_param.h" />
+    <ClInclude Include="..\..\src\op\logical_param.h" />
+    <ClInclude Include="..\..\src\op\logsoftmax_param.h" />
+    <ClInclude Include="..\..\src\op\lrn_param.h" />
+    <ClInclude Include="..\..\src\op\lstm_param.h" />
+    <ClInclude Include="..\..\src\op\mvn_param.h" />
+    <ClInclude Include="..\..\src\op\normalize_param.h" />
+    <ClInclude Include="..\..\src\op\pad_param.h" />
+    <ClInclude Include="..\..\src\op\permute_param.h" />
+    <ClInclude Include="..\..\src\op\pooling_param.h" />
+    <ClInclude Include="..\..\src\op\priorbox_param.h" />
+    <ClInclude Include="..\..\src\op\psroipooling_param.h" />
+    <ClInclude Include="..\..\src\op\reducel2_param.h" />
+    <ClInclude Include="..\..\src\op\reduction_param.h" />
+    <ClInclude Include="..\..\src\op\region_param.h" />
+    <ClInclude Include="..\..\src\op\relu_param.h" />
+    <ClInclude Include="..\..\src\op\reorg_param.h" />
+    <ClInclude Include="..\..\src\op\reshape_param.h" />
+    <ClInclude Include="..\..\src\op\resize_param.h" />
+    <ClInclude Include="..\..\src\op\rnn_param.h" />
+    <ClInclude Include="..\..\src\op\roialign_param.h" />
+    <ClInclude Include="..\..\src\op\roipooling_param.h" />
+    <ClInclude Include="..\..\src\op\rpn_param.h" />
+    <ClInclude Include="..\..\src\op\scale_param.h" />
+    <ClInclude Include="..\..\src\op\scatter_param.h" />
+    <ClInclude Include="..\..\src\op\selu_param.h" />
+    <ClInclude Include="..\..\src\op\shuffle_channel_param.h" />
+    <ClInclude Include="..\..\src\op\slice_param.h" />
+    <ClInclude Include="..\..\src\op\softmax_param.h" />
+    <ClInclude Include="..\..\src\op\spacetobatchnd_param.h" />
+    <ClInclude Include="..\..\src\op\spacetodepth_param.h" />
+    <ClInclude Include="..\..\src\op\sparsetodense_param.h" />
+    <ClInclude Include="..\..\src\op\split_param.h" />
+    <ClInclude Include="..\..\src\op\squeeze_param.h" />
+    <ClInclude Include="..\..\src\op\strided_slice_param.h" />
+    <ClInclude Include="..\..\src\op\swap_axis_param.h" />
+    <ClInclude Include="..\..\src\op\threshold_param.h" />
+    <ClInclude Include="..\..\src\op\tile_param.h" />
+    <ClInclude Include="..\..\src\op\topkv2_param.h" />
+    <ClInclude Include="..\..\src\op\transpose_param.h" />
+    <ClInclude Include="..\..\src\op\unary_param.h" />
+    <ClInclude Include="..\..\src\op\unsqueeze_param.h" />
+    <ClInclude Include="..\..\src\op\upsample_param.h" />
+    <ClInclude Include="..\..\src\serializer\tiny\tiny_graph.h" />
+    <ClInclude Include="..\..\src\serializer\tm\tm2_format.h" />
+    <ClInclude Include="..\..\src\serializer\tm\tm2_serializer.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
