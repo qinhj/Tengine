@@ -63,7 +63,9 @@ typedef struct
 /**
  * read image to buffer
  * @param [in] filename: image name
- * @param [in] channels: c
+ * @param [in] channels: c (src channel)
+ * @return: no more than first 3channels with plane mode
+ *  (e.g. bgra bgra bgra ... -> bbbb ... gggg ... rrrr ...)
  */
 image load_image_stb(const char* filename, int channels);
 
