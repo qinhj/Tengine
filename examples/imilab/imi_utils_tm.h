@@ -1,4 +1,11 @@
-// @Author: qinhongjie@imilab.com
+// ============================================================
+//                  Imilab Utils: Tengine APIs
+// ------------------------------------------------------------
+// Author:  qinhongjie@imilab.com       Date:   2021/05/08
+// ============================================================
+
+#ifndef __IMI_UTILS_TM_H__
+#define __IMI_UTILS_TM_H__
 
 /* std c includes */
 #include <stdio.h>  // for: printf
@@ -31,3 +38,5 @@ static int imi_utils_tm_run_graph(graph_t &graph, int rc) {
 
     return 0;
 }
+
+#endif // !__IMI_UTILS_TM_H__

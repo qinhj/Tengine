@@ -35,17 +35,11 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
  /* imilab includes */
-#include "imilab/imi_utils_tm.h"// imi_utils_tm_run_graph
-
-struct Size2i {
-    int width;
-    int height;
-};
-
-struct Point2f {
-    float x;
-    float y;
-};
+#include "imilab/imi_utils_elog.h"
+#include "imilab/imi_utils_types.hpp"
+#include "imilab/imi_utils_coco.h"  // for: coco_class_names
+#include "imilab/imi_utils_sort.hpp"
+#include "imilab/imi_utils_tm.h"    // for: imi_utils_tm_run_graph
 
 struct Object {
     cv::Rect_<float> rect;
@@ -72,74 +66,40 @@ static inline float intersection_area(const Object& a, const Object& b) {
     return inter.area();
 }
 
-static void qsort_descent_inplace(std::vector<Object>& faceobjects, int left, int right) {
-    int i = left;
-    int j = right;
-    float p = faceobjects[(left + right) / 2].prob;
-
-    while (i <= j) {
-        while (faceobjects[i].prob > p)
-            i++;
-
-        while (faceobjects[j].prob < p)
-            j--;
-
-        if (i <= j) {
-            // swap
-            std::swap(faceobjects[i], faceobjects[j]);
-
-            i++;
-            j--;
-        }
-    }
-
-#pragma omp parallel sections
-    {
-#pragma omp section
-        {
-            if (left < j) qsort_descent_inplace(faceobjects, left, j);
-        }
-#pragma omp section
-        {
-            if (i < right) qsort_descent_inplace(faceobjects, i, right);
-        }
-    }
-}
-
-static void qsort_descent_inplace(std::vector<Object>& faceobjects) {
-    if (faceobjects.empty())
-        return;
-
-    qsort_descent_inplace(faceobjects, 0, faceobjects.size() - 1);
-}
-
-static void nms_sorted_bboxes(const std::vector<Object>& faceobjects, std::vector<int>& picked, float nms_threshold) {
+static void nms_sorted_bboxes(const std::vector<Object>& objects, std::vector<int>& picked, float nms_threshold) {
     picked.clear();
 
-    const int n = faceobjects.size();
+    const int n = objects.size();
+    log_debug("[%s] proposal num: %d\n", __FUNCTION__, n);
 
     std::vector<float> areas(n);
     for (int i = 0; i < n; i++) {
-        areas[i] = faceobjects[i].rect.area();
+        areas[i] = objects[i].rect.area();
+        //log_debug("face[%d] x: %.3f, y: %.3f, w: %.3f, h: %.3f\n", i,
+        //    objects[i].rect.x, objects[i].rect.y,
+        //    objects[i].rect.w, objects[i].rect.h);
     }
 
     for (int i = 0; i < n; i++) {
-        const Object& a = faceobjects[i];
+        const Object& a = objects[i];
 
         int keep = 1;
         for (int j = 0; j < (int)picked.size(); j++) {
-            const Object& b = faceobjects[picked[j]];
+            const Object& b = objects[picked[j]];
 
             // intersection over union
             float inter_area = intersection_area(a, b);
             float union_area = areas[i] + areas[picked[j]] - inter_area;
+            log_debug("[%s] IOU(%d, %d) = %.3f / %.3f\n", __FUNCTION__, i, j, inter_area, union_area);
             // float IoU = inter_area / union_area
             if (inter_area / union_area > nms_threshold)
                 keep = 0;
         }
 
-        if (keep)
+        if (keep) {
             picked.push_back(i);
+            log_debug("[%s] push face(%d) into picked list\n", __FUNCTION__, i);
+        }
     }
 }
 
@@ -207,17 +167,6 @@ static void generate_proposals(int stride, const float* feat, float prob_thresho
 }
 
 static void draw_objects(const std::vector<Object>& objects, const cv::Mat& bgr) {
-    static const char* class_names[] = {
-            "person", "bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck", "boat", "traffic light",
-            "fire hydrant", "stop sign", "parking meter", "bench", "bird", "cat", "dog", "horse", "sheep", "cow",
-            "elephant", "bear", "zebra", "giraffe", "backpack", "umbrella", "handbag", "tie", "suitcase", "frisbee",
-            "skis", "snowboard", "sports ball", "kite", "baseball bat", "baseball glove", "skateboard", "surfboard",
-            "tennis racket", "bottle", "wine glass", "cup", "fork", "knife", "spoon", "bowl", "banana", "apple",
-            "sandwich", "orange", "broccoli", "carrot", "hot dog", "pizza", "donut", "cake", "chair", "couch",
-            "potted plant", "bed", "dining table", "toilet", "tv", "laptop", "mouse", "remote", "keyboard", "cell phone",
-            "microwave", "oven", "toaster", "sink", "refrigerator", "book", "clock", "vase", "scissors", "teddy bear",
-            "hair drier", "toothbrush"
-    };
 
     cv::Mat image = bgr.clone();
 
@@ -225,12 +174,12 @@ static void draw_objects(const std::vector<Object>& objects, const cv::Mat& bgr)
         const Object& obj = objects[i];
 
         fprintf(stderr, "%2d: %3.0f%%, [%4.0f, %4.0f, %4.0f, %4.0f], %s\n", obj.label, obj.prob * 100, obj.rect.x,
-            obj.rect.y, obj.rect.x + obj.rect.width, obj.rect.y + obj.rect.height, class_names[obj.label]);
+            obj.rect.y, obj.rect.x + obj.rect.width, obj.rect.y + obj.rect.height, coco_class_names[obj.label]);
 
         cv::rectangle(image, obj.rect, cv::Scalar(255, 0, 0));
 
         char text[256];
-        sprintf(text, "%s %.1f%%", class_names[obj.label], obj.prob * 100);
+        sprintf(text, "%s %.1f%%", coco_class_names[obj.label], obj.prob * 100);
 
         int baseLine = 0;
         cv::Size label_size = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
@@ -250,12 +199,6 @@ static void draw_objects(const std::vector<Object>& objects, const cv::Mat& bgr)
     }
 
     cv::imwrite("yolov5_out.jpg", image);
-}
-
-static void show_usage() {
-    fprintf(
-        stderr,
-        "[Usage]:  [-h]\n    [-m model_file] [-i image_file] [-r repeat_count] [-t thread_count]\n");
 }
 
 void get_input_data_focus(const char* image_file, float* input_data, int letterbox_rows, int letterbox_cols, const float* mean, const float* scale) {
@@ -342,6 +285,9 @@ static int proposals_objects_get(graph_t &graph, std::vector<Object> &proposals)
     float *p_data = NULL;
     tensor_t p_tensor = NULL;
     for (int i = 3; 0 < i; i--) {
+        // ==================================================================
+        // ========== This part is to get tensor information ================
+        // ==================================================================
         p_tensor = get_graph_output_tensor(graph, i - 1, 0);
         p_data = p_tensor ? (float *)get_tensor_buffer(p_tensor) : NULL;
         if (NULL == p_data) {
@@ -409,16 +355,20 @@ static std::vector<Object> proposals_objects_filter(const std::vector<Object> &p
     return objects;
 }
 
+static void show_usage() {
+    fprintf(stdout, "[Usage]:  [-h]\n");
+    fprintf(stdout, "    [-m model_file] [-i image_file] [-r repeat_count] [-t thread_count]\n");
+}
+
 int main(int argc, char* argv[]) {
     const char *model_file = nullptr;
     const char *image_file = nullptr;
+    int repeat_count = 1;
+    int num_thread = 1;
 
     int img_c = 3;
     const float mean[3] = { 0, 0, 0 };
     const float scale[3] = { 0.003921, 0.003921, 0.003921 };
-
-    int repeat_count = 1;
-    int num_thread = 1;
 
     int res;
     while ((res = getopt(argc, argv, "m:i:r:t:h:")) != -1) {

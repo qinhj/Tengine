@@ -1,4 +1,11 @@
-// @Author: qinhongjie@imilab.com
+// ============================================================
+//                  Imilab Utils: Image IO APIs
+// ------------------------------------------------------------
+// Author:  qinhongjie@imilab.com       Date:   2021/04/28
+// ============================================================
+
+#ifndef __IMI_IMREAD_H__
+#define __IMI_IMREAD_H__
 
 #include <stdio.h>  // for: printf
 #include <stdlib.h> // for: calloc
@@ -9,7 +16,7 @@
 // A: try "cat image_r.dat image_g.dat image_b.dat > image.dat",
 //  and "diff image.dat image__.dat" .
 static void _check_channel_1by1(const image &img) {
-    FILE *fp_rgb[]= {
+    FILE *fp_rgb[] = {
         fopen("image_r.dat", "wb"),
         fopen("image_g.dat", "wb"),
         fopen("image_b.dat", "wb"),
@@ -58,3 +65,5 @@ static int get_input_data(FILE *fp, image &img, int channels, char bgr) {
 
     return rc;
 }
+
+#endif // !__IMI_IMREAD_H__
