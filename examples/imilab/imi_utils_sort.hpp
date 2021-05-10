@@ -9,6 +9,49 @@
 
 /* std c++ includes */
 #include <vector>
+/* imilab includes */
+#include "imi_utils_elog.h"
+
+/** @brief
+    @note:  _Tp must have member "rect"
+*/
+template<typename _Tp>
+void nms_sorted_bboxes(const std::vector<_Tp>& objects, std::vector<int>& picked, float nms_threshold) {
+    picked.clear();
+
+    const int n = objects.size();
+    log_debug("[%s] proposal num: %d\n", __FUNCTION__, n);
+
+    std::vector<float> areas(n);
+    for (int i = 0; i < n; i++) {
+        areas[i] = objects[i].rect.area();
+        log_debug("[%s] object[%d] x: %.3f, y: %.3f, w: %.3f, h: %.3f\n", __FUNCTION__, i,
+            objects[i].rect.x, objects[i].rect.y, objects[i].rect.width, objects[i].rect.height);
+    }
+
+    for (int i = 0; i < n; i++) {
+        const _Tp &a = objects[i];
+
+        int keep = 1;
+        for (int j = 0; j < (int)picked.size(); j++) {
+            const _Tp &b = objects[picked[j]];
+
+            // intersection over union
+            float inter_area = (a.rect & b.rect).area();
+            float union_area = areas[i] + areas[picked[j]] - inter_area;
+            log_debug("[%s] IOU(%d, %d) = %.3f / %.3f\n", __FUNCTION__, i, j, inter_area, union_area);
+            // float IoU = inter_area / union_area
+            if (inter_area / union_area > nms_threshold)
+                keep = 0;
+        }
+
+        if (keep) {
+            picked.push_back(i);
+            log_debug("[%s] push face(%d) into picked list\n", __FUNCTION__, i);
+        }
+    }
+}
+
 
 /** @brief
     @note:  _Tp must have member "prob"

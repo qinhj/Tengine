@@ -1,5 +1,5 @@
 // ============================================================
-//                  Imilab Utils: Common Types
+//                  Imilab Utils: Opencv Types
 // ------------------------------------------------------------
 // Author:  qinhongjie@imilab.com       Date:   2021/05/10
 // ============================================================
@@ -7,6 +7,8 @@
 #ifndef __IMI_UTILS_TYPES_HPP__
 #define __IMI_UTILS_TYPES_HPP__
 
+#include <stdint.h> // for: uint64_t
+#include <assert.h> // for: assert
 
 #if defined _MSC_VER || defined __BORLANDC__
    typedef __int64 int64;
@@ -20,6 +22,12 @@
 #  define CV_BIG_UINT(n)  n##ULL
 #endif
 
+   //template<typename _Tp> class Complex;
+   template<typename _Tp> class Point_;
+   //template<typename _Tp> class Point3_;
+   template<typename _Tp> class Size_;
+   template<typename _Tp> class Rect_;
+   //template<typename _Tp> class Scalar_;
 
 //////////////////////////////// Point_ ////////////////////////////////
 
@@ -67,7 +75,7 @@ public:
     Point_(_Tp _x, _Tp _y);
     Point_(const Point_& pt);
     Point_(const Size_<_Tp>& sz);
-    Point_(const Vec<_Tp, 2>& v);
+    //Point_(const Vec<_Tp, 2>& v);
 
     Point_& operator = (const Point_& pt);
     //! conversion to another data type
@@ -227,6 +235,117 @@ typedef Rect_<double> Rect2d;
 typedef Rect2i Rect;
 
 
+
+////////////////////////////////// Size /////////////////////////////////
+
+template<typename _Tp> inline
+Size_<_Tp>::Size_()
+    : width(0), height(0) {}
+
+template<typename _Tp> inline
+Size_<_Tp>::Size_(_Tp _width, _Tp _height)
+    : width(_width), height(_height) {}
+
+template<typename _Tp> inline
+Size_<_Tp>::Size_(const Size_& sz)
+    : width(sz.width), height(sz.height) {}
+
+template<typename _Tp> inline
+Size_<_Tp>::Size_(const Point_<_Tp>& pt)
+    : width(pt.x), height(pt.y) {}
+
+//template<typename _Tp> template<typename _Tp2> inline
+//Size_<_Tp>::operator Size_<_Tp2>() const {
+//    return Size_<_Tp2>(saturate_cast<_Tp2>(width), saturate_cast<_Tp2>(height));
+//}
+
+template<typename _Tp> inline
+Size_<_Tp>& Size_<_Tp>::operator = (const Size_<_Tp>& sz) {
+    width = sz.width; height = sz.height;
+    return *this;
+}
+
+template<typename _Tp> inline
+_Tp Size_<_Tp>::area() const {
+    const _Tp result = width * height;
+    CV_DbgAssert(!std::numeric_limits<_Tp>::is_integer
+        || width == 0 || result / width == height); // make sure the result fits in the return value
+    return result;
+}
+
+template<typename _Tp> inline
+bool Size_<_Tp>::empty() const {
+    return width <= 0 || height <= 0;
+}
+
+
+template<typename _Tp> static inline
+Size_<_Tp>& operator *= (Size_<_Tp>& a, _Tp b) {
+    a.width *= b;
+    a.height *= b;
+    return a;
+}
+
+template<typename _Tp> static inline
+Size_<_Tp> operator * (const Size_<_Tp>& a, _Tp b) {
+    Size_<_Tp> tmp(a);
+    tmp *= b;
+    return tmp;
+}
+
+template<typename _Tp> static inline
+Size_<_Tp>& operator /= (Size_<_Tp>& a, _Tp b) {
+    a.width /= b;
+    a.height /= b;
+    return a;
+}
+
+template<typename _Tp> static inline
+Size_<_Tp> operator / (const Size_<_Tp>& a, _Tp b) {
+    Size_<_Tp> tmp(a);
+    tmp /= b;
+    return tmp;
+}
+
+template<typename _Tp> static inline
+Size_<_Tp>& operator += (Size_<_Tp>& a, const Size_<_Tp>& b) {
+    a.width += b.width;
+    a.height += b.height;
+    return a;
+}
+
+template<typename _Tp> static inline
+Size_<_Tp> operator + (const Size_<_Tp>& a, const Size_<_Tp>& b) {
+    Size_<_Tp> tmp(a);
+    tmp += b;
+    return tmp;
+}
+
+template<typename _Tp> static inline
+Size_<_Tp>& operator -= (Size_<_Tp>& a, const Size_<_Tp>& b) {
+    a.width -= b.width;
+    a.height -= b.height;
+    return a;
+}
+
+template<typename _Tp> static inline
+Size_<_Tp> operator - (const Size_<_Tp>& a, const Size_<_Tp>& b) {
+    Size_<_Tp> tmp(a);
+    tmp -= b;
+    return tmp;
+}
+
+template<typename _Tp> static inline
+bool operator == (const Size_<_Tp>& a, const Size_<_Tp>& b) {
+    return a.width == b.width && a.height == b.height;
+}
+
+template<typename _Tp> static inline
+bool operator != (const Size_<_Tp>& a, const Size_<_Tp>& b) {
+    return !(a == b);
+}
+
+
 ////////////////////////////////// Rect /////////////////////////////////
 
 template<typename _Tp> inline
@@ -280,8 +399,10 @@ Size_<_Tp> Rect_<_Tp>::size() const {
 template<typename _Tp> inline
 _Tp Rect_<_Tp>::area() const {
     const _Tp result = width * height;
-    CV_DbgAssert(!std::numeric_limits<_Tp>::is_integer
+#ifdef _DEBUG
+    /*CV_DbgAssert*/assert(!std::numeric_limits<_Tp>::is_integer
         || width == 0 || result / width == height); // make sure the result fits in the return value
+#endif // _DEBUG
     return result;
 }
 
@@ -341,7 +462,7 @@ Rect_<_Tp>& operator &= (Rect_<_Tp>& a, const Rect_<_Tp>& b) {
     a.x = x1;
     a.y = y1;
     if (a.width <= 0 || a.height <= 0)
-        a = Rect();
+        a = Rect_<_Tp>();
     return a;
 }
 

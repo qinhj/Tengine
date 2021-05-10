@@ -7,6 +7,7 @@
 #ifndef __IMI_UTILS_COCO_H__
 #define __IMI_UTILS_COCO_H__
 
+static const int coco_class_num = 80;
 static const char *coco_class_names[] = {
         "person", "bicycle", "car", "motorcycle", "airplane", "bus",            // 00-04
         "train", "truck", "boat", "traffic light",                              // 05-09
@@ -25,5 +26,8 @@ static const char *coco_class_names[] = {
         "toaster", "sink", "refrigerator", "book", "clock",                     // 70-74
         "vase", "scissors", "teddy bear", "hair drier", "toothbrush"            // 75-79
 };
+
+//static const float coco_image_mean[] = { 0, 0, 0 };
+//static const float coco_image_scale[] = { 0.003921, 0.003921, 0.003921 };
 
 #endif // !__IMI_UTILS_COCO_H__

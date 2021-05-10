@@ -24,94 +24,62 @@
  * Author: qinhongjie@imilab.com
  */
 
+//#define USE_OPENCV
+
 /* std c includes */
 #include <stdlib.h>
 /* std c++ includes */
 #include <vector>
 #include <algorithm>
 #include <cmath>
+/* imilab includes */
+#include "imilab/imi_utils_elog.h"
+#ifdef USE_OPENCV
 /* opencv includes */
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
- /* imilab includes */
-#include "imilab/imi_utils_elog.h"
+#else // !USE_OPENCV
 #include "imilab/imi_utils_types.hpp"
+#include "imilab/imi_imread.h"
+#endif // USE_OPENCV
 #include "imilab/imi_utils_coco.h"  // for: coco_class_names
 #include "imilab/imi_utils_sort.hpp"
 #include "imilab/imi_utils_tm.h"    // for: imi_utils_tm_run_graph
 
+#ifdef USE_OPENCV
+using namespace cv;
+#endif // USE_OPENCV
+
 struct Object {
-    cv::Rect_<float> rect;
+    Rect2f rect;
     int label;
     float prob;
 };
 
-// allow none square letterbox, set default letterbox size
-static const int letterbox_rows = 640;
-static const int letterbox_cols = 640;
 // postprocess threshold
-static const float prob_threshold = 0.25f;
+static const float prob_threshold = 0.5f; // 0.25f;
 static const float nms_threshold = 0.45f;
 
-static Size2i scale_tmp = { 0, 0 };
-static Point2f scale_ratio = { 0., 0. };
+// allow none square letterbox, set default letterbox size
+static image lb = make_image(640, 640, 3);
+static const float cov[][3] = {
+    { 0, 0, 0 }, // mean
+    { 0.003921, 0.003921, 0.003921 } // scale
+};
 
 static inline float sigmoid(float x) {
     return static_cast<float>(1.f / (1.f + exp(-x)));
 }
 
-static inline float intersection_area(const Object& a, const Object& b) {
-    cv::Rect_<float> inter = a.rect & b.rect;
-    return inter.area();
-}
-
-static void nms_sorted_bboxes(const std::vector<Object>& objects, std::vector<int>& picked, float nms_threshold) {
-    picked.clear();
-
-    const int n = objects.size();
-    log_debug("[%s] proposal num: %d\n", __FUNCTION__, n);
-
-    std::vector<float> areas(n);
-    for (int i = 0; i < n; i++) {
-        areas[i] = objects[i].rect.area();
-        //log_debug("face[%d] x: %.3f, y: %.3f, w: %.3f, h: %.3f\n", i,
-        //    objects[i].rect.x, objects[i].rect.y,
-        //    objects[i].rect.w, objects[i].rect.h);
-    }
-
-    for (int i = 0; i < n; i++) {
-        const Object& a = objects[i];
-
-        int keep = 1;
-        for (int j = 0; j < (int)picked.size(); j++) {
-            const Object& b = objects[picked[j]];
-
-            // intersection over union
-            float inter_area = intersection_area(a, b);
-            float union_area = areas[i] + areas[picked[j]] - inter_area;
-            log_debug("[%s] IOU(%d, %d) = %.3f / %.3f\n", __FUNCTION__, i, j, inter_area, union_area);
-            // float IoU = inter_area / union_area
-            if (inter_area / union_area > nms_threshold)
-                keep = 0;
-        }
-
-        if (keep) {
-            picked.push_back(i);
-            log_debug("[%s] push face(%d) into picked list\n", __FUNCTION__, i);
-        }
-    }
-}
-
-
-static void generate_proposals(int stride, const float* feat, float prob_threshold, std::vector<Object>& objects,
-    int letterbox_cols, int letterbox_rows) {
+// todo: optimize
+static void generate_proposals(int stride, const float *feat, float prob_threshold, std::vector<Object>& objects) {
     static float anchors[18] = { 10, 13, 16, 30, 33, 23, 30, 61, 62, 45, 59, 119, 116, 90, 156, 198, 373, 326 };
 
     int anchor_num = 3;
-    int feat_w = letterbox_cols / stride;
-    int feat_h = letterbox_rows / stride;
-    int cls_num = 80;
+    int feat_w = lb.w / stride;
+    int feat_h = lb.h / stride;
+    int cls_num = coco_class_num; // 80
     int anchor_group;
     if (stride == 8)
         anchor_group = 1;
@@ -119,10 +87,11 @@ static void generate_proposals(int stride, const float* feat, float prob_thresho
         anchor_group = 2;
     if (stride == 32)
         anchor_group = 3;
+
     for (int h = 0; h <= feat_h - 1; h++) {
         for (int w = 0; w <= feat_w - 1; w++) {
             for (int a = 0; a <= anchor_num - 1; a++) {
-                //process cls score
+                // process cls score
                 int class_index = 0;
                 float class_score = -FLT_MAX;
                 for (int s = 0; s <= cls_num - 1; s++) {
@@ -132,7 +101,7 @@ static void generate_proposals(int stride, const float* feat, float prob_thresho
                         class_score = score;
                     }
                 }
-                //process box score
+                // process box score
                 float box_score = feat[a * feat_w * feat_h * 85 + (h * feat_w) * 85 + w * 85 + 4];
                 float final_score = sigmoid(box_score) * sigmoid(class_score);
                 if (final_score >= prob_threshold) {
@@ -166,8 +135,9 @@ static void generate_proposals(int stride, const float* feat, float prob_thresho
     }
 }
 
-static void draw_objects(const std::vector<Object>& objects, const cv::Mat& bgr) {
+#ifdef USE_OPENCV
 
+static void draw_objects(const std::vector<Object>& objects, const cv::Mat& bgr, int cls) {
     cv::Mat image = bgr.clone();
 
     for (size_t i = 0; i < objects.size(); i++) {
@@ -175,6 +145,8 @@ static void draw_objects(const std::vector<Object>& objects, const cv::Mat& bgr)
 
         fprintf(stderr, "%2d: %3.0f%%, [%4.0f, %4.0f, %4.0f, %4.0f], %s\n", obj.label, obj.prob * 100, obj.rect.x,
             obj.rect.y, obj.rect.x + obj.rect.width, obj.rect.y + obj.rect.height, coco_class_names[obj.label]);
+
+        if (-1 != cls && obj.label != cls) continue;
 
         cv::rectangle(image, obj.rect, cv::Scalar(255, 0, 0));
 
@@ -198,10 +170,11 @@ static void draw_objects(const std::vector<Object>& objects, const cv::Mat& bgr)
             cv::Scalar(0, 0, 0));
     }
 
-    cv::imwrite("yolov5_out.jpg", image);
+    cv::imwrite("yolov5s_out.jpg", image);
 }
 
-void get_input_data_focus(const char* image_file, float* input_data, int letterbox_rows, int letterbox_cols, const float* mean, const float* scale) {
+// load input images
+static void get_input_data_focus(const char *image_file, float *input_data) {
     cv::Mat sample = cv::imread(image_file, 1);
     cv::Mat img;
 
@@ -212,57 +185,70 @@ void get_input_data_focus(const char* image_file, float* input_data, int letterb
 
     /* letterbox process to support different letterbox size */
     float scale_letterbox;
+    //Size2i resize;
     int resize_rows;
     int resize_cols;
-    if ((letterbox_rows * 1.0 / img.rows) < (letterbox_cols * 1.0 / img.cols)) {
-        scale_letterbox = letterbox_rows * 1.0 / img.rows;
+    if ((lb.h * 1.0 / img.rows) < (lb.w * 1.0 / img.cols)) {
+        scale_letterbox = lb.h * 1.0 / img.rows;
     }
     else {
-        scale_letterbox = letterbox_cols * 1.0 / img.cols;
+        scale_letterbox = lb.w * 1.0 / img.cols;
     }
     resize_cols = int(scale_letterbox * img.cols);
     resize_rows = int(scale_letterbox * img.rows);
 
+    // resize to part of letter box(e.g. 506x381 -> 640x481)
     cv::resize(img, img, cv::Size(resize_cols, resize_rows));
+    //cv::imwrite("yolov5_resize.jpg", img);
     img.convertTo(img, CV_32FC3);
+    //cv::imwrite("yolov5_resize_32FC3.jpg", img);
+
     // Generate a gray image for letterbox using opencv
-    cv::Mat img_new(letterbox_cols, letterbox_rows, CV_32FC3, cv::Scalar(0.5 / scale[0] + mean[0], 0.5 / scale[1] + mean[1], 0.5 / scale[2] + mean[2]));
-    int top = (letterbox_rows - resize_rows) / 2;
-    int bot = (letterbox_rows - resize_rows + 1) / 2;
-    int left = (letterbox_cols - resize_cols) / 2;
-    int right = (letterbox_cols - resize_cols + 1) / 2;
+    cv::Mat img_new(lb.w, lb.h, CV_32FC3,
+        cv::Scalar(0.5 / cov[1][0] + cov[0][0], 0.5 / cov[1][1] + cov[0][1], 0.5 / cov[1][2] + cov[0][2]));
+    int top = (lb.h - resize_rows) / 2;
+    int bot = (lb.h - resize_rows + 1) / 2;
+    int left = (lb.w - resize_cols) / 2;
+    int right = (lb.w - resize_cols + 1) / 2;
     // Letterbox filling
     cv::copyMakeBorder(img, img_new, top, bot, left, right, cv::BORDER_CONSTANT, cv::Scalar(0, 0, 0));
+    //cv::imwrite("yolov5_make_border.jpg", img_new);
 
     img_new.convertTo(img_new, CV_32FC3);
+    //cv::imwrite("yolov5_make_border_32FC3.jpg", img_new);
+
     float* img_data = (float*)img_new.data;
-    float* input_temp = (float*)malloc(3 * letterbox_cols * letterbox_rows * sizeof(float));
+    float* input_temp = (float*)malloc(3 * lb.w * lb.h * sizeof(float));
 
     /* nhwc to nchw */
-    for (int h = 0; h < letterbox_rows; h++) {
-        for (int w = 0; w < letterbox_cols; w++) {
+    for (int h = 0; h < lb.h; h++) {
+        for (int w = 0; w < lb.w; w++) {
             for (int c = 0; c < 3; c++) {
-                int in_index = h * letterbox_cols * 3 + w * 3 + c;
-                int out_index = c * letterbox_rows * letterbox_cols + h * letterbox_cols + w;
-                input_temp[out_index] = (img_data[in_index] - mean[c]) * scale[c];
+                int in_index = h * lb.w * 3 + w * 3 + c;
+                int out_index = c * lb.w * lb.h + h * lb.w + w;
+                input_temp[out_index] = (img_data[in_index] - cov[0][c]) * cov[1][c];
             }
         }
     }
 
-    /* focus process */
-    for (int i = 0; i < 2; i++) // corresponding to rows
-    {
-        for (int g = 0; g < 2; g++) // corresponding to cols
-        {
+    /* focus process: 3x640x640 -> 12x320x320 */
+    /*
+     | 0 2 |          C0-0, C1-0, C2-0,
+     | 1 3 | x C3 =>  C0-1, C1-1, C2-1, x C12
+                      C0-2, C1-2, C2-2,
+                      C0-3, C1-3, C2-3,
+    */
+    for (int i = 0; i < 2; i++) {       // corresponding to rows
+        for (int g = 0; g < 2; g++) {   // corresponding to cols
             for (int c = 0; c < 3; c++) {
-                for (int h = 0; h < letterbox_rows / 2; h++) {
-                    for (int w = 0; w < letterbox_cols / 2; w++) {
-                        int in_index = i + g * letterbox_cols + c * letterbox_cols * letterbox_rows +
-                            h * 2 * letterbox_cols + w * 2;
-                        int out_index = i * 2 * 3 * (letterbox_cols / 2) * (letterbox_rows / 2) +
-                            g * 3 * (letterbox_cols / 2) * (letterbox_rows / 2) +
-                            c * (letterbox_cols / 2) * (letterbox_rows / 2) +
-                            h * (letterbox_cols / 2) +
+                for (int h = 0; h < lb.h / 2; h++) {
+                    for (int w = 0; w < lb.w / 2; w++) {
+                        int in_index = i + g * lb.w + c * lb.w * lb.h +
+                            h * 2 * lb.w + w * 2;
+                        int out_index = i * 2 * 3 * (lb.w / 2) * (lb.h / 2) +
+                            g * 3 * (lb.w / 2) * (lb.h / 2) +
+                            c * (lb.w / 2) * (lb.h / 2) +
+                            h * (lb.w / 2) +
                             w;
 
                         /* quant to uint8 */
@@ -276,11 +262,34 @@ void get_input_data_focus(const char* image_file, float* input_data, int letterb
     free(input_temp);
 }
 
+#else // !USE_OPENCV
+
+static int draw_objects(const std::vector<Object>& objects, image &img, int cls) {
+    size_t size = objects.size();
+    fprintf(stdout, "detected objects num: %zu\n", size);
+
+    for (size_t i = 0; i < size; i++) {
+        const Object& obj = objects[i];
+        fprintf(stdout, "[%2d]: %3.3f%%, [(%4.0f, %4.0f), (%4.0f, %4.0f)], %s\n",
+            obj.label, obj.prob * 100, obj.rect.x, obj.rect.y,
+            obj.rect.x + obj.rect.width, obj.rect.y + obj.rect.height, coco_class_names[obj.label]);
+
+        if (-1 == cls || obj.label == cls) {
+            draw_box(img, obj.rect.x, obj.rect.y,
+                obj.rect.x + obj.rect.width, obj.rect.y + obj.rect.height, 2, 0, 255, 0);
+        }
+    }
+    return 0;
+}
+
+#endif // USE_OPENCV
+
 // yolov5 postprocess
 // 0: 1, 3, 20, 20, 85
 // 1: 1, 3, 40, 40, 85
 // 2: 1, 3, 80, 80, 85
 static int proposals_objects_get(graph_t &graph, std::vector<Object> &proposals) {
+    proposals.clear();
     int stride = 32;
     float *p_data = NULL;
     tensor_t p_tensor = NULL;
@@ -294,28 +303,9 @@ static int proposals_objects_get(graph_t &graph, std::vector<Object> &proposals)
             fprintf(stderr, "[%s] get_tensor_buffer NULL\n", __FUNCTION__);
             return -1;
         }
-        generate_proposals(stride, p_data, prob_threshold, proposals, letterbox_cols, letterbox_rows);
+        generate_proposals(stride, p_data, prob_threshold, proposals);
         stride >>= 1;
     }
-    return 0;
-}
-
-static int get_letterbox_scale_ratio(const Size2i &image_size, Size2i &tmp, Point2f &ratio) {
-    float scale_letterbox;
-    if ((letterbox_rows * 1.0 / image_size.height) < (letterbox_cols * 1.0 / image_size.width)) {
-        scale_letterbox = letterbox_rows * 1.0 / image_size.height;
-    }
-    else {
-        scale_letterbox = letterbox_cols * 1.0 / image_size.width;
-    }
-    tmp.width = int(scale_letterbox * image_size.width);
-    tmp.height = int(scale_letterbox * image_size.height);
-
-    ratio.x = (float)image_size.height / tmp.height;
-    ratio.y = (float)image_size.width / tmp.width;
-
-    tmp.height = (letterbox_rows - tmp.height) / 2;
-    tmp.width = (letterbox_cols - tmp.width) / 2;
     return 0;
 }
 
@@ -327,6 +317,18 @@ static std::vector<Object> proposals_objects_filter(const std::vector<Object> &p
     int count = picked.size();
     fprintf(stdout, "%d objects are picked\n", count);
 
+    // post process: scale and offset
+    float lb_scale;
+    if ((lb.h * 1.0 / image_size.height) < (lb.w * 1.0 / image_size.width)) {
+        lb_scale = lb.h * 1.0 / image_size.height;
+    }
+    else {
+        lb_scale = lb.w * 1.0 / image_size.width;
+    }
+    Size2i off = { int(lb_scale * image_size.width), int(lb_scale * image_size.height) };
+    off.width = (lb.w - off.width) / 2;
+    off.height = (lb.h - off.height) / 2;
+
     std::vector<Object> objects(count);
     for (int i = 0; i < count; i++) {
         objects[i] = proposals[picked[i]];
@@ -336,10 +338,11 @@ static std::vector<Object> proposals_objects_filter(const std::vector<Object> &p
         float x1 = (objects[i].rect.x + objects[i].rect.width);
         float y1 = (objects[i].rect.y + objects[i].rect.height);
 
-        x0 = (x0 - scale_tmp.width) * scale_ratio.x;
-        y0 = (y0 - scale_tmp.height) * scale_ratio.y;
-        x1 = (x1 - scale_tmp.width) * scale_ratio.x;
-        y1 = (y1 - scale_tmp.height) * scale_ratio.y;
+        // post process: from letter box to input image
+        x0 = (x0 - off.width) / lb_scale;
+        y0 = (y0 - off.height) / lb_scale;
+        x1 = (x1 - off.width) / lb_scale;
+        y1 = (y1 - off.height) / lb_scale;
 
         x0 = std::max(std::min(x0, (float)(image_size.width - 1)), 0.f);
         y0 = std::max(std::min(y0, (float)(image_size.height - 1)), 0.f);
@@ -356,23 +359,37 @@ static std::vector<Object> proposals_objects_filter(const std::vector<Object> &p
 }
 
 static void show_usage() {
-    fprintf(stdout, "[Usage]:  [-h]\n");
-    fprintf(stdout, "    [-m model_file] [-i image_file] [-r repeat_count] [-t thread_count]\n");
+    fprintf(stdout, "[Usage]:  [-u]\n");
+    fprintf(stdout, "    [-m model_file] [-i input_file] [-o output_file] [-n device_name] [-c target_class]\n");
+    fprintf(stdout, "    [-w width] [-h height] [-f max_frame] [-r repeat_count] [-t thread_count]\n");
+    fprintf(stdout, "[Examples]:\n");
+    fprintf(stdout, "   tm_yolov5s_ -m yolov5s.v5.tmfile -i /Dataset/imilab_640x360x3_bgr_catdog.rgb24 -o imilab_640x360x3_bgr_catdog.rgb24 -c 0 -f 200\n");
+    fprintf(stdout, "   tm_yolov5s_ -m yolov5s.v5.tmfile -i /Dataset/imilab_640x360x3_bgr_human1.rgb24 -o imilab_640x360x3_bgr_human1.rgb24 -c 0 -f 100\n");
+    fprintf(stdout, "   tm_yolov5s_ -m yolov5s.v5.tmfile -i /Dataset/imilab_640x360x3_bgr_human2.rgb24 -o imilab_640x360x3_bgr_human2.rgb24 -c 0 -f 500\n");
+    fprintf(stdout, "   tm_yolov5s_ -m yolov5s.v5.tmfile -i /Dataset/imilab_960x512x3_bgr.rgb24 -o imilab_960x512x3_bgr.rgb24 -c 0 -f 200\n");
 }
 
 int main(int argc, char* argv[]) {
-    const char *model_file = nullptr;
-    const char *image_file = nullptr;
     int repeat_count = 1;
     int num_thread = 1;
+    int target_class = -1;
 
-    int img_c = 3;
-    const float mean[3] = { 0, 0, 0 };
-    const float scale[3] = { 0.003921, 0.003921, 0.003921 };
+    const char *model_file = nullptr;
+    const char *image_file = nullptr;
+    const char *output_file = "output.rgb";
+    const char *device_name = "";
+    image input = make_empty_image(640, 360, 3);
 
-    int res;
-    while ((res = getopt(argc, argv, "m:i:r:t:h:")) != -1) {
+    int res, frame = 1, fc = 0;
+    while ((res = getopt(argc, argv, "c:m:i:r:t:w:h:n:o:f:u")) != -1) {
         switch (res) {
+        case 'c':
+            target_class = atoi(optarg);
+            if (target_class < 0 || coco_class_num <= target_class) {
+                // reset all invalid argument as -1
+                target_class = -1;
+            }
+            break;
         case 'm':
             model_file = optarg;
             break;
@@ -385,7 +402,22 @@ int main(int argc, char* argv[]) {
         case 't':
             num_thread = std::strtoul(optarg, nullptr, 10);
             break;
+        case 'n':
+            device_name = optarg;
+            break;
+        case 'w':
+            input.w = atoi(optarg);
+            break;
         case 'h':
+            input.h = atoi(optarg);
+            break;
+        case 'o':
+            output_file = optarg;
+            break;
+        case 'f':
+            frame = atoi(optarg);
+            break;
+        case 'u':
             show_usage();
             return 0;
         default:
@@ -402,14 +434,6 @@ int main(int argc, char* argv[]) {
     if (!check_file_exist(model_file) || !check_file_exist(image_file)) {
         return -1;
     }
-
-    cv::Mat img = cv::imread(image_file, 1);
-    if (img.empty()) {
-        fprintf(stderr, "cv::imread %s failed\n", image_file);
-        return -1;
-    }
-    Size2i image_size = { img.cols, img.rows };
-    get_letterbox_scale_ratio(image_size, scale_tmp, scale_ratio);
 
     /* set runtime options */
     struct options opt;
@@ -433,10 +457,8 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    int img_size = letterbox_rows * letterbox_cols * img_c;
     /* set the input shape to initial the graph, and pre-run graph to infer shape */
-    int dims[] = { 1, 12, int(letterbox_rows / 2), int(letterbox_cols / 2) };
-    float *input_data = (float *)malloc(img_size * sizeof(float));
+    int dims[] = { 1, 12, lb.h / 2, lb.w / 2 };
 
     tensor_t input_tensor = get_graph_input_tensor(graph, 0, 0);
     if (nullptr == input_tensor) {
@@ -449,8 +471,9 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
+    int img_size = lb.c * lb.h * lb.w, bgr = 0;
     /* set the data mem to input tensor */
-    if (set_tensor_buffer(input_tensor, input_data, img_size * 4) < 0) {
+    if (set_tensor_buffer(input_tensor, lb.data, img_size * sizeof(float)) < 0) {
         fprintf(stderr, "[%s] Set input tensor buffer failed\n", __FUNCTION__);
         return -1;
     }
@@ -464,25 +487,84 @@ int main(int argc, char* argv[]) {
     std::vector<Object> proposals;
     std::vector<Object> objects;
 
+#ifdef USE_OPENCV
+    cv::Mat img = cv::imread(image_file, 1);
+    if (img.empty()) {
+        fprintf(stderr, "[%s] cv::imread %s failed\n", __FUNCTION__, image_file);
+        return -1;
+    }
+    Size2i image_size = { img.cols, img.rows };
+#else // !USE_OPENCV
+    FILE *fout = output_file ? fopen(output_file, "wb") : NULL;
+    FILE *fp = fopen(image_file, "rb");
+
+    // load raw data(non-planar)
+    if (strstr(image_file, "bgra")) input.c = 4, bgr = 1;
+    else if (strstr(image_file, "bgr")) input.c = 3, bgr = 1;
+    else if (strstr(image_file, "rgba")) input.c = 4, bgr = 0;
+    else if (strstr(image_file, "rgb")) input.c = 3, bgr = 0;
+    else {
+        fprintf(stderr, "[%s] unknown test data format!\n", __FUNCTION__);
+        goto exit;
+    }
+    input.data = (float *)calloc(sizeof(float), input.c * input.w * input.h);
+#endif // USE_OPENCV
+
+read_data:
     /* prepare process input data, set the data mem to input tensor */
-    get_input_data_focus(image_file, input_data, letterbox_rows, letterbox_cols, mean, scale);
+#ifdef USE_OPENCV
+    get_input_data_focus(image_file, lb.data);
+#else // !USE_OPENCV
+    if (1 != (ret = get_input_data_yolov5(fp, lb, bgr, input, cov))) {
+        fprintf(stderr, "%s\n", ret ? "get_input_data error!" : "read input data fin");
+        goto exit;
+    }
+    fc++;
+#endif // USE_OPENCV
 
     /* run graph */
     if (imi_utils_tm_run_graph(graph, repeat_count) < 0) {
-        ;//goto exit;
+        goto exit;
     }
 
     /* process the detection result */
     if (proposals_objects_get(graph, proposals) < 0) {
-        ;//goto exit;
+        goto exit;
     }
 
     // sort all proposals by score from highest to lowest
     qsort_descent_inplace(proposals);
     // filter objects
-    objects = proposals_objects_filter(proposals, image_size);
+    objects = proposals_objects_filter(proposals, Size2i(input.w, input.h));
+
     // draw objects
-    draw_objects(objects, img);
+#ifdef USE_OPENCV
+    draw_objects(objects, img, target_class);
+exit:
+#else // !USE_OPENCV
+    draw_objects(objects, input, target_class);
+
+    // save result to output
+    if (fout) {
+        unsigned char uc[3];
+        int img_size_ = input.w * input.h;
+        for (int i = 0; i < img_size_; i++) {
+            uc[0] = (unsigned char)(*(input.data + i + 2 * img_size_)); // b
+            uc[1] = (unsigned char)(*(input.data + i + 1 * img_size_)); // g
+            uc[2] = (unsigned char)(*(input.data + i + 0 * img_size_)); // r
+            fwrite(uc, sizeof(unsigned char), 3, fout);
+        }
+    }
+
+    if (fc < frame) goto read_data;
+
+exit:
+    fclose(fp);
+    if (fout) fclose(fout);
+    free(input.data);
+    printf("total frame: %d\n", fc);
+#endif // USE_OPENCV
+    free(lb.data);
 
     /* release tengine */
     postrun_graph(graph);
