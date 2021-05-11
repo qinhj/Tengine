@@ -129,7 +129,7 @@ static void generate_proposals(int stride, const float *feat, float prob_thresho
                     obj.rect.height = y1 - y0;
                     obj.label = class_index;
                     obj.prob = final_score;
-                    objects.push_back(obj);
+                    /*if (0 == class_index)*/ objects.push_back(obj);
                 }
             }
         }
@@ -329,6 +329,7 @@ static std::vector<Object> proposals_objects_filter(const std::vector<Object> &p
     Size2i off = { int(lb_scale * image_size.width), int(lb_scale * image_size.height) };
     off.width = (lb.w - off.width) / 2;
     off.height = (lb.h - off.height) / 2;
+    log_debug("[%s] lb scale: %3.4f, off: (%d, %d)\n", __FUNCTION__, lb_scale, off.width, off.height);
 
     std::vector<Object> objects(count);
     for (int i = 0; i < count; i++) {
@@ -494,7 +495,7 @@ int main(int argc, char* argv[]) {
         fprintf(stderr, "[%s] cv::imread %s failed\n", __FUNCTION__, image_file);
         return -1;
     }
-    Size2i image_size = { img.cols, img.rows };
+    input.w = img.cols, input.h = img.rows;
 #else // !USE_OPENCV
     FILE *fout = output_file ? fopen(output_file, "wb") : NULL;
     FILE *fp = fopen(image_file, "rb");
