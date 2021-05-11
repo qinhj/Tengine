@@ -25,6 +25,7 @@
  */
 
 //#define USE_OPENCV
+//#define _DEBUG
 
 /* std c includes */
 #include <stdlib.h>
@@ -58,8 +59,8 @@ struct Object {
 };
 
 // postprocess threshold
-static const float prob_threshold = 0.5f; // 0.25f;
-static const float nms_threshold = 0.45f;
+static const float prob_threshold = 0.6f; // 0.25f
+static const float nms_threshold = 0.40f; // 0.45f
 
 // allow none square letterbox, set default letterbox size
 static image lb = make_image(640, 640, 3);

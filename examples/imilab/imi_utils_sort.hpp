@@ -24,25 +24,28 @@ void nms_sorted_bboxes(const std::vector<_Tp>& objects, std::vector<int>& picked
 
     std::vector<float> areas(n);
     for (int i = 0; i < n; i++) {
-        areas[i] = objects[i].rect.area();
-        log_debug("[%s] object[%d] x: %.3f, y: %.3f, w: %.3f, h: %.3f\n", __FUNCTION__, i,
-            objects[i].rect.x, objects[i].rect.y, objects[i].rect.width, objects[i].rect.height);
+        const _Tp &obj = objects[i];
+        areas[i] = obj.rect.area();
+        log_debug("[%s] object[%d] class[%d] (%.3f, %.3f), w: %.3f, h: %.3f\n", __FUNCTION__,
+            i, obj.label, obj.rect.x, obj.rect.y, obj.rect.width, obj.rect.height);
     }
 
     for (int i = 0; i < n; i++) {
         const _Tp &a = objects[i];
 
         int keep = 1;
-        for (int j = 0; j < (int)picked.size(); j++) {
+        for (int j = 0; j < (int)picked.size() && keep; j++) {
             const _Tp &b = objects[picked[j]];
 
             // intersection over union
             float inter_area = (a.rect & b.rect).area();
             float union_area = areas[i] + areas[picked[j]] - inter_area;
-            log_debug("[%s] IOU(%d, %d) = %.3f / %.3f\n", __FUNCTION__, i, j, inter_area, union_area);
+            float iou = inter_area / union_area;
+            log_debug("[%s] IOU(%d, %d)=%.3f/%.3f=%.3f\n", __FUNCTION__, i, j, inter_area, union_area, iou);
             // float IoU = inter_area / union_area
-            if (inter_area / union_area > nms_threshold)
+            if (iou > nms_threshold) {
                 keep = 0;
+            }
         }
 
         if (keep) {
