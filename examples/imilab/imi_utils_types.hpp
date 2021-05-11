@@ -7,8 +7,17 @@
 #ifndef __IMI_UTILS_TYPES_HPP__
 #define __IMI_UTILS_TYPES_HPP__
 
+/* std c includes */
 #include <stdint.h> // for: uint64_t
 #include <assert.h> // for: assert
+/* std c++ includes */
+#include <algorithm>// for: std::numeric_limits
+
+#ifdef _DEBUG
+#define CV_DbgAssert    assert
+#else // !_DEBUG
+#define CV_DbgAssert(...)
+#endif // _DEBUG
 
 #if defined _MSC_VER || defined __BORLANDC__
    typedef __int64 int64;
@@ -399,10 +408,8 @@ Size_<_Tp> Rect_<_Tp>::size() const {
 template<typename _Tp> inline
 _Tp Rect_<_Tp>::area() const {
     const _Tp result = width * height;
-#ifdef _DEBUG
-    /*CV_DbgAssert*/assert(!std::numeric_limits<_Tp>::is_integer
+    CV_DbgAssert(!std::numeric_limits<_Tp>::is_integer
         || width == 0 || result / width == height); // make sure the result fits in the return value
-#endif // _DEBUG
     return result;
 }
 

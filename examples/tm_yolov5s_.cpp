@@ -31,8 +31,6 @@
 #include <stdlib.h>
 /* std c++ includes */
 #include <vector>
-#include <algorithm>
-#include <cmath>
 /* imilab includes */
 #include "imilab/imi_utils_elog.h"
 #ifdef USE_OPENCV
