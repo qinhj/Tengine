@@ -133,7 +133,10 @@ static void generate_proposals(int stride, const float *feat, float prob_thresho
                     obj.rect.height = y1 - y0;
                     obj.label = class_index;
                     obj.prob = final_score;
-                    /*if (0 == class_index)*/ objects.push_back(obj);
+                    /*if (0 == class_index)*/ {
+                        objects.push_back(obj);
+                        //log_debug("[%s] stride: %d, push back: %d\n", __FUNCTION__, stride, class_index);
+                    }
                 }
             }
         }
@@ -293,22 +296,11 @@ static int draw_objects(const std::vector<Object>& objects, image &img, int cls)
 // 0: 1, 3, 20, 20, 85
 // 1: 1, 3, 40, 40, 85
 // 2: 1, 3, 80, 80, 85
-static int proposals_objects_get(graph_t &graph, std::vector<Object> &proposals) {
+static int proposals_objects_get(graph_t &graph, tm_tensor_output_t pt, std::vector<Object> &proposals) {
     proposals.clear();
     int stride = 32;
-    float *p_data = NULL;
-    tensor_t p_tensor = NULL;
-    for (int i = 3; 0 < i; i--) {
-        // ==================================================================
-        // ========== This part is to get tensor information ================
-        // ==================================================================
-        p_tensor = get_graph_output_tensor(graph, i - 1, 0);
-        p_data = p_tensor ? (float *)get_tensor_buffer(p_tensor) : NULL;
-        if (NULL == p_data) {
-            fprintf(stderr, "[%s] get_tensor_buffer NULL\n", __FUNCTION__);
-            return -1;
-        }
-        generate_proposals(stride, p_data, prob_threshold, proposals);
+    for (int i = 2; -1 < i; i--) {
+        generate_proposals(stride, (float *)pt[i].p_data, prob_threshold, proposals);
         stride >>= 1;
     }
     return 0;
@@ -494,6 +486,14 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
+    /* get output tensor info */
+    int yolov5s_output_node_count = 3;
+    tm_tensor_output_s tensor[yolov5s_output_node_count];
+    if (imi_utils_tm_get_graph_tensor(graph, tensor, yolov5s_output_node_count, 0) < 0) {
+        fprintf(stderr, "[%s] get output tensor info failed\n", __FUNCTION__);
+        return -1;
+    }
+
     std::vector<Object> proposals;
     std::vector<Object> objects;
 
@@ -538,7 +538,7 @@ read_data:
     }
 
     /* process the detection result */
-    if (proposals_objects_get(graph, proposals) < 0) {
+    if (proposals_objects_get(graph, tensor, proposals) < 0) {
         goto exit;
     }
 

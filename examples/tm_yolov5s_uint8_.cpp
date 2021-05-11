@@ -24,6 +24,7 @@
  * Author: qinhongjie@imilab.com
  */
 
+//#define CROSS_VALIDATION
 //#define USE_OPENCV
 //#define _DEBUG
 
@@ -60,7 +61,7 @@ struct Object {
 static int class_num = coco_class_num;
 static const char **class_names = coco_class_names;
 // postprocess threshold
-static const float prob_threshold = 0.6f; // 0.25f
+static const float prob_threshold = 0.4f; // 0.25f
 static const float nms_threshold = 0.40f; // 0.45f
 
 // allow none square letterbox, set default letterbox size
@@ -133,7 +134,10 @@ static void generate_proposals(int stride, const float *feat, float prob_thresho
                     obj.rect.height = y1 - y0;
                     obj.label = class_index;
                     obj.prob = final_score;
-                    /*if (0 == class_index)*/ objects.push_back(obj);
+                    /*if (0 == class_index)*/ {
+                        objects.push_back(obj);
+                        //log_debug("[%s] stride: %d, push back: %d\n", __FUNCTION__, stride, class_index);
+                    }
                 }
             }
         }
@@ -296,28 +300,14 @@ static int draw_objects(const std::vector<Object>& objects, image &img, int cls)
 // 0: 1, 3, 20, 20, 85
 // 1: 1, 3, 40, 40, 85
 // 2: 1, 3, 80, 80, 85
-static int proposals_objects_get(graph_t &graph, std::vector<Object> &proposals) {
+static int proposals_objects_get(graph_t &graph, tm_tensor_output_t pt, std::vector<Object> &proposals) {
     proposals.clear();
     int stride = 32;
-    float *p_data = NULL;
-    tensor_t p_tensor = NULL;
-    for (int i = 3; 0 < i; i--) {
-        // ==================================================================
-        // ========== This part is to get tensor information ================
-        // ==================================================================
-        p_tensor = get_graph_output_tensor(graph, i - 1, 0);
-
-        /* dequant output data */
-        float p_scale = 0.f;
-        int p_zero_point = 0;
-
-        get_tensor_quant_param(p_tensor, &p_scale, &p_zero_point, 1);
-        int p_count = get_tensor_buffer_size(p_tensor) / sizeof(uint8_t);
-
-        uint8_t *p_data_u8 = (uint8_t *)get_tensor_buffer(p_tensor);
-        float *p_data = (float *)calloc(p_count, sizeof(float));
-        for (int c = 0; c < p_count; c++) {
-            p_data[c] = ((float)p_data_u8[c] - (float)p_zero_point) * p_scale;
+    for (int i = 2; -1 < i; i--) {
+        uint8_t *p_data_u8 = (uint8_t *)pt[i].p_data;
+        float *p_data = (float *)calloc(pt[i].p_count, sizeof(float));
+        for (int c = 0; c < pt[i].p_count; c++) {
+            p_data[c] = ((float)p_data_u8[c] - (float)pt[i].p_zero_point) * pt[i].p_scale;
         }
 
         generate_proposals(stride, p_data, prob_threshold, proposals);
@@ -508,6 +498,14 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
+    /* get output tensor info */
+    int yolov5s_output_node_count = 3;
+    tm_tensor_output_s tensor[yolov5s_output_node_count];
+    if (imi_utils_tm_get_graph_tensor(graph, tensor, yolov5s_output_node_count, 1) < 0) {
+        fprintf(stderr, "[%s] get output tensor info failed\n", __FUNCTION__);
+        return -1;
+    }
+
     float input_scale = 0.f;
     int input_zero_point = 0;
     get_tensor_quant_param(input_tensor, &input_scale, &input_zero_point, 1);
@@ -542,12 +540,30 @@ read_data:
     /* prepare process input data, set the data mem to input tensor */
 #ifdef USE_OPENCV
     get_input_data_focus(image_file, (uint8_t *)(lb.data), input_scale, input_zero_point);
+
+#ifdef CROSS_VALIDATION
+    {
+        FILE *fp1 = fopen("temp_.dat", "wb");
+        fwrite(lb.data, 1, img_size, fp1);
+        fclose(fp1);
+    }
+#endif // CROSS_VALIDATION
+
 #else // !USE_OPENCV
     if (1 != (ret = get_input_data_yolov5_uint8(fp, lb, bgr, input, cov, input_scale, input_zero_point))) {
         fprintf(stderr, "%s\n", ret ? "get_input_data error!" : "read input data fin");
         goto exit;
     }
     fc++;
+
+#ifdef CROSS_VALIDATION
+    {
+        FILE *fp1 = fopen("temp_.dat", "rb");
+        fread(lb.data, 1, img_size, fp1);
+        fclose(fp1);
+    }
+#endif // CROSS_VALIDATION
+
 #endif // USE_OPENCV
 
     /* run graph */
@@ -556,7 +572,7 @@ read_data:
     }
 
     /* process the detection result */
-    if (proposals_objects_get(graph, proposals) < 0) {
+    if (proposals_objects_get(graph, tensor, proposals) < 0) {
         goto exit;
     }
 
