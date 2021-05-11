@@ -9,7 +9,6 @@
 
 #include <stdio.h>  // for: printf
 #include <stdlib.h> // for: calloc
-#include <assert.h> // for: assert
 /* tengine includes */
 #include "tengine_operations.h" // for: image
 
@@ -82,11 +81,22 @@ static int get_input_data_yolov5(FILE *fp, image &lb, char bgr, image &img, cons
         lb.data = (float *)calloc(sizeof(float), lb_size);
     }
 
-    // todo: optimize
-    assert(640 == lb.w); assert(640 == lb.h);
+    if (640 != lb.w || 640 != lb.h) {
+        fprintf(stderr, "[%s] yolov5 letter box size must be: 640x640!\n", __FUNCTION__);
+        exit(0);
+    }
+    // todo: optimize/resize input image
+    if ((img.w <= img.h && 640 != img.h) ||
+        (img.h <= img.w && 640 != img.w)) {
+        fprintf(stderr, "[%s] input size (%d, %d) not match letter box size (%d, %d)!\n", __FUNCTION__, img.w, img.h, lb.w, lb.h);
+        fprintf(stderr, "[%s] please try to resize the input image first!\n", __FUNCTION__);
+        exit(0);
+    }
+
     static float *data = (float *)calloc(sizeof(float), lb_size);
     //printf("mean:  %.3f, %.3f, %.3f\n", cov[0][0], cov[0][1], cov[0][2]);
     //printf("scale: %.3f, %.3f, %.3f\n", cov[1][0], cov[1][1], cov[1][2]);
+
 
     int idx;
     // init letter box
