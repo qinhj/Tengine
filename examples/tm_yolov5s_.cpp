@@ -31,6 +31,7 @@
 #include <stdlib.h>
 /* std c++ includes */
 #include <vector>
+#include <cmath>    // for: exp
 /* imilab includes */
 #include "imilab/imi_utils_elog.h"
 #ifdef USE_OPENCV
@@ -56,6 +57,8 @@ struct Object {
     float prob;
 };
 
+static int class_num = coco_class_num;
+static const char **class_names = coco_class_names;
 // postprocess threshold
 static const float prob_threshold = 0.6f; // 0.25f
 static const float nms_threshold = 0.40f; // 0.45f
@@ -72,13 +75,14 @@ static inline float sigmoid(float x) {
 }
 
 // todo: optimize
+// @param:  feat[in]    anchor results: box.x, box.y, box.w, box.h, box.score, {cls.score} x cls.num
 static void generate_proposals(int stride, const float *feat, float prob_threshold, std::vector<Object>& objects) {
     static float anchors[18] = { 10, 13, 16, 30, 33, 23, 30, 61, 62, 45, 59, 119, 116, 90, 156, 198, 373, 326 };
 
+    int cls_num = class_num; // 80
+    int out_num = 4 + 1 + cls_num;// rent, score, cls_num
+
     int anchor_num = 3;
-    int feat_w = lb.w / stride;
-    int feat_h = lb.h / stride;
-    int cls_num = coco_class_num; // 80
     int anchor_group;
     if (stride == 8)
         anchor_group = 1;
@@ -87,24 +91,26 @@ static void generate_proposals(int stride, const float *feat, float prob_thresho
     if (stride == 32)
         anchor_group = 3;
 
-    for (int h = 0; h <= feat_h - 1; h++) {
-        for (int w = 0; w <= feat_w - 1; w++) {
-            for (int a = 0; a <= anchor_num - 1; a++) {
+    int feat_w = lb.w / stride;
+    int feat_h = lb.h / stride;
+    for (int h = 0; h < feat_h; h++) {
+        for (int w = 0; w < feat_w; w++) {
+            for (int a = 0; a < anchor_num; a++) {
+                int loc_idx = a * feat_w * feat_h * out_num + h * feat_w * out_num + w * out_num;
                 // process cls score
                 int class_index = 0;
                 float class_score = -FLT_MAX;
                 for (int s = 0; s <= cls_num - 1; s++) {
-                    float score = feat[a * feat_w * feat_h * 85 + h * feat_w * 85 + w * 85 + s + 5];
+                    float score = feat[loc_idx + 5 + s];
                     if (score > class_score) {
                         class_index = s;
                         class_score = score;
                     }
                 }
                 // process box score
-                float box_score = feat[a * feat_w * feat_h * 85 + (h * feat_w) * 85 + w * 85 + 4];
+                float box_score = feat[loc_idx + 4];
                 float final_score = sigmoid(box_score) * sigmoid(class_score);
                 if (final_score >= prob_threshold) {
-                    int loc_idx = a * feat_h * feat_w * 85 + h * feat_w * 85 + w * 85;
                     float dx = sigmoid(feat[loc_idx + 0]);
                     float dy = sigmoid(feat[loc_idx + 1]);
                     float dw = sigmoid(feat[loc_idx + 2]);
@@ -143,14 +149,14 @@ static void draw_objects(const std::vector<Object>& objects, const cv::Mat& bgr,
         const Object& obj = objects[i];
 
         fprintf(stderr, "%2d: %3.0f%%, [%4.0f, %4.0f, %4.0f, %4.0f], %s\n", obj.label, obj.prob * 100, obj.rect.x,
-            obj.rect.y, obj.rect.x + obj.rect.width, obj.rect.y + obj.rect.height, coco_class_names[obj.label]);
+            obj.rect.y, obj.rect.x + obj.rect.width, obj.rect.y + obj.rect.height, class_names[obj.label]);
 
         if (-1 != cls && obj.label != cls) continue;
 
         cv::rectangle(image, obj.rect, cv::Scalar(255, 0, 0));
 
         char text[256];
-        sprintf(text, "%s %.1f%%", coco_class_names[obj.label], obj.prob * 100);
+        sprintf(text, "%s %.1f%%", class_names[obj.label], obj.prob * 100);
 
         int baseLine = 0;
         cv::Size label_size = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
@@ -271,7 +277,7 @@ static int draw_objects(const std::vector<Object>& objects, image &img, int cls)
         const Object& obj = objects[i];
         fprintf(stdout, "[%2d]: %3.3f%%, [(%4.0f, %4.0f), (%4.0f, %4.0f)], %s\n",
             obj.label, obj.prob * 100, obj.rect.x, obj.rect.y,
-            obj.rect.x + obj.rect.width, obj.rect.y + obj.rect.height, coco_class_names[obj.label]);
+            obj.rect.x + obj.rect.width, obj.rect.y + obj.rect.height, class_names[obj.label]);
 
         if (-1 == cls || obj.label == cls) {
             draw_box(img, obj.rect.x, obj.rect.y,
@@ -360,13 +366,18 @@ static std::vector<Object> proposals_objects_filter(const std::vector<Object> &p
 
 static void show_usage() {
     fprintf(stdout, "[Usage]:  [-u]\n");
-    fprintf(stdout, "    [-m model_file] [-i input_file] [-o output_file] [-n device_name] [-c target_class]\n");
+    fprintf(stdout, "    [-m model_file] [-i input_file] [-o output_file] [-n class_number] [-c target_class]\n");
     fprintf(stdout, "    [-w width] [-h height] [-f max_frame] [-r repeat_count] [-t thread_count]\n");
     fprintf(stdout, "[Examples]:\n");
-    fprintf(stdout, "   tm_yolov5s_ -m yolov5s.v5.tmfile -i /Dataset/imilab_640x360x3_bgr_catdog.rgb24 -o imilab_640x360x3_bgr_catdog.rgb24 -c 0 -f 200\n");
+    fprintf(stdout, "   # coco 80 classes\n");
+    fprintf(stdout, "   tm_yolov5s_ -m yolov5s.v5.tmfile -i /Dataset/imilab_640x360x3_bgr_catdog.rgb24 -o imilab_640x360x3_bgr_catdog.rgb24 -f 200\n");
+    fprintf(stdout, "   # specific class of coco 80 classes(e.g. person)\n");
     fprintf(stdout, "   tm_yolov5s_ -m yolov5s.v5.tmfile -i /Dataset/imilab_640x360x3_bgr_human1.rgb24 -o imilab_640x360x3_bgr_human1.rgb24 -c 0 -f 100\n");
     fprintf(stdout, "   tm_yolov5s_ -m yolov5s.v5.tmfile -i /Dataset/imilab_640x360x3_bgr_human2.rgb24 -o imilab_640x360x3_bgr_human2.rgb24 -c 0 -f 500\n");
-    fprintf(stdout, "   tm_yolov5s_ -m yolov5s.v5.tmfile -i /Dataset/imilab_960x512x3_bgr.rgb24 -o imilab_960x512x3_bgr.rgb24 -c 0 -f 200\n");
+    fprintf(stdout, "   # single class(e.g. person)\n");
+    fprintf(stdout, "   tm_yolov5s_ -m yolov5s.tmfile -i /Dataset/imilab_640x360x3_bgr_catdog.rgb24 -o imilab_640x360x3_bgr_catdog.rgb24 -n 1 -f 200\n");
+    fprintf(stdout, "   tm_yolov5s_ -m yolov5s.tmfile -i /Dataset/imilab_640x360x3_bgr_human1.rgb24 -o imilab_640x360x3_bgr_human1.rgb24 -n 1 -f 100\n");
+    fprintf(stdout, "   tm_yolov5s_ -m yolov5s.tmfile -i /Dataset/imilab_640x360x3_bgr_human2.rgb24 -o imilab_640x360x3_bgr_human2.rgb24 -n 1 -f 500\n");
 }
 
 int main(int argc, char* argv[]) {
@@ -377,7 +388,6 @@ int main(int argc, char* argv[]) {
     const char *model_file = nullptr;
     const char *image_file = nullptr;
     const char *output_file = "output.rgb";
-    const char *device_name = "";
     image input = make_empty_image(640, 360, 3);
 
     int res, frame = 1, fc = 0;
@@ -385,7 +395,7 @@ int main(int argc, char* argv[]) {
         switch (res) {
         case 'c':
             target_class = atoi(optarg);
-            if (target_class < 0 || coco_class_num <= target_class) {
+            if (target_class < 0 || class_num <= target_class) {
                 // reset all invalid argument as -1
                 target_class = -1;
             }
@@ -403,7 +413,7 @@ int main(int argc, char* argv[]) {
             num_thread = std::strtoul(optarg, nullptr, 10);
             break;
         case 'n':
-            device_name = optarg;
+            class_num = atoi(optarg);
             break;
         case 'w':
             input.w = atoi(optarg);
