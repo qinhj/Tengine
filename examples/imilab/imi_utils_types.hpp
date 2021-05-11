@@ -243,7 +243,249 @@ typedef Rect_<float> Rect2f;
 typedef Rect_<double> Rect2d;
 typedef Rect2i Rect;
 
+/////////////////////////////////////////////////////////////////////////
+///////////////////////////// Implementation ////////////////////////////
+/////////////////////////////////////////////////////////////////////////
 
+//////////////////////////////// 2D Point ///////////////////////////////
+
+template<typename _Tp> inline
+Point_<_Tp>::Point_()
+    : x(0), y(0) {}
+
+template<typename _Tp> inline
+Point_<_Tp>::Point_(_Tp _x, _Tp _y)
+    : x(_x), y(_y) {}
+
+template<typename _Tp> inline
+Point_<_Tp>::Point_(const Point_& pt)
+    : x(pt.x), y(pt.y) {}
+
+template<typename _Tp> inline
+Point_<_Tp>::Point_(const Size_<_Tp>& sz)
+    : x(sz.width), y(sz.height) {}
+/*
+template<typename _Tp> inline
+Point_<_Tp>::Point_(const Vec<_Tp,2>& v)
+    : x(v[0]), y(v[1]) {}
+*/
+template<typename _Tp> inline
+Point_<_Tp>& Point_<_Tp>::operator = (const Point_& pt)
+{
+    x = pt.x; y = pt.y;
+    return *this;
+}
+/*
+template<typename _Tp> template<typename _Tp2> inline
+Point_<_Tp>::operator Point_<_Tp2>() const
+{
+    return Point_<_Tp2>(saturate_cast<_Tp2>(x), saturate_cast<_Tp2>(y));
+}
+
+template<typename _Tp> inline
+Point_<_Tp>::operator Vec<_Tp, 2>() const
+{
+    return Vec<_Tp, 2>(x, y);
+}
+
+template<typename _Tp> inline
+_Tp Point_<_Tp>::dot(const Point_& pt) const
+{
+    return saturate_cast<_Tp>(x*pt.x + y*pt.y);
+}
+
+template<typename _Tp> inline
+double Point_<_Tp>::ddot(const Point_& pt) const
+{
+    return (double)x*(double)(pt.x) + (double)y*(double)(pt.y);
+}
+
+template<typename _Tp> inline
+double Point_<_Tp>::cross(const Point_& pt) const
+{
+    return (double)x*pt.y - (double)y*pt.x;
+}
+
+template<typename _Tp> inline bool
+Point_<_Tp>::inside( const Rect_<_Tp>& r ) const
+{
+    return r.contains(*this);
+}
+
+
+template<typename _Tp> static inline
+Point_<_Tp>& operator += (Point_<_Tp>& a, const Point_<_Tp>& b)
+{
+    a.x += b.x;
+    a.y += b.y;
+    return a;
+}
+
+template<typename _Tp> static inline
+Point_<_Tp>& operator -= (Point_<_Tp>& a, const Point_<_Tp>& b)
+{
+    a.x -= b.x;
+    a.y -= b.y;
+    return a;
+}
+
+template<typename _Tp> static inline
+Point_<_Tp>& operator *= (Point_<_Tp>& a, int b)
+{
+    a.x = saturate_cast<_Tp>(a.x * b);
+    a.y = saturate_cast<_Tp>(a.y * b);
+    return a;
+}
+
+template<typename _Tp> static inline
+Point_<_Tp>& operator *= (Point_<_Tp>& a, float b)
+{
+    a.x = saturate_cast<_Tp>(a.x * b);
+    a.y = saturate_cast<_Tp>(a.y * b);
+    return a;
+}
+
+template<typename _Tp> static inline
+Point_<_Tp>& operator *= (Point_<_Tp>& a, double b)
+{
+    a.x = saturate_cast<_Tp>(a.x * b);
+    a.y = saturate_cast<_Tp>(a.y * b);
+    return a;
+}
+
+template<typename _Tp> static inline
+Point_<_Tp>& operator /= (Point_<_Tp>& a, int b)
+{
+    a.x = saturate_cast<_Tp>(a.x / b);
+    a.y = saturate_cast<_Tp>(a.y / b);
+    return a;
+}
+
+template<typename _Tp> static inline
+Point_<_Tp>& operator /= (Point_<_Tp>& a, float b)
+{
+    a.x = saturate_cast<_Tp>(a.x / b);
+    a.y = saturate_cast<_Tp>(a.y / b);
+    return a;
+}
+
+template<typename _Tp> static inline
+Point_<_Tp>& operator /= (Point_<_Tp>& a, double b)
+{
+    a.x = saturate_cast<_Tp>(a.x / b);
+    a.y = saturate_cast<_Tp>(a.y / b);
+    return a;
+}
+
+template<typename _Tp> static inline
+double norm(const Point_<_Tp>& pt)
+{
+    return std::sqrt((double)pt.x*pt.x + (double)pt.y*pt.y);
+}
+*/
+template<typename _Tp> static inline
+bool operator == (const Point_<_Tp>& a, const Point_<_Tp>& b)
+{
+    return a.x == b.x && a.y == b.y;
+}
+
+template<typename _Tp> static inline
+bool operator != (const Point_<_Tp>& a, const Point_<_Tp>& b)
+{
+    return a.x != b.x || a.y != b.y;
+}
+/*
+template<typename _Tp> static inline
+Point_<_Tp> operator + (const Point_<_Tp>& a, const Point_<_Tp>& b)
+{
+    return Point_<_Tp>( saturate_cast<_Tp>(a.x + b.x), saturate_cast<_Tp>(a.y + b.y) );
+}
+
+template<typename _Tp> static inline
+Point_<_Tp> operator - (const Point_<_Tp>& a, const Point_<_Tp>& b)
+{
+    return Point_<_Tp>( saturate_cast<_Tp>(a.x - b.x), saturate_cast<_Tp>(a.y - b.y) );
+}
+
+template<typename _Tp> static inline
+Point_<_Tp> operator - (const Point_<_Tp>& a)
+{
+    return Point_<_Tp>( saturate_cast<_Tp>(-a.x), saturate_cast<_Tp>(-a.y) );
+}
+
+template<typename _Tp> static inline
+Point_<_Tp> operator * (const Point_<_Tp>& a, int b)
+{
+    return Point_<_Tp>( saturate_cast<_Tp>(a.x*b), saturate_cast<_Tp>(a.y*b) );
+}
+
+template<typename _Tp> static inline
+Point_<_Tp> operator * (int a, const Point_<_Tp>& b)
+{
+    return Point_<_Tp>( saturate_cast<_Tp>(b.x*a), saturate_cast<_Tp>(b.y*a) );
+}
+
+template<typename _Tp> static inline
+Point_<_Tp> operator * (const Point_<_Tp>& a, float b)
+{
+    return Point_<_Tp>( saturate_cast<_Tp>(a.x*b), saturate_cast<_Tp>(a.y*b) );
+}
+
+template<typename _Tp> static inline
+Point_<_Tp> operator * (float a, const Point_<_Tp>& b)
+{
+    return Point_<_Tp>( saturate_cast<_Tp>(b.x*a), saturate_cast<_Tp>(b.y*a) );
+}
+
+template<typename _Tp> static inline
+Point_<_Tp> operator * (const Point_<_Tp>& a, double b)
+{
+    return Point_<_Tp>( saturate_cast<_Tp>(a.x*b), saturate_cast<_Tp>(a.y*b) );
+}
+
+template<typename _Tp> static inline
+Point_<_Tp> operator * (double a, const Point_<_Tp>& b)
+{
+    return Point_<_Tp>( saturate_cast<_Tp>(b.x*a), saturate_cast<_Tp>(b.y*a) );
+}
+
+template<typename _Tp> static inline
+Point_<_Tp> operator * (const Matx<_Tp, 2, 2>& a, const Point_<_Tp>& b)
+{
+    Matx<_Tp, 2, 1> tmp = a * Vec<_Tp,2>(b.x, b.y);
+    return Point_<_Tp>(tmp.val[0], tmp.val[1]);
+}
+
+template<typename _Tp> static inline
+Point3_<_Tp> operator * (const Matx<_Tp, 3, 3>& a, const Point_<_Tp>& b)
+{
+    Matx<_Tp, 3, 1> tmp = a * Vec<_Tp,3>(b.x, b.y, 1);
+    return Point3_<_Tp>(tmp.val[0], tmp.val[1], tmp.val[2]);
+}
+*/
+template<typename _Tp> static inline
+Point_<_Tp> operator / (const Point_<_Tp>& a, int b)
+{
+    Point_<_Tp> tmp(a);
+    tmp /= b;
+    return tmp;
+}
+
+template<typename _Tp> static inline
+Point_<_Tp> operator / (const Point_<_Tp>& a, float b)
+{
+    Point_<_Tp> tmp(a);
+    tmp /= b;
+    return tmp;
+}
+
+template<typename _Tp> static inline
+Point_<_Tp> operator / (const Point_<_Tp>& a, double b)
+{
+    Point_<_Tp> tmp(a);
+    tmp /= b;
+    return tmp;
+}
 
 ////////////////////////////////// Size /////////////////////////////////
 

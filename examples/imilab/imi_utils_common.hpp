@@ -25,4 +25,10 @@ typedef struct object_s {
     float prob;
 } Object;
 
+typedef struct face_s {
+    float prob;
+    Rect2f rect;
+    Point2f landmark[5];
+} Face2f;
+
 #endif // !__IMI_UTILS_COMMON_HPP__

@@ -4,8 +4,8 @@
 // Author:  qinhongjie@imilab.com       Date:   2021/05/12
 // ============================================================
 
-#ifndef __IMI_IMREAD_H__
-#define __IMI_IMREAD_H__
+#ifndef __IMI_UTILS_IMREAD_H__
+#define __IMI_UTILS_IMREAD_H__
 
 /* std c includes */
 #include <stdio.h>  // for: printf
@@ -123,4 +123,4 @@ static int imi_utils_load_letterbox(FILE *fp, image &img, char bgr, image &lb, c
     return rc;
 }
 
-#endif // !__IMI_IMREAD_H__
+#endif // !__IMI_UTILS_IMREAD_H__

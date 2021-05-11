@@ -37,6 +37,7 @@
  * https://opensource.org/licenses/BSD-3-Clause
  */
 
+/* std c++ includes */
 #include <vector>
 #include <string>
 
@@ -44,22 +45,11 @@
 #define NOMINMAX
 #endif
 
-#include <algorithm>
-#include <cmath>
-#include <cstdlib>
-
-#include "common.h"
-
-#include "tengine/c_api.h"
-#include "tengine_operations.h"
 /* imilab includes */
-#include "imi_imread.h" // for: get_input_data
-
-#if defined(DEBUG) // || 1
-#define log_debug(...)  printf(__VA_ARGS__)
-#else   /* !DEBUG */
-#define log_debug(...)
-#endif  /* DEBUG */
+#include "imilab/imi_utils_object.hpp"
+#include "imilab/imi_utils_visual.hpp"
+#include "imilab/imi_utils_imread.h"// for: imi_utils_load_image
+#include "imilab/imi_utils_tm.h"    // for: imi_utils_tm_run_graph
 
 #define DEFAULT_REPEAT_COUNT 1
 #define DEFAULT_THREAD_COUNT 1
@@ -68,156 +58,36 @@
 #define IMAGE_PATH  "/media/sf_Workshop/color_375x375_rgb888.bmp"
 #define OUTPUT_PATH "output.rgb"
 
-const float CONF_THRESH = 0.8f;
-const float NMS_THRESH = 0.4f;
+// postprocess threshold
+static const float prob_threshold = 0.8f;
+static const float nms_threshold = 0.40f;
 
-const char* input_name = "data";
+const char *input_name = "data";
 
-const char* bbox_name[3] = { "face_rpn_bbox_pred_stride32", "face_rpn_bbox_pred_stride16", "face_rpn_bbox_pred_stride8" };
-const char* score_name[3] = { "face_rpn_cls_prob_reshape_stride32", "face_rpn_cls_prob_reshape_stride16",
-                             "face_rpn_cls_prob_reshape_stride8" };
-const char* landmark_name[3] = { "face_rpn_landmark_pred_stride32", "face_rpn_landmark_pred_stride16",
-                                "face_rpn_landmark_pred_stride8" };
+static const char *bbox_name[] = {
+    "face_rpn_bbox_pred_stride32",
+    "face_rpn_bbox_pred_stride16",
+    "face_rpn_bbox_pred_stride8",
+};
+static const char *score_name[3] = {
+    "face_rpn_cls_prob_reshape_stride32",
+    "face_rpn_cls_prob_reshape_stride16",
+    "face_rpn_cls_prob_reshape_stride8",
+};
+static const char *landmark_name[3] = {
+    "face_rpn_landmark_pred_stride32",
+    "face_rpn_landmark_pred_stride16",
+    "face_rpn_landmark_pred_stride8",
+};
 
 const int stride[3] = { 32, 16, 8 };
 
 const float scales[3][2] = { {32.f, 16.f}, {8.f, 4.f}, {2.f, 1.f} };
 
-struct Size2i {
-    int width;
-    int height;
-};
-
-struct Point2f {
-    float x;
-    float y;
-};
-
 struct Box2f {
-    float x1;
-    float y1;
-    float x2;
-    float y2;
+    float x1, y1;
+    float x2, y2;
 };
-
-struct Rect2f {
-    float x;
-    float y;
-    float w;
-    float h;
-};
-
-struct Face2f {
-    float score;
-    Rect2f rect;
-    Point2f landmark[5];
-};
-
-void draw_target(const std::vector<Face2f>& all_pred_boxes, image img) {
-    const char* class_names[] = { "faces" };
-
-    fprintf(stdout, "detected face num: %zu\n", all_pred_boxes.size());
-    for (int b = 0; b < (int)all_pred_boxes.size(); b++) {
-        Face2f box = all_pred_boxes[b];
-
-        printf("BOX %.2f:( %g , %g ),( %g , %g )\n", box.score, box.rect.x, box.rect.y, box.rect.w, box.rect.h);
-
-        draw_box(img, box.rect.x, box.rect.y, box.rect.x + box.rect.w, box.rect.y + box.rect.h, 2, 0, 255, 0);
-
-        for (int l = 0; l < 5; l++) {
-            draw_circle(img, box.landmark[l].x, box.landmark[l].y, 1, 0, 128, 128);
-        }
-    }
-    //save_image(img, "tengine_example_out");
-}
-
-float iou(const Face2f& a, const Face2f& b) {
-    float area_a = a.rect.w * a.rect.h;
-    float area_b = b.rect.w * b.rect.h;
-
-    float xx1 = std::max(a.rect.x, b.rect.x);
-    float yy1 = std::max(a.rect.y, b.rect.y);
-    float xx2 = std::min(a.rect.x + a.rect.w, b.rect.x + b.rect.w);
-    float yy2 = std::min(a.rect.y + a.rect.h, b.rect.y + b.rect.h);
-    log_debug("IOU: (%.3f %.3f) (%.3f, %.3f)\n", xx1, yy1, xx2, yy2);
-    float w = std::max(float(0), xx2 - xx1 + 1);
-    float h = std::max(float(0), yy2 - yy1 + 1);
-    log_debug("IOU: w=%.3f h=%.3f\n", w, h);
-
-    float inter = w * h;
-    float ovr = inter / (area_a + area_b - inter);
-    return ovr;
-}
-
-void nms_sorted_boxes(const std::vector<Face2f>& face_objects, std::vector<int>& picked, float nms_threshold) {
-    picked.clear();
-
-    const int n = face_objects.size();
-    log_debug("face count(proposal): %d\n", n);
-
-    std::vector<float> areas(n);
-    for (int i = 0; i < n; i++) {
-        areas[i] = face_objects[i].rect.w * face_objects[i].rect.h;
-        log_debug("face[%d] x: %.3f, y: %.3f, w: %.3f, h: %.3f\n", i,
-            face_objects[i].rect.x, face_objects[i].rect.y,
-            face_objects[i].rect.w, face_objects[i].rect.h);
-    }
-
-    for (int i = 0; i < n; i++) {
-        const Face2f& a = face_objects[i];
-
-        int keep = 1;
-        for (int j = 0; j < (int)picked.size(); j++) {
-            const Face2f& b = face_objects[picked[j]];
-
-            // intersection over union
-            float inter_area = iou(a, b);
-            log_debug("IOU(%d, %d) = %.3f\n", i, j, inter_area);
-            if (inter_area > nms_threshold)
-                keep = 0;
-        }
-
-        if (keep) {
-            picked.push_back(i);
-            log_debug("push face(%d) into picked list\n", i);
-        }
-    }
-}
-
-void qsort_descent_inplace(std::vector<Face2f>& face_objects, const int& left, const int& right) {
-    int i = left;
-    int j = right;
-
-    float p = face_objects[(left + right) / 2].score;
-
-    while (i <= j) {
-        while (face_objects[i].score > p)
-            i++;
-
-        while (face_objects[j].score < p)
-            j--;
-
-        if (i <= j) {
-            // swap
-            std::swap(face_objects[i], face_objects[j]);
-
-            i++;
-            j--;
-        }
-    }
-
-    if (left < j)
-        qsort_descent_inplace(face_objects, left, j);
-    if (i < right)
-        qsort_descent_inplace(face_objects, i, right);
-}
-
-void qsort_descent_inplace(std::vector<Face2f>& face_objects) {
-    if (face_objects.empty())
-        return;
-
-    qsort_descent_inplace(face_objects, 0, face_objects.size() - 1);
-}
 
 std::vector<Box2f> generate_anchors(int base_size, const std::vector<float>& ratios, const std::vector<float>& scales) {
     size_t num_ratio = ratios.size();
@@ -308,8 +178,8 @@ static void generate_proposals(std::vector<Box2f>& anchors, int feat_stride, con
                     Face2f obj{};
                     obj.rect.x = x0;
                     obj.rect.y = y0;
-                    obj.rect.w = x1 - x0 + 1;
-                    obj.rect.h = y1 - y0 + 1;
+                    obj.rect.width = x1 - x0 + 1;
+                    obj.rect.height = y1 - y0 + 1;
 
                     obj.landmark[0].x = cx + (anchor_w + 1) * landmark[index + offset * 0];
                     obj.landmark[0].y = cy + (anchor_h + 1) * landmark[index + offset * 1];
@@ -322,7 +192,7 @@ static void generate_proposals(std::vector<Box2f>& anchors, int feat_stride, con
                     obj.landmark[4].x = cx + (anchor_w + 1) * landmark[index + offset * 8];
                     obj.landmark[4].y = cy + (anchor_h + 1) * landmark[index + offset * 9];
 
-                    obj.score = prob;
+                    obj.prob = prob;
                     log_debug("face score: %.3f\n", prob);
                     faces.push_back(obj);
                 }
@@ -333,117 +203,6 @@ static void generate_proposals(std::vector<Box2f>& anchors, int feat_stride, con
             anchor_y += (float)feat_stride;
         }
     }
-}
-
-int get_input_data(const char* image_file, const int& max_size, const int& target_size, std::vector<float>& image_data,
-    Size2i& ori_size, Size2i& dst_size, float& scale) {
-    image img = imread(image_file);
-
-    ori_size.width = img.w;
-    ori_size.height = img.h;
-
-    img = image_premute(img);
-
-    int im_size_min = std::min(img.h, img.w);
-    int im_size_max = std::max(img.h, img.w);
-
-    scale = float(target_size) / float(im_size_min);
-
-    if (scale * (float)im_size_max > (float)max_size)
-        scale = float(max_size) / float(im_size_max);
-
-    dst_size.width = (int)round((float)img.w * scale);
-    dst_size.height = (int)round((float)img.h * scale);
-
-    image resImg = resize_image(img, dst_size.width, dst_size.height);
-    int img_size = dst_size.height * dst_size.width * 3;
-
-    image_data.resize(img_size);
-
-    memcpy(image_data.data(), resImg.data, img_size * sizeof(float));
-
-    free_image(img);
-    free_image(resImg);
-
-    return img_size;
-}
-
-int get_input_data(const char* image_file, std::vector<float>& image_data, Size2i& size) {
-    image img = imread(image_file);
-
-    size.width = img.w;
-    size.height = img.h;
-
-    int img_size = img.w * img.h * img.c;
-
-    img = image_premute(img);
-
-    image_data.resize(img_size);
-
-    memcpy(image_data.data(), img.data, img_size * sizeof(float));
-
-    free_image(img);
-
-    return img_size;
-}
-
-// @brief:  run graph
-// @param[in/out]   graph
-// @param[in]       rc  repeat count
-// @return: error code
-static int tm_run_graph(graph_t &graph, int rc) {
-    float min_time = FLT_MAX, max_time = 0, total_time = 0.f;
-    for (int i = 0; i < rc; i++) {
-        double start = get_current_time();
-        if (run_graph(graph, 1) < 0) {
-            printf("Run graph failed\n");
-            return -1;
-        }
-        double end = get_current_time();
-
-        float cur = float(end - start);
-
-        total_time += cur;
-        min_time = std::min(min_time, cur);
-        max_time = std::max(max_time, cur);
-    }
-    printf("Repeat %d times, avg time %.2f ms, max_time %.2f ms, min_time %.2f ms\n",
-        rc, total_time / (float)rc, max_time, min_time);
-    printf("--------------------------------------\n");
-
-    return 0;
-}
-
-static std::vector<Face2f> get_face_objects(const std::vector<Face2f> &face_proposals, const Size2i &image_size) {
-    // apply nms with nms_threshold
-    std::vector<int> picked;
-    nms_sorted_boxes(face_proposals, picked, NMS_THRESH);
-
-    int face_count = picked.size();
-    log_debug("face count(picked): %d\n", face_count);
-
-    std::vector<Face2f> face_objects(face_count);
-    for (int i = 0; i < face_count; i++) {
-        face_objects[i] = face_proposals[picked[i]];
-
-        // clip to image size
-        float x0 = face_objects[i].rect.x;
-        float y0 = face_objects[i].rect.y;
-        float x1 = x0 + face_objects[i].rect.w;
-        float y1 = y0 + face_objects[i].rect.h;
-
-        x0 = std::max(std::min(x0, (float)image_size.width - 1), 0.f);
-        y0 = std::max(std::min(y0, (float)image_size.height - 1), 0.f);
-        x1 = std::max(std::min(x1, (float)image_size.width - 1), 0.f);
-        y1 = std::max(std::min(y1, (float)image_size.height - 1), 0.f);
-
-        face_objects[i].rect.x = x0;
-        face_objects[i].rect.y = y0;
-        face_objects[i].rect.w = x1 - x0;
-        face_objects[i].rect.h = y1 - y0;
-    }
-
-    return face_objects;
 }
 
 static std::vector<Face2f> get_face_proposals(graph_t &graph) {
@@ -478,22 +237,21 @@ static std::vector<Face2f> get_face_proposals(graph_t &graph) {
         current_scales[0] = scales[stride_index][0];
         current_scales[1] = scales[stride_index][1];
 
-        const float threshold = CONF_THRESH;
-
         std::vector<Box2f> anchors = generate_anchors(base_size, current_ratios, current_scales);
 
         std::vector<Face2f> face_objects;
-        generate_proposals(anchors, feat_stride, score_blob, score_blob_dims, bbox_blob, bbox_blob_dims, landmark_blob,
-            landmark_blob_dims, threshold, face_objects);
+        generate_proposals(anchors, feat_stride, score_blob, score_blob_dims, bbox_blob, bbox_blob_dims,
+            landmark_blob, landmark_blob_dims, prob_threshold, face_objects);
 
         face_proposals.insert(face_proposals.end(), face_objects.begin(), face_objects.end());
     }
     return face_proposals;
 }
 
-void show_usage() {
-    printf("[Usage]:  [-u]\n");
-    printf("    [-i input_file] [-o output_file] [-w width] [-h height] [-f max_frame] [-t num_thread] [-n device_name]\n");
+static void show_usage() {
+    fprintf(stdout, "[Usage]:  [-u]\n");
+    fprintf(stdout, "    [-m model_file] [-i input_file] [-o output_file] [-n device_name]\n");
+    fprintf(stdout, "    [-w width] [-h height] [-f max_frame] [-r repeat_count] [-t thread_count]\n");
 }
 
 int main(int argc, char* argv[]) {
@@ -545,20 +303,14 @@ int main(int argc, char* argv[]) {
     }
 
     /* check files */
-    if (model_file == nullptr) {
-        printf("Error: Tengine model file not specified!\n");
+    if (nullptr == model_file || nullptr == image_file) {
+        fprintf(stderr, "[%s] Error: Tengine model or image file not specified!\n", __FUNCTION__);
         show_usage();
         return -1;
     }
-
-    if (image_file == nullptr) {
-        printf("Error: Image file not specified!\n");
-        show_usage();
+    if (!check_file_exist(model_file) || !check_file_exist(image_file)) {
         return -1;
     }
-
-    if (!check_file_exist(model_file) || !check_file_exist(image_file))
-        return -1;
 
     /* set runtime options */
     struct options opt;
@@ -570,15 +322,15 @@ int main(int argc, char* argv[]) {
     /* inital tengine */
     int ret = init_tengine();
     if (0 != ret) {
-        printf("Init tengine-lite failed.\n");
+        fprintf(stderr, "[%s] Initial tengine failed.\n", __FUNCTION__);
         return -1;
     }
-    printf("tengine-lite library version: %s\n", get_tengine_version());
+    fprintf(stdout, "tengine-lite library version: %s\n", get_tengine_version());
 
     /* create graph, load tengine model xxx.tmfile */
     graph_t graph = create_graph(NULL, "tengine", model_file);
-    if (graph == nullptr) {
-        printf("Load model to graph failed(%d).\n", get_tengine_errno());
+    if (nullptr == graph) {
+        fprintf(stderr, "[%s] Load model to graph failed: %d\n", __FUNCTION__, get_tengine_errno());
         return -1;
     }
 
@@ -587,12 +339,12 @@ int main(int argc, char* argv[]) {
 
     tensor_t input_tensor = get_graph_tensor(graph, input_name);
     if (nullptr == input_tensor) {
-        printf("Get input tensor failed\n");
+        fprintf(stderr, "[%s] Get input tensor failed\n", __FUNCTION__);
         return -1;
     }
 
     if (0 != set_tensor_shape(input_tensor, dims, 4)) {
-        printf("Set input tensor shape failed\n");
+        fprintf(stderr, "[%s] Set input tensor shape failed\n", __FUNCTION__);
         return -1;
     }
 
@@ -600,23 +352,22 @@ int main(int argc, char* argv[]) {
     int img_size = img.w * img.h * img.c, channel = 3, bgr = 0;
     /* set the data mem to input tensor */
     if (set_tensor_buffer(input_tensor, img.data, img_size * sizeof(float)) < 0) {
-        printf("Set input tensor buffer failed\n");
+        fprintf(stderr, "[%s] Set input tensor buffer failed\n", __FUNCTION__);
         return -1;
     }
 
     /* prerun graph, set work options(num_thread, cluster, precision) */
     if (0 != prerun_graph_multithread(graph, opt)) {
-        printf("Pre-run graph failed\n");
+        fprintf(stderr, "[%s] Prerun multithread graph failed.\n", __FUNCTION__);
         return -1;
     }
 
-    std::vector<Face2f> face_proposals;
-    std::vector<Face2f> face_objects;
+    std::vector<Face2f> proposals;
+    std::vector<Face2f> objects;
 
     FILE *fout = output_file ? fopen(output_file, "wb") : NULL;
     FILE *fp = fopen(image_file, "rb");
 
-read_data:
     // benchmark:
     //  tm_retinaface -m /media/workshop/retinaface.tmfile -i /media/workshop/009962.bmp
 #if defined(TEST_IMAGE_DATA_F32C3_PLANAR)
@@ -639,16 +390,18 @@ read_data:
     else if (strstr(image_file, "rgba")) channel = 4, bgr = 0;
     else if (strstr(image_file, "rgb")) channel = 3, bgr = 0;
     else {
-        printf("unknown test data format!\n");
-        exit(0);
+        fprintf(stderr, "[%s] unknown test data format!\n", __FUNCTION__);
+        goto exit;
     }
-    if ((ret = get_input_data(fp, img, channel, bgr)) != 1) {
-        printf("%s\n", ret ? "get_input_data error!" : "get input data fin");
+
+read_data:
+    if (1 != (ret = imi_utils_load_image(fp, img, bgr, channel))) {
+        fprintf(stderr, "%s\n", ret ? "get_input_data error!" : "read input data fin");
         goto exit;
     }
 #if 0
     // check channel one by one(default: R G B)
-    _check_channel_1by1(img);
+    _imi_utils_check_channel_1by1(img);
     {
         FILE *fx = fopen("image.dat", "wb");
         fwrite(img.data, sizeof(float), img_size, fx);
@@ -659,19 +412,21 @@ read_data:
     fc++;
 
     /* run graph */
-    if (tm_run_graph(graph, repeat_count) < 0) {
+    if (imi_utils_tm_run_graph(graph, repeat_count) < 0) {
         goto exit;
     }
 
     /* process the detection result */
-    face_proposals = get_face_proposals(graph);
+    proposals = get_face_proposals(graph);
 
     // sort all proposals by score from highest to lowest
-    qsort_descent_inplace(face_proposals);
-    // get face objects
-    face_objects = get_face_objects(face_proposals, image_size);
+    imi_utils_objects_qsort(proposals);
+    // filter objects
+    objects = imi_utils_proposals_filter(proposals, Size2i(img.w, img.h), Size2i(-1, -1), nms_threshold);
 
-    draw_target(face_objects, img);
+    // draw objects
+    imi_utils_faces_draw(objects, img);
+
     // save result to output
     if (fout) {
         unsigned char uc[3];
@@ -692,6 +447,7 @@ exit:
     free(img.data);
     printf("total frame: %d\n", fc);
 
+    /* release tengine */
     postrun_graph(graph);
     destroy_graph(graph);
     release_tengine();
