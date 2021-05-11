@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="源文件\common">
+      <UniqueIdentifier>{6da0c916-6b81-4ed6-9edb-b2872cdadffb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\imilab">
+      <UniqueIdentifier>{b020e204-1110-4ead-b9b4-67c2b05026a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\common">
+      <UniqueIdentifier>{5ec2d5ef-5c26-42a4-be70-5f10b0baf66c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\examples\common\tengine_operations.c">
+      <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\examples\tm_yolov5s_uint8_.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\examples\imilab\imi_imread.h">
+      <Filter>头文件\imilab</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\examples\imilab\imi_utils_coco.h">
+      <Filter>头文件\imilab</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\examples\imilab\imi_utils_elog.h">
+      <Filter>头文件\imilab</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\examples\imilab\imi_utils_sort.hpp">
+      <Filter>头文件\imilab</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\examples\imilab\imi_utils_tm.h">
+      <Filter>头文件\imilab</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\examples\imilab\imi_utils_types.hpp">
+      <Filter>头文件\imilab</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\examples\common\common.h">
+      <Filter>头文件\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\examples\common\msc_getopt.h">
+      <Filter>头文件\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\examples\common\stb_image.h">
+      <Filter>头文件\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\examples\common\stb_image_write.h">
+      <Filter>头文件\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\examples\common\tengine_operations.h">
+      <Filter>头文件\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\examples\common\test_nnie_all.hpp">
+      <Filter>头文件\common</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
