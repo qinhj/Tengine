@@ -144,12 +144,15 @@
     <ClInclude Include="..\..\examples\common\stb_image_write.h" />
     <ClInclude Include="..\..\examples\common\tengine_operations.h" />
     <ClInclude Include="..\..\examples\common\test_nnie_all.hpp" />
-    <ClInclude Include="..\..\examples\imilab\imi_imread.h" />
     <ClInclude Include="..\..\examples\imilab\imi_utils_coco.h" />
+    <ClInclude Include="..\..\examples\imilab\imi_utils_common.hpp" />
     <ClInclude Include="..\..\examples\imilab\imi_utils_elog.h" />
-    <ClInclude Include="..\..\examples\imilab\imi_utils_sort.hpp" />
+    <ClInclude Include="..\..\examples\imilab\imi_utils_imread.h" />
+    <ClInclude Include="..\..\examples\imilab\imi_utils_object.hpp" />
     <ClInclude Include="..\..\examples\imilab\imi_utils_tm.h" />
     <ClInclude Include="..\..\examples\imilab\imi_utils_types.hpp" />
+    <ClInclude Include="..\..\examples\imilab\imi_utils_visual.hpp" />
+    <ClInclude Include="..\..\examples\imilab\imi_utils_yolov5.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

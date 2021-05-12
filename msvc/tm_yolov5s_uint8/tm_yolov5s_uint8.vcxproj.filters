@@ -32,24 +32,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\examples\imilab\imi_imread.h">
-      <Filter>头文件\imilab</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\examples\imilab\imi_utils_coco.h">
-      <Filter>头文件\imilab</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\examples\imilab\imi_utils_elog.h">
-      <Filter>头文件\imilab</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\examples\imilab\imi_utils_sort.hpp">
-      <Filter>头文件\imilab</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\examples\imilab\imi_utils_tm.h">
-      <Filter>头文件\imilab</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\examples\imilab\imi_utils_types.hpp">
-      <Filter>头文件\imilab</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\examples\common\common.h">
       <Filter>头文件\common</Filter>
     </ClInclude>
@@ -67,6 +49,33 @@
     </ClInclude>
     <ClInclude Include="..\..\examples\common\test_nnie_all.hpp">
       <Filter>头文件\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\examples\imilab\imi_utils_coco.h">
+      <Filter>头文件\imilab</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\examples\imilab\imi_utils_common.hpp">
+      <Filter>头文件\imilab</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\examples\imilab\imi_utils_elog.h">
+      <Filter>头文件\imilab</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\examples\imilab\imi_utils_imread.h">
+      <Filter>头文件\imilab</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\examples\imilab\imi_utils_object.hpp">
+      <Filter>头文件\imilab</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\examples\imilab\imi_utils_tm.h">
+      <Filter>头文件\imilab</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\examples\imilab\imi_utils_types.hpp">
+      <Filter>头文件\imilab</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\examples\imilab\imi_utils_visual.hpp">
+      <Filter>头文件\imilab</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\examples\imilab\imi_utils_yolov5.hpp">
+      <Filter>头文件\imilab</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
