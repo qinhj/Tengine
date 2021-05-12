@@ -7,6 +7,8 @@
 #ifndef __IMI_UTILS_OBJECT_HPP__
 #define __IMI_UTILS_OBJECT_HPP__
 
+/* std c includes */
+#include <stdio.h>  // for: stdout
 /* std c++ includes */
 #include <vector>
 /* imilab includes */
@@ -110,7 +112,7 @@ std::vector<_Tp> imi_utils_proposals_filter(const std::vector<_Tp> &proposals,
     // post process: scale and offset for letter box
     Size2i lb_offset;
     float lb_scale = -1;
-    if (!letter_box.empty()) {
+    if (0 < letter_box.width && 0 < letter_box.height) {
         float scale_w = letter_box.width * 1.0 / image_size.width;
         float scale_h = letter_box.height * 1.0 / image_size.height;
         lb_scale = scale_h < scale_w ? scale_h : scale_w;
@@ -131,11 +133,11 @@ std::vector<_Tp> imi_utils_proposals_filter(const std::vector<_Tp> &proposals,
         float y1 = (objects[i].rect.y + objects[i].rect.height);
 
         // post process: from letter box to input image
-        if (!letter_box.empty()) {
-            x0 = (x0 - letter_box.width) / lb_scale;
-            y0 = (y0 - letter_box.height) / lb_scale;
-            x1 = (x1 - letter_box.width) / lb_scale;
-            y1 = (y1 - letter_box.height) / lb_scale;
+        if (0 < letter_box.width && 0 < letter_box.height) {
+            x0 = (x0 - lb_offset.width) / lb_scale;
+            y0 = (y0 - lb_offset.height) / lb_scale;
+            x1 = (x1 - lb_offset.width) / lb_scale;
+            y1 = (y1 - lb_offset.height) / lb_scale;
         }
 
         x0 = std::max(std::min(x0, (float)(image_size.width - 1)), 0.f);

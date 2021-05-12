@@ -105,41 +105,47 @@ static int imi_utils_yolov5_load_data(FILE *fp, image &img, char bgr, image &lb,
     float *swap = lb.data;
     lb.data = data;
     // load image to letter box
-    imi_utils_load_letterbox(fp, img, bgr, lb, cov);
+    int rc = imi_utils_load_letterbox(fp, img, bgr, lb, cov);
+    if (1 != rc) {
+        free(data);
+        return rc;
+    }
     lb.data = swap;
 
     // todo: optimize
     if (input_scale < 0) {
-        return imi_utils_yolov5_focus_data(data, lb);
+        return (imi_utils_yolov5_focus_data(data, lb), rc);
     }
     else {
-        return imi_utils_yolov5_focus_data(data, lb, input_scale, zero_point);
+        return (imi_utils_yolov5_focus_data(data, lb, input_scale, zero_point), rc);
     }
 }
 
+/* std c includes */
+#include <float.h>  // for: FLT_MAX
+/* std c++ includes */
+#include <cmath>    // for: exp
+/* imilab includes */
 #include "imi_utils_coco.h"
 #include "imi_utils_object.hpp"
 
+static __inline float sigmoid(float x) {
+    return static_cast<float>(1.f / (1.f + exp(-x)));
+}
+
 // todo: optimize
 // @param:  feat[in] anchor results: box.x, box.y, box.w, box.h, box.score, {cls.score} x cls.num
-static void imi_utils_yolov5_proposals_generate(int stride, const float *feat,
+static void imi_utils_yolov5_proposals_generate(
+    int stride, const Size2i &lb, int anchor_group, const float *feat,
     float prob_threshold, std::vector<Object> &objects, int class_num = coco_class_num) {
+    int anchor_num = 3;
     static float anchors[18] = { 10, 13, 16, 30, 33, 23, 30, 61, 62, 45, 59, 119, 116, 90, 156, 198, 373, 326 };
 
     int cls_num = class_num; // 80
     int out_num = 4 + 1 + cls_num;// rent, score, cls_num
 
-    int anchor_num = 3;
-    int anchor_group;
-    if (stride == 8)
-        anchor_group = 1;
-    if (stride == 16)
-        anchor_group = 2;
-    if (stride == 32)
-        anchor_group = 3;
-
-    int feat_w = lb.w / stride;
-    int feat_h = lb.h / stride;
+    int feat_w = lb.width / stride;
+    int feat_h = lb.height / stride;
     for (int h = 0; h < feat_h; h++) {
         for (int w = 0; w < feat_w; w++) {
             for (int a = 0; a < anchor_num; a++) {

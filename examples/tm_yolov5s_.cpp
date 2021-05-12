@@ -31,7 +31,6 @@
 #include <stdlib.h>
 /* std c++ includes */
 #include <vector>
-#include <cmath>    // for: exp
 /* imilab includes */
 #include "imilab/imi_utils_coco.h"  // for: coco_class_names
 #include "imilab/imi_utils_object.hpp"
@@ -44,10 +43,6 @@ static const char **class_names = coco_class_names;
 // postprocess threshold
 static const float prob_threshold = 0.6f; // 0.25f
 static const float nms_threshold = 0.40f; // 0.45f
-
-static inline float sigmoid(float x) {
-    return static_cast<float>(1.f / (1.f + exp(-x)));
-}
 
 #ifdef USE_OPENCV
 
@@ -120,11 +115,14 @@ static void get_input_data_focus(const char *image_file, image &lb) {
 // 0: 1, 3, 20, 20, 85
 // 1: 1, 3, 40, 40, 85
 // 2: 1, 3, 80, 80, 85
-static int proposals_objects_get(graph_t &graph, tm_tensor_output_t pt, std::vector<Object> &proposals) {
+static int proposals_objects_get(graph_t &graph, tm_tensor_output_t pt,
+    std::vector<Object> &proposals, const Size2i &lb) {
     proposals.clear();
-    int stride = 32;
+    int stride = 32, anchor_group; // 32 -> 3, 16 -> 2, 8 -> 1
     for (int i = 2; -1 < i; i--) {
-        imi_utils_yolov5_proposals_generate(stride, (float *)pt[i].p_data, prob_threshold, proposals, class_num);
+        anchor_group = i + 1;
+        imi_utils_yolov5_proposals_generate(stride, lb, anchor_group,
+            (float *)pt[i].p_data, prob_threshold, proposals, class_num);
         stride >>= 1;
     }
     return 0;
@@ -314,7 +312,7 @@ read_data:
     }
 
     /* process the detection result */
-    if (proposals_objects_get(graph, tensor, proposals) < 0) {
+    if (proposals_objects_get(graph, tensor, proposals, Size2i(lb.w, lb.h)) < 0) {
         goto exit;
     }
 
