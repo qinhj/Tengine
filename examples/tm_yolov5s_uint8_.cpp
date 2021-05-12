@@ -499,9 +499,8 @@ int main(int argc, char* argv[]) {
     }
 
     /* get output tensor info */
-    int yolov5s_output_node_count = 3;
-    tm_tensor_output_s tensor[yolov5s_output_node_count];
-    if (imi_utils_tm_get_graph_tensor(graph, tensor, yolov5s_output_node_count, 1) < 0) {
+    tm_tensor_output_s tensor[3];
+    if (imi_utils_tm_get_graph_tensor(graph, tensor, 3, 1) < 0) {
         fprintf(stderr, "[%s] get output tensor info failed\n", __FUNCTION__);
         return -1;
     }

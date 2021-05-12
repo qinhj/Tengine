@@ -29,5 +29,9 @@ static const char *coco_class_names[] = {
 
 //static const float coco_image_mean[] = { 0, 0, 0 };
 //static const float coco_image_scale[] = { 0.003921, 0.003921, 0.003921 };
+static const float coco_image_cov[][3] = {
+    { 0, 0, 0 }, // mean
+    { 0.003921, 0.003921, 0.003921 } // scale
+};
 
 #endif // !__IMI_UTILS_COCO_H__
