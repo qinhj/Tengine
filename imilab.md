@@ -2,6 +2,25 @@
 ```
 $ mkdir -p build_new && cd build_new
 $ cmake .. -DTENGINE_BUILD_TESTS=ON
+$ make && make install
+```
+
+## Quick Build (Android) ##
+```
+## Note: set TENGINE_BUILD_TESTS/TENGINE_DEBUG_MEM_STAT OFF
+$ mkdir -p build.android-armv7
+$ ANDROID_NDK=/home/qinhj/desktop/android-ndk-r18b
+$ ANDROID_VER=android-19
+$ cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake -DANDROID_ABI="armeabi-v7a" -DANDROID_ARM_NEON=ON -DANDROID_PLATFORM=$ANDROID_VER .. # -DCMAKE_C_FLAGS="-std=gnu99"
+$ make && make install
+```
+
+## Quick Benchmark ##
+```
+$ cd build
+$ ln -sf ../benchmark/models
+$ LD_LIBRARY_PATH=install/lib
+$ ./benchmark/tm_benchmark
 ```
 
 ## Quick Test ##
@@ -26,4 +45,7 @@ $ tm_retinaface_ -m $MODEL/retinaface.tmfile -i $MODEL/imilab_960x512_human.bgra
 A: try to increase confidence threshold, e.g.
 - const float CONF_THRESH = 0.8f;
 + const float CONF_THRESH = 0.9f;
+
+2. How to check COLLECT_GCC_OPTIONS and IS?
+A: "echo 'main(){}' | ${CROSS_TOOLS}gcc -E -v -" and "cat /proc/cpuinfo".
 ```
