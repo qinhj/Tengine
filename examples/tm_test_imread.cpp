@@ -4,14 +4,14 @@
 #define NOMINMAX
 #endif
 
-/* stdc++ includes */
+/* std c++ includes */
 #include <vector>
 /* tengine includes */
 #include "common.h"
-#include "tengine/c_api.h"
+//#include "tengine/c_api.h"
 #include "tengine_operations.h" // for: imread
 /* imilab includes */
-#include "imi_imread.h"
+#include "imilab/imi_utils_imread.h"
 
 #define IMAGE_PATH  "/media/sf_Workshop/color_375x375_rgb888.bmp"
 #define OUTPUT_PATH "output.rgb"
@@ -38,7 +38,7 @@ static int get_input_data(const char* image_file, std::vector<float>& image_data
     fwrite(img.data, sizeof(float), img.w * img.h * img.c, fp);
     fclose(fp);
     // check channel one by one(default: R G B)
-    _check_channel_1by1(img);
+    _imi_utils_check_channel_1by1(img);
 
     int img_size = img.w * img.h * img.c;
 
@@ -74,7 +74,7 @@ static void test_load_data(int channel, char bgr) {
     int img_size = img.w * img.h * img.c, rc = 0;
     unsigned char uc;
     while (rc < frame) {
-        if (get_input_data(fin, img, channel, bgr) != 1) {
+        if (imi_utils_load_image(fin, img, bgr, channel) != 1) {
             printf("get_input_data error!\n");
             break;
         }
@@ -87,7 +87,7 @@ static void test_load_data(int channel, char bgr) {
             }
             rc += 1;
             // check channel one by one(default: R G B)
-            _check_channel_1by1(img);
+            _imi_utils_check_channel_1by1(img);
         }
     }
 
