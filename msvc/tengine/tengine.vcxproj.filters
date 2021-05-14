@@ -13,1023 +13,1081 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="源文件\dev">
-      <UniqueIdentifier>{593d8905-7f5e-46a7-8c79-53f61bbd2d5a}</UniqueIdentifier>
+    <Filter Include="源文件\api">
+      <UniqueIdentifier>{a8ba82df-2206-47fa-a429-a9ba103191ab}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\lib">
-      <UniqueIdentifier>{d9ca69c1-fbb4-4077-9d2d-4f5b7f970536}</UniqueIdentifier>
+    <Filter Include="源文件\device">
+      <UniqueIdentifier>{f0945320-be2b-43be-bfee-3803df82acf8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\op">
-      <UniqueIdentifier>{a2887680-9492-4a88-b73f-c8b0bb3a031a}</UniqueIdentifier>
+    <Filter Include="源文件\device\cpu">
+      <UniqueIdentifier>{5316212f-7b00-427e-8e6d-a1a54ca6abc1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\device\cpu\op">
+      <UniqueIdentifier>{4ef58d68-fbf6-49a0-a82d-16a92c1bac1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\device\cpu\op\interp">
+      <UniqueIdentifier>{5432f0e7-1334-406b-859d-274ac5ff436f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\executer">
+      <UniqueIdentifier>{ae5b0221-7cef-4336-ad2e-8395b4fe108e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\graph">
+      <UniqueIdentifier>{0ec56068-5459-4e90-b0f2-b82b002944ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\module">
+      <UniqueIdentifier>{a089dba0-8163-41d7-9f7e-93acba080dd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\operator">
+      <UniqueIdentifier>{927292fd-6a77-4a68-ae7c-3be31d0f3608}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\operator\prototype">
+      <UniqueIdentifier>{954f90a7-a555-4add-83d7-757d590d4fd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\optimizer">
+      <UniqueIdentifier>{8fbfc5db-4905-4e60-ad2d-59dd7cc471d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\scheduler">
+      <UniqueIdentifier>{4a43dcb5-17e7-40aa-9be8-79fb85c48eec}</UniqueIdentifier>
     </Filter>
     <Filter Include="源文件\serializer">
-      <UniqueIdentifier>{3f692ad0-1cec-4d51-b8fa-a94fb3a92162}</UniqueIdentifier>
+      <UniqueIdentifier>{a4c18156-8f39-481a-8ec5-26c822b7c3ce}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\serializer\tiny">
-      <UniqueIdentifier>{2c505d86-d6f1-486e-8a44-5ee6e5b7e8e1}</UniqueIdentifier>
+    <Filter Include="源文件\serializer\tmfile">
+      <UniqueIdentifier>{9f7bf3fd-7f96-49c7-81df-2d9fb37ee69c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\serializer\tm">
-      <UniqueIdentifier>{473e48ba-f9b4-4453-ab9e-14c3d3743451}</UniqueIdentifier>
+    <Filter Include="源文件\serializer\tmfile\op">
+      <UniqueIdentifier>{4332f227-1d72-4a8a-bdb2-2a0726d2ad68}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\serializer\tm\op">
-      <UniqueIdentifier>{daaea6a7-bca1-40f7-9d0c-0da3d881d752}</UniqueIdentifier>
+    <Filter Include="源文件\system">
+      <UniqueIdentifier>{0a52b168-c509-4711-b282-bd3bfbab7497}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\dev\acl">
-      <UniqueIdentifier>{2ec7d7f7-d007-4b74-9a45-e683ceb26dab}</UniqueIdentifier>
+    <Filter Include="源文件\utility">
+      <UniqueIdentifier>{2bfde480-4767-4801-8621-a47576a4fd34}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\dev\cpu">
-      <UniqueIdentifier>{4743debd-081e-46bf-ae65-591fe691ced6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\dev\acl\op">
-      <UniqueIdentifier>{e73a33cd-d43f-4419-9f51-afeaed495d89}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\dev\cpu\op">
-      <UniqueIdentifier>{1ea760dc-20ef-4a79-865a-690ffb79ec49}</UniqueIdentifier>
+    <Filter Include="源文件\device\cpu\op\pad">
+      <UniqueIdentifier>{339862a0-6282-4b61-9366-5af34370ed9e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\lib\cpu.c">
-      <Filter>源文件\lib</Filter>
+    <ClCompile Include="..\..\source\api\c_api.c">
+      <Filter>源文件\api</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\lib\dev_allocator.c">
-      <Filter>源文件\lib</Filter>
+    <ClCompile Include="..\..\source\api\plugin.c">
+      <Filter>源文件\api</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\lib\exec_graph.c">
-      <Filter>源文件\lib</Filter>
+    <ClCompile Include="..\..\source\device\device.c">
+      <Filter>源文件\device</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\lib\exec_scheduler.c">
-      <Filter>源文件\lib</Filter>
+    <ClCompile Include="..\..\source\device\cpu\cpu_device.c">
+      <Filter>源文件\device\cpu</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\lib\hash.c">
-      <Filter>源文件\lib</Filter>
+    <ClCompile Include="..\..\source\device\cpu\cpu_dump.c">
+      <Filter>源文件\device\cpu</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\lib\hash_impl.c">
-      <Filter>源文件\lib</Filter>
+    <ClCompile Include="..\..\source\device\cpu\cpu_graph.c">
+      <Filter>源文件\device\cpu</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\lib\hcl_version.c">
-      <Filter>源文件\lib</Filter>
+    <ClCompile Include="..\..\source\device\cpu\cpu_module.c">
+      <Filter>源文件\device\cpu</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\lib\map.c">
-      <Filter>源文件\lib</Filter>
+    <ClCompile Include="..\..\source\device\cpu\cpu_node.c">
+      <Filter>源文件\device\cpu</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\lib\mem_stat.c">
-      <Filter>源文件\lib</Filter>
+    <ClCompile Include="..\..\source\device\cpu\cpu_pool.c">
+      <Filter>源文件\device\cpu</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\lib\module.c">
-      <Filter>源文件\lib</Filter>
+    <ClCompile Include="..\..\source\device\cpu\op\interp\interp_ref.c">
+      <Filter>源文件\device\cpu\op\interp</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\lib\nn_device.c">
-      <Filter>源文件\lib</Filter>
+    <ClCompile Include="..\..\source\executer\executer.c">
+      <Filter>源文件\executer</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\lib\sys_port.c">
-      <Filter>源文件\lib</Filter>
+    <ClCompile Include="..\..\source\graph\graph.c">
+      <Filter>源文件\graph</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\lib\tengine_c_api.c">
-      <Filter>源文件\lib</Filter>
+    <ClCompile Include="..\..\source\graph\node.c">
+      <Filter>源文件\graph</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\lib\tengine_cpp_api.cpp">
-      <Filter>源文件\lib</Filter>
+    <ClCompile Include="..\..\source\graph\subgraph.c">
+      <Filter>源文件\graph</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\lib\tengine_errno.c">
-      <Filter>源文件\lib</Filter>
+    <ClCompile Include="..\..\source\graph\tensor.c">
+      <Filter>源文件\graph</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\lib\tengine_exec.c">
-      <Filter>源文件\lib</Filter>
+    <ClCompile Include="..\..\source\module\module.c">
+      <Filter>源文件\module</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\lib\tengine_ir.c">
-      <Filter>源文件\lib</Filter>
+    <ClCompile Include="..\..\source\operator\op.c">
+      <Filter>源文件\operator</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\lib\tengine_ir_pack.c">
-      <Filter>源文件\lib</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\absval.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\lib\tengine_log.c">
-      <Filter>源文件\lib</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\add_n.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\lib\tengine_op.c">
-      <Filter>源文件\lib</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\argmax.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\lib\tengine_plugin.c">
-      <Filter>源文件\lib</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\argmin.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\lib\tengine_serializer.c">
-      <Filter>源文件\lib</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\batchnorm.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\lib\tengine_utils.c">
-      <Filter>源文件\lib</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\batchtospacend.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\lib\vector.c">
-      <Filter>源文件\lib</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\bias.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\absval.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\broadmul.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\add_n.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\cast.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\argmax.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\ceil.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\argmin.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\clip.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\batchnorm.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\comparison.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\batchtospacend.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\concat.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\bias.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\const.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\broadmul.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\convolution.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\cast.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\crop.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\ceil.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\deconvolution.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\clip.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\depthtospace.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\comparison.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\detection_output.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\concat.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\detection_postprocess.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\const.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\dropout.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\convolution.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\eltwise.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\crop.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\elu.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\deconvolution.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\embedding.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\depthtospace.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\expanddims.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\detection_output.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\fc.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\detection_postprocess.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\flatten.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\dropout.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\gather.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\eltwise.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\gemm.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\elu.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\generic.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\embedding.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\gru.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\expanddims.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\hardsigmoid.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\fc.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\hardswish.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\flatten.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\input.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\gather.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\instancenorm.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\gemm.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\interp.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\generic.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\l2normalization.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\gru.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\l2pool.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\hardsigmoid.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\logical.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\hardswish.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\logsoftmax.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\input.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\lrn.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\instancenorm.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\lstm.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\interp.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\matmul.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\l2normalization.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\maximum.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\l2pool.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\mean.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\logical.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\minimum.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\logsoftmax.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\mish.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\lrn.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\mvn.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\lstm.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\noop.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\matmul.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\normalize.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\maximum.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\pad.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\mean.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\permute.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\minimum.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\pooling.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\mish.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\prelu.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\mvn.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\priorbox.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\noop.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\psroipooling.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\normalize.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\reciprocal.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\pad.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\reducel2.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\permute.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\reduction.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\pooling.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\region.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\prelu.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\relu.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\priorbox.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\relu1.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\psroipooling.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\relu6.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\reciprocal.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\reorg.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\reducel2.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\reshape.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\reduction.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\resize.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\region.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\reverse.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\relu.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\rnn.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\relu1.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\roialign.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\relu6.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\roipooling.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\reorg.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\round.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\reshape.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\rpn.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\resize.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\scale.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\reverse.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\scatter.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\rnn.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\selu.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\roialign.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\shape.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\roipooling.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\shuffle_channel.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\round.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\sigmoid.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\rpn.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\slice.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\scale.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\softmax.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\scatter.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\softplus.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\selu.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\spacetobatchnd.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\shape.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\spacetodepth.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\shuffle_channel.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\sparsetodense.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\sigmoid.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\split.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\slice.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\squareddifference.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\softmax.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\squeeze.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\softplus.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\strided_slice.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\spacetobatchnd.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\swap_axis.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\spacetodepth.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\tanh.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\sparsetodense.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\threshold.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\split.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\tile.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\squareddifference.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\topkv2.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\squeeze.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\transpose.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\strided_slice.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\unary.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\swap_axis.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\unsqueeze.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\tanh.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\upsample.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\threshold.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\where.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\tile.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\operator\prototype\zeroslike.c">
+      <Filter>源文件\operator\prototype</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\topkv2.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\optimizer\estimation.c">
+      <Filter>源文件\optimizer</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\transpose.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\optimizer\helper.c">
+      <Filter>源文件\optimizer</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\unary.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\optimizer\split.c">
+      <Filter>源文件\optimizer</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\unsqueeze.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\scheduler\scheduler.c">
+      <Filter>源文件\scheduler</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\upsample.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\tm2_serializer.c">
+      <Filter>源文件\serializer\tmfile</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\where.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_add_n.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\op\zeroslike.c">
-      <Filter>源文件\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_argmax.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tiny\tiny_serializer.c">
-      <Filter>源文件\serializer\tiny</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_argmin.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_add_n.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_batchnorm.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_argmax.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_batchtospacend.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_argmin.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_bias.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_batchnorm.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_broadmul.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_batchtospacend.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_cast.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_bias.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_ceil.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_broadmul.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_clip.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_cast.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_comparison.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_ceil.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_concat.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_clip.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_conv.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_comparison.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_crop.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_concat.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_deconv.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_conv.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_depthtospace.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_crop.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_detection_output.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_deconv.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_detection_postprocess.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_depthtospace.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_dropout.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_detection_output.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_eltwise.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_detection_postprocess.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_elu.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_dropout.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_embedding.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_eltwise.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_expanddims.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_elu.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_fc.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_embedding.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_flatten.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_expanddims.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_gather.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_fc.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_gemm.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_flatten.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_generic.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_gather.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_gru.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_gemm.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_hardsigmoid.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_generic.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_hardswish.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_gru.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_instancenorm.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_hardsigmoid.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_interp.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_hardswish.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_l2normalization.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_instancenrom.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_l2pool.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_interp.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_logical.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_l2normalization.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_logistic.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_l2pool.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_logsoftmax.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_logical.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_lrn.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_logistic.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_lstm.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_logsoftmax.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_matmul.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_lrn.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_maximum.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_lstm.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_mean.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_matmul.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_mish.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_maximum.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_mvn.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_mean.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_noop.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_mish.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_normalize.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_mvn.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_pad.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_noop.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_permute.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_normalize.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_pool.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_pad.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_prelu.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_permute.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_priorbox.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_pool.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_psroipooling.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_prelu.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_reducel2.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_priorbox.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_reduction.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_psroipooling.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_region.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_reciprocal.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_relu.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_reducel2.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_relu1.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_reduction.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_relu6.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_region.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_reorg.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_relu.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_reshape.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_relu1.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_resize.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_relu6.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_reverse.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_reorg.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_rnn.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_reshape.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_roialign.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_resize.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_roipooling.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_reverse.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_round.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_rnn.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_rpn.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_roialign.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_scale.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_roipooling.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_scatter.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_round.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_shape.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_rpn.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_shuffle_channel.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_scale.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_sigmoid.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_scatter.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_slice.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_shape.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_softmax.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_shuffle_channel.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_spacetobatchnd.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_sigmoid.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_spacetodepth.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_slice.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_sparsetodense.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_softmax.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_split.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_softplus.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_squareddifference.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_spacetobatchnd.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_squeeze.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_spacetodepth.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_strided_slice.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_sparsetodense.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_swap_axis.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_split.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_tanh.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_squareddifference.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_threshold.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_squeeze.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_tile.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_strided_slice.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_topkv2.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_swap_axis.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_transpose.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_tanh.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_unary.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_threshold.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_unsqueeze.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_tile.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_upsample.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_topkv2.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_where.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_transpose.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\tmfile\op\tm2_zeroslike.c">
+      <Filter>源文件\serializer\tmfile\op</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_unary.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\serializer\serializer.c">
+      <Filter>源文件\serializer</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_unsqueeze.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\system\cpu.c">
+      <Filter>源文件\system</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_upsample.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\utility\float.c">
+      <Filter>源文件\utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_where.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\utility\lock.c">
+      <Filter>源文件\utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\op\tm2_zeroslike.c">
-      <Filter>源文件\serializer\tm\op</Filter>
+    <ClCompile Include="..\..\source\utility\log.c">
+      <Filter>源文件\utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\serializer\tm\tm2_serializer.c">
-      <Filter>源文件\serializer\tm</Filter>
+    <ClCompile Include="..\..\source\utility\math.c">
+      <Filter>源文件\utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\dev\acl\op\acl_bn.cpp">
-      <Filter>源文件\dev\acl\op</Filter>
+    <ClCompile Include="..\..\source\utility\mem_stat.c">
+      <Filter>源文件\utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\dev\acl\op\acl_cast.cpp">
-      <Filter>源文件\dev\acl\op</Filter>
+    <ClCompile Include="..\..\source\utility\sys_port.c">
+      <Filter>源文件\utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\dev\acl\op\acl_clip.cpp">
-      <Filter>源文件\dev\acl\op</Filter>
+    <ClCompile Include="..\..\source\utility\utils.c">
+      <Filter>源文件\utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\dev\acl\op\acl_concat.cpp">
-      <Filter>源文件\dev\acl\op</Filter>
+    <ClCompile Include="..\..\source\utility\vector.c">
+      <Filter>源文件\utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\dev\acl\op\acl_convolution.cpp">
-      <Filter>源文件\dev\acl\op</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\dev\acl\op\acl_crop.cpp">
-      <Filter>源文件\dev\acl\op</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\dev\acl\op\acl_dropout.cpp">
-      <Filter>源文件\dev\acl\op</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\dev\acl\op\acl_eltwise.cpp">
-      <Filter>源文件\dev\acl\op</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\dev\acl\op\acl_fc.cpp">
-      <Filter>源文件\dev\acl\op</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\dev\acl\op\acl_input.cpp">
-      <Filter>源文件\dev\acl\op</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\dev\acl\op\acl_interp.cpp">
-      <Filter>源文件\dev\acl\op</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\dev\acl\op\acl_pooling.cpp">
-      <Filter>源文件\dev\acl\op</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\dev\acl\op\acl_relu.cpp">
-      <Filter>源文件\dev\acl\op</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\dev\acl\op\acl_reshape.cpp">
-      <Filter>源文件\dev\acl\op</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\dev\acl\op\acl_resize.cpp">
-      <Filter>源文件\dev\acl\op</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\dev\acl\op\acl_softmax.cpp">
-      <Filter>源文件\dev\acl\op</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\dev\acl\acl_device.cpp">
-      <Filter>源文件\dev\acl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\dev\acl\acl_executor.cpp">
-      <Filter>源文件\dev\acl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\dev\acl\acl_graph.cpp">
-      <Filter>源文件\dev\acl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\dev\cpu\cpu_allocator.c">
-      <Filter>源文件\dev\cpu</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\dev\cpu\cpu_device.c">
-      <Filter>源文件\dev\cpu</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\dev\cpu\cpu_module.c">
-      <Filter>源文件\dev\cpu</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\dev\cpu\cpu_node_ops.c">
-      <Filter>源文件\dev\cpu</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\dev\cpu\cpu_probe.c">
-      <Filter>源文件\dev\cpu</Filter>
+    <ClCompile Include="..\..\source\device\cpu\op\pad\pad_ref.c">
+      <Filter>源文件\device\cpu\op\pad</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\op\argmax_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\api\c_api.h">
+      <Filter>源文件\api</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\argmin_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\api\c_api_ex.h">
+      <Filter>源文件\api</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\batchnorm_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\device\device.h">
+      <Filter>源文件\device</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\batchtospacend_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\device\cpu\cpu_define.h">
+      <Filter>源文件\device\cpu</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\cast_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\device\cpu\cpu_device.h">
+      <Filter>源文件\device\cpu</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\clip_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\device\cpu\cpu_dump.h">
+      <Filter>源文件\device\cpu</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\comparison_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\device\cpu\cpu_graph.h">
+      <Filter>源文件\device\cpu</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\concat_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\device\cpu\cpu_module.h">
+      <Filter>源文件\device\cpu</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\convolution_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\device\cpu\cpu_node.h">
+      <Filter>源文件\device\cpu</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\crop_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\device\cpu\cpu_pool.h">
+      <Filter>源文件\device\cpu</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\deconv_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\executer\executer.h">
+      <Filter>源文件\executer</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\depthtospace_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\graph\graph.h">
+      <Filter>源文件\graph</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\detection_output_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\graph\node.h">
+      <Filter>源文件\graph</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\detection_postprocess_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\graph\subgraph.h">
+      <Filter>源文件\graph</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\eltwise_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\graph\tensor.h">
+      <Filter>源文件\graph</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\elu_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\module\module.h">
+      <Filter>源文件\module</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\embedding_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\op.h">
+      <Filter>源文件\operator</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\expanddims_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\op_name.h">
+      <Filter>源文件\operator</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\fc_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\argmax_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\flatten_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\argmin_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\gather_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\batchnorm_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\gemm_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\batchtospacend_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\generic_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\cast_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\gru_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\clip_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\hardsigmoid_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\comparison_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\instancenorm_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\concat_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\interp_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\convolution_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\l2pool_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\crop_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\logical_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\deconv_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\logsoftmax_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\depthtospace_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\lrn_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\detection_output_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\lstm_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\detection_postprocess_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\mvn_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\eltwise_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\normalize_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\elu_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\pad_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\embedding_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\permute_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\expanddims_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\pooling_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\fc_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\priorbox_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\flatten_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\psroipooling_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\gather_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\reducel2_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\gemm_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\reduction_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\generic_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\region_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\gru_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\relu_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\hardsigmoid_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\reorg_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\hardswish_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\reshape_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\instancenorm_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\resize_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\interp_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\rnn_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\l2pool_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\roialign_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\logical_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\roipooling_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\logsoftmax_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\rpn_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\lrn_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\scale_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\lstm_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\scatter_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\mvn_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\selu_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\normalize_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\shuffle_channel_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\pad_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\slice_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\permute_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\softmax_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\pooling_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\spacetobatchnd_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\priorbox_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\spacetodepth_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\psroipooling_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\sparsetodense_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\reducel2_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\split_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\reduction_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\squeeze_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\region_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\strided_slice_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\relu_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\swap_axis_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\reorg_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\threshold_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\reshape_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\tile_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\resize_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\topkv2_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\rnn_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\transpose_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\roialign_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\unary_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\roipooling_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\unsqueeze_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\rpn_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\op\upsample_param.h">
-      <Filter>源文件\op</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\scale_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\serializer\tiny\tiny_graph.h">
-      <Filter>源文件\serializer\tiny</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\scatter_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\serializer\tm\tm2_format.h">
-      <Filter>源文件\serializer\tm</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\selu_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\serializer\tm\tm2_serializer.h">
-      <Filter>源文件\serializer\tm</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\shuffle_channel_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\dev\acl\acl_device.hpp">
-      <Filter>源文件\dev\acl</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\slice_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\dev\acl\acl_executor.hpp">
-      <Filter>源文件\dev\acl</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\softmax_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\dev\acl\acl_graph.hpp">
-      <Filter>源文件\dev\acl</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\spacetobatchnd_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\dev\acl\acl_helper.hpp">
-      <Filter>源文件\dev\acl</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\spacetodepth_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\dev\acl\acl_limit.hpp">
-      <Filter>源文件\dev\acl</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\sparsetodense_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\dev\cpu\cpu_allocator.h">
-      <Filter>源文件\dev\cpu</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\split_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\dev\cpu\cpu_device.h">
-      <Filter>源文件\dev\cpu</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\squeeze_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\dev\cpu\cpu_model.h">
-      <Filter>源文件\dev\cpu</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\strided_slice_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\dev\cpu\cpu_node_ops.h">
-      <Filter>源文件\dev\cpu</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\swap_axis_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\dev\cpu\cpu_probe.h">
-      <Filter>源文件\dev\cpu</Filter>
+    <ClInclude Include="..\..\source\operator\prototype\threshold_param.h">
+      <Filter>源文件\operator\prototype</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\operator\prototype\tile_param.h">
+      <Filter>源文件\operator\prototype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\operator\prototype\topkv2_param.h">
+      <Filter>源文件\operator\prototype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\operator\prototype\transpose_param.h">
+      <Filter>源文件\operator\prototype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\operator\prototype\unary_param.h">
+      <Filter>源文件\operator\prototype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\operator\prototype\unsqueeze_param.h">
+      <Filter>源文件\operator\prototype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\operator\prototype\upsample_param.h">
+      <Filter>源文件\operator\prototype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\optimizer\estimation.h">
+      <Filter>源文件\optimizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\optimizer\helper.h">
+      <Filter>源文件\optimizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\optimizer\split.h">
+      <Filter>源文件\optimizer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\scheduler\scheduler.h">
+      <Filter>源文件\scheduler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\serializer\tmfile\tm2_format.h">
+      <Filter>源文件\serializer\tmfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\serializer\tmfile\tm2_serializer.h">
+      <Filter>源文件\serializer\tmfile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\serializer\serializer.h">
+      <Filter>源文件\serializer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\system\cpu.h">
+      <Filter>源文件\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\utility\float.h">
+      <Filter>源文件\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\utility\lock.h">
+      <Filter>源文件\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\utility\log.h">
+      <Filter>源文件\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\utility\math.h">
+      <Filter>源文件\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\utility\mem_stat.h">
+      <Filter>源文件\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\utility\sys_port.h">
+      <Filter>源文件\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\utility\utils.h">
+      <Filter>源文件\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\utility\vector.h">
+      <Filter>源文件\utility</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\source\device\cpu\CMakeLists.txt">
+      <Filter>源文件\device\cpu</Filter>
+    </Text>
+    <Text Include="..\..\source\operator\CMakeLists.txt">
+      <Filter>源文件\operator</Filter>
+    </Text>
+    <Text Include="..\..\source\scheduler\CMakeLists.txt">
+      <Filter>源文件\scheduler</Filter>
+    </Text>
+    <Text Include="..\..\source\serializer\CMakeLists.txt">
+      <Filter>源文件\serializer</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\source\device\cpu\cpu_ops.h.in">
+      <Filter>源文件\device\cpu</Filter>
+    </None>
+    <None Include="..\..\source\operator\prototype.h.in">
+      <Filter>源文件\operator</Filter>
+    </None>
+    <None Include="..\..\source\serializer\tmfile\tm2_ops.h.in">
+      <Filter>源文件\serializer\tmfile</Filter>
+    </None>
+    <None Include="..\..\source\serializer\register.h.in">
+      <Filter>源文件\serializer</Filter>
+    </None>
   </ItemGroup>
 </Project>
