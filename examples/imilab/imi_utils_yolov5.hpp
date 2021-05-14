@@ -106,11 +106,11 @@ static int imi_utils_yolov5_load_data(FILE *fp, image &img, char bgr, image &lb,
     lb.data = data;
     // load image to letter box
     int rc = imi_utils_load_letterbox(fp, img, bgr, lb, cov);
+    lb.data = swap;
     if (1 != rc) {
         free(data);
         return rc;
     }
-    lb.data = swap;
 
     // todo: optimize
     if (input_scale < 0) {

@@ -55,7 +55,8 @@ static int imi_utils_tm_get_graph_tensor(const graph_t &graph, tm_tensor_t pt, i
             /* dequant output data */
             get_tensor_quant_param(pt[i].p_tensor, &pt[i].p_scale, &pt[i].p_zero_point, 1);
             pt[i].p_count *= (sizeof(float) / sizeof(uint8_t));
-            fprintf(stdout, "p_scale: %.4f, p_zero_point: %d\n", pt[i].p_scale, pt[i].p_zero_point);
+            fprintf(stdout, "node[%d] p_scale: %.4f, p_zero_point: %d\n",
+                i, pt[i].p_scale, pt[i].p_zero_point);
         }
         fprintf(stdout, "node[%d] p_tensor: %p, p_data: %p, p_count: %d\n",
             i, pt[i].p_tensor, pt[i].p_data, pt[i].p_count);

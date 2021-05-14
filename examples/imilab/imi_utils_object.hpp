@@ -107,7 +107,7 @@ std::vector<_Tp> imi_utils_proposals_filter(const std::vector<_Tp> &proposals,
     imi_utils_objects_nms(proposals, picked, nms_threshold);
 
     int count = picked.size();
-    fprintf(stdout, "%d objects are picked\n", count);
+    log_debug("[%s] %d objects are picked\n", __FUNCTION__, count);
 
     // post process: scale and offset for letter box
     Size2i lb_offset;
@@ -120,7 +120,8 @@ std::vector<_Tp> imi_utils_proposals_filter(const std::vector<_Tp> &proposals,
         lb_offset.height = int(lb_scale * image_size.height);
         lb_offset.width = (letter_box.width - lb_offset.width) / 2;
         lb_offset.height = (letter_box.height - lb_offset.height) / 2;
-        fprintf(stdout, "letter box scale: %3.4f, offset: (%d, %d)\n", lb_scale, lb_offset.width, lb_offset.height);
+        log_debug("[%s] letter box scale: %3.4f, offset: (%d, %d)\n",
+            __FUNCTION__, lb_scale, lb_offset.width, lb_offset.height);
     }
 
     std::vector<_Tp> objects(count);
