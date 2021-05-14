@@ -3,14 +3,26 @@
 $ mkdir -p build_new && cd build_new
 $ cmake .. -DTENGINE_BUILD_TESTS=ON
 $ make && make install
+
+* Note:
+1) To build with static library, try:
+-    TARGET_LINK_LIBRARIES (${name} PRIVATE ${CMAKE_PROJECT_NAME})
++    TARGET_LINK_LIBRARIES (${name} PRIVATE ${CMAKE_PROJECT_NAME}-static)
 ```
 
 ## Quick Build (Android) ##
 ```
-## Note: set TENGINE_BUILD_TESTS/TENGINE_DEBUG_MEM_STAT OFF
-$ mkdir -p build.android-armv7
+* Note: set TENGINE_BUILD_TESTS/TENGINE_DEBUG_MEM_STAT OFF
 $ ANDROID_NDK=/home/qinhj/desktop/android-ndk-r18b
-$ ANDROID_VER=android-19
+$ ANDROID_VER=android-28
+
+## Android: Arm64
+$ mkdir -p build.android-aarch64 && cd build.android-aarch64
+$ cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake -DANDROID_ABI="arm64-v8a" -DANDROID_PLATFORM=$ANDROID_VER ..
+$ make && make install
+
+## Android: Arm32
+$ mkdir -p build.android-armv7 && cd build.android-armv7
 $ cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake -DANDROID_ABI="armeabi-v7a" -DANDROID_ARM_NEON=ON -DANDROID_PLATFORM=$ANDROID_VER .. # -DCMAKE_C_FLAGS="-std=gnu99"
 $ make && make install
 ```
@@ -48,4 +60,8 @@ A: try to increase confidence threshold, e.g.
 
 2. How to check COLLECT_GCC_OPTIONS and IS?
 A: "echo 'main(){}' | ${CROSS_TOOLS}gcc -E -v -" and "cat /proc/cpuinfo".
+
+3. .../tengine/source/system/cpu.c:336: undefined reference to `__kmpc_global_thread_num'
+A: try another ndk toolchain, or don't "make install" while building with static library.
+Otherwise, add necessary "libomp.a" by hand.
 ```
