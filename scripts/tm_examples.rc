@@ -1,0 +1,3 @@
+DIR_BUILD=$(pwd)
+export PATH=$DIR_BUILD/install/bin:$PATH
+export LD_LIBRARY_PATH=$DIR_BUILD/install/lib:$LD_LIBRARY_PATH
