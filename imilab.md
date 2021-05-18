@@ -1,13 +1,33 @@
+# Tengine Lite #
+https://github.com/OAID/Tengine  
+
 ## Quick Build ##
 ```
-$ mkdir -p build_new && cd build_new
-$ cmake .. -DTENGINE_BUILD_TESTS=ON
+* requirements: g++, make, cmake(>=3.10)
+$ sudo apt-get install build-essential
+$ ...
+
+## quick build
+$ mkdir -p build && cd build
+$ cmake .. -DTENGINE_BUILD_TESTS=ON -DTENGINE_FORCE_SKIP_OPENMP=OFF
 $ make && make install
 
 * Note:
-1) To build with static library, try:
+0) To build with static library, try:
 -    TARGET_LINK_LIBRARIES (${name} PRIVATE ${CMAKE_PROJECT_NAME})
 +    TARGET_LINK_LIBRARIES (${name} PRIVATE ${CMAKE_PROJECT_NAME}-static)
+1) To build with arm-linux-gnueabi.toolchain.cmake
+SET(TENGINE_TOOLCHIN_FLAG "-march=armv7-a -mfloat-abi=softfp -mfpu=neon-vfpv4")
+SET(TENGINE_FORCE_SKIP_OPENMP OFF)
+2) To build with arm-linux-gnueabihf.toolchain.cmake
+SET(TENGINE_TOOLCHIN_FLAG "-march=armv7-a -mfloat-abi=hard -mfpu=neon-vfpv4")
+SET(TENGINE_FORCE_SKIP_OPENMP OFF)
+3) To build with mips64-linux-gnu.toolchain.cmake
+set(CMAKE_C_FLAGS "-march=mips64r2 -mabi=64 -mmsa -mhard-float -mfp64")
+set(CMAKE_CXX_FLAGS "-march=mips64r2 -mabi=64 -mmsa -mhard-float -mfp64")
+4) To cache flags:
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "c flags")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" CACHE STRING "c++ flags")
 ```
 
 ## Quick Build (Android) ##
@@ -31,7 +51,7 @@ $ make && make install
 ```
 $ cd build
 $ ln -sf ../benchmark/models
-$ LD_LIBRARY_PATH=install/lib
+$ export LD_LIBRARY_PATH=install/lib:$LD_LIBRARY_PATH
 $ ./benchmark/tm_benchmark
 ```
 
