@@ -41,7 +41,7 @@
 #include "imilab/imi_utils_tm_debug.h"
 
 // postprocess threshold
-static const float prob_threshold = 0.4f; // 0.25f
+static const float prob_threshold = 0.6f; // 0.25f
 static const float nms_threshold = 0.40f; // 0.45f
 
 #ifdef USE_OPENCV
@@ -107,9 +107,10 @@ static void get_input_data(const char *image_file, image &lb) {
 
 #endif // USE_OPENCV
 
-// @brief:  yolov3-tiny output tensor postprocess
-// P4 node[0].output[0]: (1, 3, 26, 26, 5+nc), stride=416/26=16, middle obj
-// P5 node[1].output[0]: (1, 3, 13, 13, 5+nc), stride=416/13=32,  large obj
+// @brief:  yolov3 output tensor postprocess
+// P3 node[0].output[0]: (1, 3, 80, 80, 85), stride=640/80=8 ,  small obj
+// P4 node[1].output[0]: (1, 3, 40, 40, 85), stride=640/40=16, middle obj
+// P5 node[2].output[0]: (1, 3, 20, 20, 85), stride=640/20=32,  large obj
 // @param:  model[in]   input yolo model info
 // @param:  graph[in]   input yolo graph inst
 // @param:  buffer[in]  output tensor buffer
@@ -128,14 +129,14 @@ static void show_usage() {
     fprintf(stdout, "    [-w width] [-h height] [-f max_frame] [-r repeat_count] [-t thread_count]\n");
     fprintf(stdout, "[Examples]:\n");
     fprintf(stdout, "   # coco 80 classes\n");
-    fprintf(stdout, "   tm_yolov3_tiny_ -m yolov3_tiny.tmfile -i /Dataset/imilab_640x360x3_bgr_catdog.rgb24 -o imilab_640x360x3_bgr_catdog.rgb24 -f 200\n");
+    fprintf(stdout, "   tm_yolov3_ -m yolov3.tmfile -i /Dataset/imilab_640x360x3_bgr_catdog.rgb24 -o imilab_640x360x3_bgr_catdog.rgb24 -f 200\n");
     fprintf(stdout, "   # specific class of coco 80 classes(e.g. person)\n");
-    fprintf(stdout, "   tm_yolov3_tiny_ -m yolov3_tiny.tmfile -i /Dataset/imilab_640x360x3_bgr_human1.rgb24 -o imilab_640x360x3_bgr_human1.rgb24 -c 0 -f 100\n");
-    fprintf(stdout, "   tm_yolov3_tiny_ -m yolov3_tiny.tmfile -i /Dataset/imilab_640x360x3_bgr_human2.rgb24 -o imilab_640x360x3_bgr_human2.rgb24 -c 0 -f 500\n");
+    fprintf(stdout, "   tm_yolov3_ -m yolov3.tmfile -i /Dataset/imilab_640x360x3_bgr_human1.rgb24 -o imilab_640x360x3_bgr_human1.rgb24 -c 0 -f 100\n");
+    fprintf(stdout, "   tm_yolov3_ -m yolov3.tmfile -i /Dataset/imilab_640x360x3_bgr_human2.rgb24 -o imilab_640x360x3_bgr_human2.rgb24 -c 0 -f 500\n");
     fprintf(stdout, "   # single class(e.g. person)\n");
-    fprintf(stdout, "   tm_yolov3_tiny_ -m yolov3_tiny.tmfile -i /Dataset/imilab_640x360x3_bgr_catdog.rgb24 -o imilab_640x360x3_bgr_catdog.rgb24 -n 1 -f 200\n");
-    fprintf(stdout, "   tm_yolov3_tiny_ -m yolov3_tiny.tmfile -i /Dataset/imilab_640x360x3_bgr_human1.rgb24 -o imilab_640x360x3_bgr_human1.rgb24 -n 1 -f 100\n");
-    fprintf(stdout, "   tm_yolov3_tiny_ -m yolov3_tiny.tmfile -i /Dataset/imilab_640x360x3_bgr_human2.rgb24 -o imilab_640x360x3_bgr_human2.rgb24 -n 1 -f 500\n");
+    fprintf(stdout, "   tm_yolov3_ -m yolov3.tmfile -i /Dataset/imilab_640x360x3_bgr_catdog.rgb24 -o imilab_640x360x3_bgr_catdog.rgb24 -n 1 -f 200\n");
+    fprintf(stdout, "   tm_yolov3_ -m yolov3.tmfile -i /Dataset/imilab_640x360x3_bgr_human1.rgb24 -o imilab_640x360x3_bgr_human1.rgb24 -n 1 -f 100\n");
+    fprintf(stdout, "   tm_yolov3_ -m yolov3.tmfile -i /Dataset/imilab_640x360x3_bgr_human2.rgb24 -o imilab_640x360x3_bgr_human2.rgb24 -n 1 -f 500\n");
 }
 
 int main(int argc, char* argv[]) {
@@ -147,7 +148,7 @@ int main(int argc, char* argv[]) {
     const char *image_file = nullptr;
     const char *output_file = "output.rgb";
 
-    yolov3 &model = yolov3_tiny;
+    yolov3 &model = yolov3_std;
     // reset letter box size if necessary
     model.lb = make_image(640, 640, 3); // make_image(416, 416, 3);
     // allow none square letterbox, set default letterbox size
@@ -260,8 +261,8 @@ int main(int argc, char* argv[]) {
     imi_utils_tm_show_graph(graph, 0, IMI_MASK_NODE_OUTPUT);
 
     /* get output parameter info */
-    const void *buffer[NODE_CNT_YOLOV3_TINY] = { 0 };
-    if (imi_utils_yolov3_get_output_parameter(graph, buffer, NODE_CNT_YOLOV3_TINY, 0) < 0) {
+    const void *buffer[NODE_CNT_YOLOV3] = { 0 };
+    if (imi_utils_yolov3_get_output_parameter(graph, buffer, NODE_CNT_YOLOV3, 0) < 0) {
         fprintf(stderr, "[%s] get output parameter failed\n", __FUNCTION__);
         return -1;
     }

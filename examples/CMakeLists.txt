@@ -53,8 +53,6 @@ IF (TENGINE_BUILD_CPP_API)
     TENGINE_EXAMPLE (cpp_tm_mobilenet_ssd        cpp_tm_mobilenet_ssd.cpp)
 ENDIF()
 
-# add hello world
-TENGINE_EXAMPLE (tm_hello_world              tm_hello_world.cpp)
 # add c api examples
 TENGINE_EXAMPLE (tm_classification           tm_classification.c)
 TENGINE_EXAMPLE (tm_classification_int8      tm_classification_int8.c)

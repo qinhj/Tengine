@@ -28,18 +28,17 @@
 //#define _DEBUG
 
 /* std c includes */
+#include <stdio.h>  // for: fprintf
 #include <stdlib.h>
 /* std c++ includes */
 #include <vector>
 /* imilab includes */
-#include "imilab/imi_utils_coco.h"  // for: coco_class_names
 #include "imilab/imi_utils_object.hpp"
 #include "imilab/imi_utils_visual.hpp"
 #include "imilab/imi_utils_yolov5.hpp"
 #include "imilab/imi_utils_tm.h"    // for: imi_utils_tm_run_graph
+#include "imilab/imi_utils_tm_debug.h"
 
-static int class_num = coco_class_num;
-static const char **class_names = coco_class_names;
 // postprocess threshold
 static const float prob_threshold = 0.6f; // 0.25f
 static const float nms_threshold = 0.40f; // 0.45f
@@ -111,21 +110,20 @@ static void get_input_data_focus(const char *image_file, image &lb) {
 
 #endif // USE_OPENCV
 
-// yolov5 postprocess
-// 0: 1, 3, 20, 20, 85
-// 1: 1, 3, 40, 40, 85
-// 2: 1, 3, 80, 80, 85
-static int proposals_objects_get(graph_t &graph, tm_tensor_output_t pt,
-    std::vector<Object> &proposals, const Size2i &lb) {
+// @brief:  yolov5 output tensor postprocess
+// P3 node[0].output[0]: (1, 3, 80, 80, 85), stride=640/80=8 ,  small obj
+// P4 node[1].output[0]: (1, 3, 40, 40, 85), stride=640/40=16, middle obj
+// P5 node[2].output[0]: (1, 3, 20, 20, 85), stride=640/20=32,  large obj
+// @param:  model[in]   input yolo model info
+// @param:  graph[in]   input yolo graph inst
+// @param:  buffer[in]  output tensor buffer
+// @param:  proposals   output detected boxes
+static int proposals_objects_get(const yolov3 &model,
+    graph_t &graph, const void *buffer[], std::vector<Object> &proposals) {
     proposals.clear();
-    int stride = 32, anchor_group; // 32 -> 3, 16 -> 2, 8 -> 1
-    for (int i = 2; -1 < i; i--) {
-        anchor_group = i + 1;
-        imi_utils_yolov5_proposals_generate(stride, lb, anchor_group,
-            (float *)pt[i].p_data, prob_threshold, proposals, class_num);
-        stride >>= 1;
-    }
-    return 0;
+
+    /* generate output proposals */
+    return imi_utils_yolov3_proposals_generate(model, buffer, proposals, prob_threshold);
 }
 
 static void show_usage() {
@@ -153,8 +151,11 @@ int main(int argc, char* argv[]) {
     const char *image_file = nullptr;
     const char *output_file = "output.rgb";
 
+    yolov3 &model = yolov5s;
+    // reset letter box size if necessary
+    model.lb = make_image(640, 640, 3);
     // allow none square letterbox, set default letterbox size
-    image lb = make_image(640, 640, 3);
+    image &lb = model.lb;
     image input = make_empty_image(640, 360, 3);
 
     int res, frame = 1, fc = 0;
@@ -162,7 +163,7 @@ int main(int argc, char* argv[]) {
         switch (res) {
         case 'c':
             target_class = atoi(optarg);
-            if (target_class < 0 || class_num <= target_class) {
+            if (target_class < 0 || model.class_num <= target_class) {
                 // reset all invalid argument as -1
                 target_class = -1;
             }
@@ -180,7 +181,7 @@ int main(int argc, char* argv[]) {
             num_thread = std::strtoul(optarg, nullptr, 10);
             break;
         case 'n':
-            class_num = atoi(optarg);
+            model.class_num = atoi(optarg);
             break;
         case 'w':
             input.w = atoi(optarg);
@@ -257,14 +258,15 @@ int main(int argc, char* argv[]) {
 
     /* prerun graph, set work options(num_thread, cluster, precision) */
     if (prerun_graph_multithread(graph, opt) < 0) {
-        fprintf(stderr, "[%s] Prerun multithread graph failed.\n", __FUNCTION__);
+        fprintf(stderr, "[%s] Prerun multithread graph failed\n", __FUNCTION__);
         return -1;
     }
+    //imi_utils_tm_show_graph(graph, 0, IMI_MASK_NODE_OUTPUT);
 
-    /* get output tensor info */
-    tm_tensor_output_s tensor[NODE_CNT_YOLOV5S];
-    if (imi_utils_tm_get_graph_tensor(graph, tensor, NODE_CNT_YOLOV5S, 0) < 0) {
-        fprintf(stderr, "[%s] get output tensor info failed\n", __FUNCTION__);
+    /* get output parameter info */
+    const void *buffer[NODE_CNT_YOLOV5S] = { 0 };
+    if (imi_utils_yolov3_get_output_parameter(graph, buffer, NODE_CNT_YOLOV5S, 0) < 0) {
+        fprintf(stderr, "[%s] get output parameter failed\n", __FUNCTION__);
         return -1;
     }
 
@@ -299,7 +301,7 @@ read_data:
 #ifdef USE_OPENCV
     get_input_data_focus(image_file, lb);
 #else // !USE_OPENCV
-    if (1 != (ret = imi_utils_yolov5_load_data(fp, input, bgr, lb, coco_image_cov, -1, 0))) {
+    if (1 != (ret = imi_utils_yolov5_load_data(fp, input, bgr, lb, (const float (*)[3])model.usr_data, -1, 0))) {
         fprintf(stderr, "%s\n", ret ? "get_input_data error!" : "read input data fin");
         goto exit;
     }
@@ -312,7 +314,7 @@ read_data:
     }
 
     /* process the detection result */
-    if (proposals_objects_get(graph, tensor, proposals, Size2i(lb.w, lb.h)) < 0) {
+    if (proposals_objects_get(model, graph, buffer, proposals) < 0) {
         goto exit;
     }
 
@@ -323,10 +325,10 @@ read_data:
 
     // draw objects
 #ifdef USE_OPENCV
-    imi_utils_objects_draw(objects, img, target_class, class_names, output_file);
+    imi_utils_objects_draw(objects, img, target_class, model.class_names, output_file);
 exit:
 #else // !USE_OPENCV
-    imi_utils_objects_draw(objects, input, target_class, class_names);
+    imi_utils_objects_draw(objects, input, target_class, model.class_names);
 
     // save result to output
     if (fout) {

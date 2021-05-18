@@ -23,7 +23,7 @@
 // @param:  file[in]    output image file path
 template<typename _Tp>
 void imi_utils_objects_draw(const std::vector<_Tp> &objects,
-    cv::Mat &image, int cls, const char **labels, const char *file) {
+    cv::Mat &image, int cls, const char * const *labels, const char *file) {
     for (size_t i = 0; i < objects.size(); i++) {
         const _Tp &obj = objects[i];
 
@@ -64,14 +64,15 @@ void imi_utils_objects_draw(const std::vector<_Tp> &objects,
 
 // @param:  cls[in] target class(-1: all)
 template<typename _Tp>
-int imi_utils_objects_draw(const std::vector<_Tp> &objects, image &img, int cls, const char **labels) {
+int imi_utils_objects_draw(const std::vector<_Tp> &objects,
+    image &img, int cls, const char * const *labels) {
     size_t size = objects.size();
     fprintf(stdout, "detected objects num: %zu\n", size);
 
     for (size_t i = 0; i < size; i++) {
         const _Tp &obj = objects[i];
         if (labels) {
-            fprintf(stdout, "[%2d]: %3.3f%%, [(%g, %g), (%g, %g)], %s\n",
+            fprintf(stdout, "[%2d]: %3.3f%%, [(%.3f, %.3f), (%.3f, %.3f)], %s\n",
                 obj.label, obj.prob * 100, obj.rect.x, obj.rect.y,
                 obj.rect.x + obj.rect.width, obj.rect.y + obj.rect.height, labels[obj.label]);
         }
@@ -91,7 +92,7 @@ int imi_utils_faces_draw(const std::vector<_Tp> &faces, image &img) {
 
     for (size_t i = 0; i < size; i++) {
         const _Tp &face = faces[i];
-        fprintf(stdout, "Face[%2d]: %3.3f%%, [(%g, %g), (%g, %g)]\n",
+        fprintf(stdout, "Face[%2d]: %3.3f%%, [(%.3f, %.3f), (%.3f, %.3f)]\n",
             (int)i, face.prob * 100, face.rect.x, face.rect.y, face.rect.width, face.rect.height);
 
         draw_box(img, face.rect.x, face.rect.y, face.rect.x + face.rect.width, face.rect.y + face.rect.height, 2, 0, 255, 0);
