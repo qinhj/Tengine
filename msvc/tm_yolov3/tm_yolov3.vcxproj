@@ -20,8 +20,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{153F613D-FA2C-46D8-8348-AE44BD05E8C4}</ProjectGuid>
-    <RootNamespace>tmyolov5suint8</RootNamespace>
+    <ProjectGuid>{A9C81C3E-428F-40E4-B10D-37C158EC775B}</ProjectGuid>
+    <RootNamespace>tmyolov3</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -69,24 +69,14 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)\..\examples\common;$(SolutionDir)\..\examples\imilab;$(SolutionDir)\tengine;$(LibHome)\opencv\build\include;%(AdditionalIncludeDirectories);$(IncludePath)</IncludePath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)\..\examples\common;$(SolutionDir)\..\examples\imilab;$(SolutionDir)\tengine;$(LibHome)\opencv\build\include;%(AdditionalIncludeDirectories);$(IncludePath)</IncludePath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)\..\examples\common;$(SolutionDir)\..\examples\imilab;$(SolutionDir)\tengine;$(LibHome)\opencv\build\include;%(AdditionalIncludeDirectories);$(IncludePath)</IncludePath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)\..\examples\common;$(SolutionDir)\..\examples\imilab;$(SolutionDir)\tengine;$(LibHome)\opencv\build\include;%(AdditionalIncludeDirectories);$(IncludePath)</IncludePath>
-  </PropertyGroup>
+  <PropertyGroup />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\examples\common;$(SolutionDir)\..\examples\imilab;$(SolutionDir)\tengine;$(LibHome)\opencv\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -98,6 +88,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\examples\common;$(SolutionDir)\..\examples\imilab;$(SolutionDir)\tengine;$(LibHome)\opencv\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -111,6 +102,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\examples\common;$(SolutionDir)\..\examples\imilab;$(SolutionDir)\tengine;$(LibHome)\opencv\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -126,6 +118,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\examples\common;$(SolutionDir)\..\examples\imilab;$(SolutionDir)\tengine;$(LibHome)\opencv\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -133,10 +126,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\examples\common\tengine_operations.c" />
-    <ClCompile Include="..\..\examples\tm_yolov5s_uint8_.cpp" />
-  </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\examples\common\common.h" />
     <ClInclude Include="..\..\examples\common\msc_getopt.h" />
@@ -157,6 +146,10 @@
     <ClInclude Include="..\..\examples\imilab\imi_utils_visual.hpp" />
     <ClInclude Include="..\..\examples\imilab\imi_utils_yolov3.hpp" />
     <ClInclude Include="..\..\examples\imilab\imi_utils_yolov5.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\examples\common\tengine_operations.c" />
+    <ClCompile Include="..\..\examples\tm_yolov3_.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

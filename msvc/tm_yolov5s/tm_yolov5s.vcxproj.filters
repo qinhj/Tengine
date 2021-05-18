@@ -69,6 +69,18 @@
     <ClInclude Include="..\..\examples\imilab\imi_utils_yolov5.hpp">
       <Filter>头文件\imilab</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\examples\imilab\imi_utils_tm_debug.h">
+      <Filter>头文件\imilab</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\examples\imilab\imi_utils_tm-inl.h">
+      <Filter>头文件\imilab</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\examples\imilab\imi_utils_yolov3.hpp">
+      <Filter>头文件\imilab</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\examples\imilab\imi_utils_tm_quant.h">
+      <Filter>头文件\imilab</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\examples\common\tengine_operations.c">
