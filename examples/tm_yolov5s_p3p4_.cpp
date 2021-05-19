@@ -35,8 +35,7 @@
 /* imilab includes */
 #include "imilab/imi_utils_object.hpp"
 #include "imilab/imi_utils_visual.hpp"
-#include "imilab/imi_utils_yolov3.hpp"
-#include "imilab/imi_utils_imread.h"
+#include "imilab/imi_utils_yolov5.hpp"
 #include "imilab/imi_utils_tm.h"    // for: imi_utils_tm_run_graph
 #include "imilab/imi_utils_tm_debug.h"
 
@@ -47,7 +46,7 @@ static const float nms_threshold = 0.40f; // 0.45f
 #ifdef USE_OPENCV
 
 // load input images
-static void get_input_data(const char *image_file, image &lb) {
+static void get_input_data_focus(const char *image_file, image &lb) {
     cv::Mat sample = cv::imread(image_file, 1);
     cv::Mat img;
 
@@ -90,8 +89,8 @@ static void get_input_data(const char *image_file, image &lb) {
     img_new.convertTo(img_new, CV_32FC3);
     //cv::imwrite("yolov5_make_border_32FC3.jpg", img_new);
 
-    float *img_data = (float *)img_new.data;
-    float *input_temp = (float *)lb.data;
+    float* img_data = (float*)img_new.data;
+    float* input_temp = (float*)malloc(3 * lb.w * lb.h * sizeof(float));
 
     /* nhwc to nchw */
     for (int h = 0; h < lb.h; h++) {
@@ -103,11 +102,15 @@ static void get_input_data(const char *image_file, image &lb) {
             }
         }
     }
+
+    /* focus process: 3x640x640 -> 12x320x320 */
+    imi_utils_yolov5_focus_data(input_temp, lb);
+    free(input_temp);
 }
 
 #endif // USE_OPENCV
 
-// @brief:  yolov3 output tensor postprocess
+// @brief:  yolov5 output tensor postprocess
 // P3 node[0].output[0]: (1, 3, 80, 80, 85), stride=640/80=8 ,  small obj
 // P4 node[1].output[0]: (1, 3, 40, 40, 85), stride=640/40=16, middle obj
 // P5 node[2].output[0]: (1, 3, 20, 20, 85), stride=640/20=32,  large obj
@@ -129,14 +132,14 @@ static void show_usage(const char *exe) {
     fprintf(stdout, "    [-w width] [-h height] [-f max_frame] [-r repeat_count] [-t thread_count]\n");
     fprintf(stdout, "[Examples]:\n");
     fprintf(stdout, "   # coco 80 classes\n");
-    fprintf(stdout, "   %s -m yolov3-p4p5.v9.5.tmfile -i imilab_640x360x3_bgr_catdog.rgb24 -o output/imilab_640x360x3_bgr_catdog.rgb24 -t 4 -f 200\n", exe);
+    fprintf(stdout, "   %s -m yolov5s-p3p4.v5.tmfile -i imilab_640x360x3_bgr_catdog.rgb24 -o output/imilab_640x360x3_bgr_catdog.rgb24 -t 4 -f 200\n", exe);
     fprintf(stdout, "   # specific class of coco 80 classes(e.g. person)\n");
-    fprintf(stdout, "   %s -m yolov3-p4p5.v9.5.tmfile -i imilab_640x360x3_bgr_human1.rgb24 -o output/imilab_640x360x3_bgr_human1.rgb24 -t 4 -f 100 -c 0\n", exe);
-    fprintf(stdout, "   %s -m yolov3-p4p5.v9.5.tmfile -i imilab_640x360x3_bgr_human2.rgb24 -o output/imilab_640x360x3_bgr_human2.rgb24 -t 4 -f 500 -c 0\n", exe);
+    fprintf(stdout, "   %s -m yolov5s-p3p4.v5.tmfile -i imilab_640x360x3_bgr_human1.rgb24 -o output/imilab_640x360x3_bgr_human1.rgb24 -t 4 -f 100 -c 0\n", exe);
+    fprintf(stdout, "   %s -m yolov5s-p3p4.v5.tmfile -i imilab_640x360x3_bgr_human2.rgb24 -o output/imilab_640x360x3_bgr_human2.rgb24 -t 4 -f 500 -c 0\n", exe);
     fprintf(stdout, "   # single class(e.g. person)\n");
-    fprintf(stdout, "   %s -m yolov3-p4p5.tmfile -i imilab_640x360x3_bgr_catdog.rgb24 -o output/imilab_640x360x3_bgr_catdog.rgb24 -t 4 -f 200 -n 1\n", exe);
-    fprintf(stdout, "   %s -m yolov3-p4p5.tmfile -i imilab_640x360x3_bgr_human1.rgb24 -o output/imilab_640x360x3_bgr_human1.rgb24 -t 4 -f 100 -n 1\n", exe);
-    fprintf(stdout, "   %s -m yolov3-p4p5.tmfile -i imilab_640x360x3_bgr_human2.rgb24 -o output/imilab_640x360x3_bgr_human2.rgb24 -t 4 -f 500 -n 1\n", exe);
+    fprintf(stdout, "   %s -m yolov5s-p3p4.tmfile -i imilab_640x360x3_bgr_catdog.rgb24 -o output/imilab_640x360x3_bgr_catdog.rgb24 -t 4 -f 200 -n 1\n", exe);
+    fprintf(stdout, "   %s -m yolov5s-p3p4.tmfile -i imilab_640x360x3_bgr_human1.rgb24 -o output/imilab_640x360x3_bgr_human1.rgb24 -t 4 -f 100 -n 1\n", exe);
+    fprintf(stdout, "   %s -m yolov5s-p3p4.tmfile -i imilab_640x360x3_bgr_human2.rgb24 -o output/imilab_640x360x3_bgr_human2.rgb24 -t 4 -f 500 -n 1\n", exe);
 }
 
 int main(int argc, char* argv[]) {
@@ -154,8 +157,8 @@ int main(int argc, char* argv[]) {
         coco_class_num,
         coco_class_names,
         /* hyp */
-        strides_tiny,
-        3, &anchors[6],
+        strides,
+        3, anchors,
         coco_image_cov,
     };
     // allow none square letterbox, set default letterbox size
@@ -240,7 +243,7 @@ int main(int argc, char* argv[]) {
     }
 
     /* set the input shape to initial the graph, and pre-run graph to infer shape */
-    int dims[] = { 1, 3, lb.h, lb.w };
+    int dims[] = { 1, 12, lb.h / 2, lb.w / 2 };
 
     tensor_t input_tensor = get_graph_input_tensor(graph, 0, 0);
     if (nullptr == input_tensor) {
@@ -265,7 +268,7 @@ int main(int argc, char* argv[]) {
         fprintf(stderr, "[%s] Prerun multithread graph failed\n", __FUNCTION__);
         return -1;
     }
-    imi_utils_tm_show_graph(graph, 0, IMI_MASK_NODE_OUTPUT);
+    //imi_utils_tm_show_graph(graph, 0, IMI_MASK_NODE_OUTPUT);
 
     /* get output parameter info */
     const void *buffer[NODE_CNT_YOLOV3_TINY] = { 0 };
@@ -303,9 +306,9 @@ int main(int argc, char* argv[]) {
 read_data:
     /* prepare process input data, set the data mem to input tensor */
 #ifdef USE_OPENCV
-    get_input_data(image_file, lb);
+    get_input_data_focus(image_file, lb);
 #else // !USE_OPENCV
-    if (1 != (ret = imi_utils_load_letterbox(fp, input, bgr, lb, (const float (*)[3])model.usr_data))) {
+    if (1 != (ret = imi_utils_yolov5_load_data(fp, input, bgr, lb, (const float (*)[3])model.usr_data, -1, 0))) {
         fprintf(stderr, "%s\n", ret ? "get_input_data error!" : "read input data fin");
         goto exit;
     }

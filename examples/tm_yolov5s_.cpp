@@ -126,20 +126,20 @@ static int proposals_objects_get(const yolov3 &model,
     return imi_utils_yolov3_proposals_generate(model, buffer, proposals, prob_threshold);
 }
 
-static void show_usage() {
+static void show_usage(const char *exe) {
     fprintf(stdout, "[Usage]:  [-u]\n");
     fprintf(stdout, "    [-m model_file] [-i input_file] [-o output_file] [-n class_number] [-c target_class]\n");
     fprintf(stdout, "    [-w width] [-h height] [-f max_frame] [-r repeat_count] [-t thread_count]\n");
     fprintf(stdout, "[Examples]:\n");
     fprintf(stdout, "   # coco 80 classes\n");
-    fprintf(stdout, "   tm_yolov5s_ -m yolov5s.v5.tmfile -i /Dataset/imilab_640x360x3_bgr_catdog.rgb24 -o imilab_640x360x3_bgr_catdog.rgb24 -f 200\n");
+    fprintf(stdout, "   %s -m yolov5s.v5.tmfile -i imilab_640x360x3_bgr_catdog.rgb24 -o output/imilab_640x360x3_bgr_catdog.rgb24 -t 4 -f 200\n", exe);
     fprintf(stdout, "   # specific class of coco 80 classes(e.g. person)\n");
-    fprintf(stdout, "   tm_yolov5s_ -m yolov5s.v5.tmfile -i /Dataset/imilab_640x360x3_bgr_human1.rgb24 -o imilab_640x360x3_bgr_human1.rgb24 -c 0 -f 100\n");
-    fprintf(stdout, "   tm_yolov5s_ -m yolov5s.v5.tmfile -i /Dataset/imilab_640x360x3_bgr_human2.rgb24 -o imilab_640x360x3_bgr_human2.rgb24 -c 0 -f 500\n");
+    fprintf(stdout, "   %s -m yolov5s.v5.tmfile -i imilab_640x360x3_bgr_human1.rgb24 -o output/imilab_640x360x3_bgr_human1.rgb24 -t 4 -f 100 -c 0\n", exe);
+    fprintf(stdout, "   %s -m yolov5s.v5.tmfile -i imilab_640x360x3_bgr_human2.rgb24 -o output/imilab_640x360x3_bgr_human2.rgb24 -t 4 -f 500 -c 0\n", exe);
     fprintf(stdout, "   # single class(e.g. person)\n");
-    fprintf(stdout, "   tm_yolov5s_ -m yolov5s.tmfile -i /Dataset/imilab_640x360x3_bgr_catdog.rgb24 -o imilab_640x360x3_bgr_catdog.rgb24 -n 1 -f 200\n");
-    fprintf(stdout, "   tm_yolov5s_ -m yolov5s.tmfile -i /Dataset/imilab_640x360x3_bgr_human1.rgb24 -o imilab_640x360x3_bgr_human1.rgb24 -n 1 -f 100\n");
-    fprintf(stdout, "   tm_yolov5s_ -m yolov5s.tmfile -i /Dataset/imilab_640x360x3_bgr_human2.rgb24 -o imilab_640x360x3_bgr_human2.rgb24 -n 1 -f 500\n");
+    fprintf(stdout, "   %s -m yolov5s.tmfile -i imilab_640x360x3_bgr_catdog.rgb24 -o output/imilab_640x360x3_bgr_catdog.rgb24 -t 4 -f 200 -n 1\n", exe);
+    fprintf(stdout, "   %s -m yolov5s.tmfile -i imilab_640x360x3_bgr_human1.rgb24 -o output/imilab_640x360x3_bgr_human1.rgb24 -t 4 -f 100 -n 1\n", exe);
+    fprintf(stdout, "   %s -m yolov5s.tmfile -i imilab_640x360x3_bgr_human2.rgb24 -o output/imilab_640x360x3_bgr_human2.rgb24 -t 4 -f 500 -n 1\n", exe);
 }
 
 int main(int argc, char* argv[]) {
@@ -196,7 +196,7 @@ int main(int argc, char* argv[]) {
             frame = atoi(optarg);
             break;
         case 'u':
-            show_usage();
+            show_usage(argv[0]);
             return 0;
         default:
             break;
@@ -206,7 +206,7 @@ int main(int argc, char* argv[]) {
     /* check files */
     if (nullptr == model_file || nullptr == image_file) {
         fprintf(stderr, "[%s] Error: Tengine model or image file not specified!\n", __FUNCTION__);
-        show_usage();
+        show_usage(argv[0]);
         return -1;
     }
     if (!check_file_exist(model_file) || !check_file_exist(image_file)) {
