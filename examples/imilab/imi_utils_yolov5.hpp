@@ -10,7 +10,14 @@
 /* imilab includes */
 #include "imi_utils_yolov3.hpp"
 
-#define NODE_CNT_YOLOV5S    3
+#define NODE_CNT_YOLOV5S        3
+#define NODE_CNT_YOLOV5S_TINY   2
+
+// yolov5s-tiny anchors
+static const float anchors_tiny_v5s[] = {
+     9,  17,  18,  39,  37, 67, // P3/8
+    62, 132, 120, 242, 273, 363 // P4/16
+};
 
 // yolov5s input info
 static yolov3 yolov5s = {
@@ -21,6 +28,18 @@ static yolov3 yolov5s = {
     /* hyp */
     strides,
     3, anchors,
+    coco_image_cov
+};
+
+// yolov5s-tiny input info
+static yolov3 yolov5s_tiny = {
+    make_empty_image(640, 640, 3),
+    NODE_CNT_YOLOV5S_TINY,
+    coco_class_num,
+    coco_class_names,
+    /* hyp */
+    strides,
+    3, anchors_tiny_v5s,
     coco_image_cov
 };
 

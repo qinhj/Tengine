@@ -132,14 +132,14 @@ static void show_usage(const char *exe) {
     fprintf(stdout, "    [-w width] [-h height] [-f max_frame] [-r repeat_count] [-t thread_count]\n");
     fprintf(stdout, "[Examples]:\n");
     fprintf(stdout, "   # coco 80 classes\n");
-    fprintf(stdout, "   %s -m yolov5s-p3p4.v5.tmfile -i imilab_640x360x3_bgr_catdog.rgb24 -o output/imilab_640x360x3_bgr_catdog.rgb24 -t 4 -f 200\n", exe);
+    fprintf(stdout, "   %s -m yolov5s-tiny.v5.tmfile -i imilab_640x360x3_bgr_catdog.rgb24 -o output/imilab_640x360x3_bgr_catdog.rgb24 -t 4 -f 200\n", exe);
     fprintf(stdout, "   # specific class of coco 80 classes(e.g. person)\n");
-    fprintf(stdout, "   %s -m yolov5s-p3p4.v5.tmfile -i imilab_640x360x3_bgr_human1.rgb24 -o output/imilab_640x360x3_bgr_human1.rgb24 -t 4 -f 100 -c 0\n", exe);
-    fprintf(stdout, "   %s -m yolov5s-p3p4.v5.tmfile -i imilab_640x360x3_bgr_human2.rgb24 -o output/imilab_640x360x3_bgr_human2.rgb24 -t 4 -f 500 -c 0\n", exe);
+    fprintf(stdout, "   %s -m yolov5s-tiny.v5.tmfile -i imilab_640x360x3_bgr_human1.rgb24 -o output/imilab_640x360x3_bgr_human1.rgb24 -t 4 -f 100 -c 0\n", exe);
+    fprintf(stdout, "   %s -m yolov5s-tiny.v5.tmfile -i imilab_640x360x3_bgr_human2.rgb24 -o output/imilab_640x360x3_bgr_human2.rgb24 -t 4 -f 500 -c 0\n", exe);
     fprintf(stdout, "   # single class(e.g. person)\n");
-    fprintf(stdout, "   %s -m yolov5s-p3p4.tmfile -i imilab_640x360x3_bgr_catdog.rgb24 -o output/imilab_640x360x3_bgr_catdog.rgb24 -t 4 -f 200 -n 1\n", exe);
-    fprintf(stdout, "   %s -m yolov5s-p3p4.tmfile -i imilab_640x360x3_bgr_human1.rgb24 -o output/imilab_640x360x3_bgr_human1.rgb24 -t 4 -f 100 -n 1\n", exe);
-    fprintf(stdout, "   %s -m yolov5s-p3p4.tmfile -i imilab_640x360x3_bgr_human2.rgb24 -o output/imilab_640x360x3_bgr_human2.rgb24 -t 4 -f 500 -n 1\n", exe);
+    fprintf(stdout, "   %s -m yolov5s-tiny.tmfile -i imilab_640x360x3_bgr_catdog.rgb24 -o output/imilab_640x360x3_bgr_catdog.rgb24 -t 4 -f 200 -n 1\n", exe);
+    fprintf(stdout, "   %s -m yolov5s-tiny.tmfile -i imilab_640x360x3_bgr_human1.rgb24 -o output/imilab_640x360x3_bgr_human1.rgb24 -t 4 -f 100 -n 1\n", exe);
+    fprintf(stdout, "   %s -m yolov5s-tiny.tmfile -i imilab_640x360x3_bgr_human2.rgb24 -o output/imilab_640x360x3_bgr_human2.rgb24 -t 4 -f 500 -n 1\n", exe);
 }
 
 int main(int argc, char* argv[]) {
@@ -151,16 +151,9 @@ int main(int argc, char* argv[]) {
     const char *image_file = nullptr;
     const char *output_file = "output.rgb";
 
-    yolov3 model = {
-        make_image(640, 640, 3), // reset letter box size if necessary
-        NODE_CNT_YOLOV5S_TINY,
-        coco_class_num,
-        coco_class_names,
-        /* hyp */
-        strides,
-        3, anchors,
-        coco_image_cov,
-    };
+    yolov3 &model = yolov5s_tiny;
+    // reset letter box size if necessary
+    model.lb = make_image(640, 640, 3);
     // allow none square letterbox, set default letterbox size
     image &lb = model.lb;
     image input = make_empty_image(640, 360, 3);
