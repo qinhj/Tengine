@@ -60,7 +60,7 @@ static __inline void _imi_utils_tm_show_tensor_buffer(const void *data, size_t d
 
 // @brief:  show tensor info
 // @param:  check[in]   whether check the value of dim or not
-static __inline int _imi_utils_tm_show_tensor(const tensor_t &tensor, int idx, char quant, int check) {
+static __inline int _imi_utils_tm_show_tensor(const tensor_t tensor, int idx, char quant, int check) {
     size_t dt = get_tensor_data_type(tensor);
     void *buf = get_tensor_buffer(tensor);
     int buf_size = get_tensor_buffer_size(tensor) / imi_utils_tm_get_tensor_datasize(dt);
@@ -93,7 +93,7 @@ static __inline int _imi_utils_tm_show_tensor(const tensor_t &tensor, int idx, c
     return rc;
 }
 // @brief:  show node info
-static __inline int _imi_utils_tm_show_node(const node_t &node, char quant, int check) {
+static __inline int _imi_utils_tm_show_node(const node_t node, char quant, int check) {
     tensor_t tensor;
     int count, idx, rc = 0;
     count = get_node_input_number(node);
@@ -119,7 +119,7 @@ static __inline int _imi_utils_tm_show_node(const node_t &node, char quant, int 
 // @brief:  show graph input/output tensor info
 // @param:  quant[in]   quant or not(maybe we can get from graph)
 // @param:  mask[in]    0x01: input; 0x02: output; 0x04: graph
-static int imi_utils_tm_show_graph(const graph_t &graph, char quant, char mask) {
+static int imi_utils_tm_show_graph(const graph_t graph, char quant, char mask) {
     node_t node;
     int count, idx, rc = 0;
 
