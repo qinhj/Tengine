@@ -18,8 +18,9 @@
  */
 
 /*
- * Copyright (c) 2020, OPEN AI LAB
+ * Copyright (c) 2020, OPEN AI LAB && IMILAB
  * Author: jxyang@openailab.com
+ * Author: qinhongjie@imilab.com
  */
 
 /*
@@ -40,16 +41,12 @@
 /* std c++ includes */
 #include <vector>
 #include <string>
-
-#ifdef _MSC_VER
-#define NOMINMAX
-#endif
-
 /* imilab includes */
+#include "imilab/imi_utils_tm.h"    // for: imi_utils_tm_run_graph
+#include "imilab/imi_utils_elog.h"  // for: log_xxxx
+#include "imilab/imi_utils_image.h" // for: imi_utils_image_load_bgr
 #include "imilab/imi_utils_object.hpp"
 #include "imilab/imi_utils_visual.hpp"
-#include "imilab/imi_utils_imread.h"// for: imi_utils_load_image
-#include "imilab/imi_utils_tm.h"    // for: imi_utils_tm_run_graph
 
 #define DEFAULT_REPEAT_COUNT 1
 #define DEFAULT_THREAD_COUNT 1
@@ -59,8 +56,8 @@
 #define OUTPUT_PATH "output.rgb"
 
 // postprocess threshold
-static const float prob_threshold = 0.8f;
-static const float nms_threshold = 0.40f;
+static float prob_threshold = 0.8f;
+static float nms_threshold = 0.40f;
 
 const char *input_name = "data";
 
@@ -193,7 +190,7 @@ static void generate_proposals(std::vector<Box2f>& anchors, int feat_stride, con
                     obj.landmark[4].y = cy + (anchor_h + 1) * landmark[index + offset * 9];
 
                     obj.prob = prob;
-                    log_debug("face score: %.3f\n", prob);
+                    log_verbose("face score: %.3f\n", prob);
                     faces.push_back(obj);
                 }
 
@@ -249,9 +246,10 @@ static std::vector<Face2f> get_face_proposals(graph_t &graph) {
 }
 
 static void show_usage() {
-    fprintf(stdout, "[Usage]:  [-u]\n");
-    fprintf(stdout, "    [-m model_file] [-i input_file] [-o output_file] [-n device_name]\n");
-    fprintf(stdout, "    [-w width] [-h height] [-f max_frame] [-r repeat_count] [-t thread_count]\n");
+    log_echo("[Usage]:  [-u]\n");
+    log_echo("    [-m model_file] [-i input_file] [-o output_file] [-n device_name]\n");
+    log_echo("    [-w width] [-h height] [-s threshold] [-f max_frame]\n");
+    log_echo("    [-r repeat_count] [-t thread_count]\n");
 }
 
 int main(int argc, char* argv[]) {
@@ -265,7 +263,7 @@ int main(int argc, char* argv[]) {
     Size2i image_size = { 640, 360 };
 
     int res, frame = 1, fc = 0;
-    while ((res = getopt(argc, argv, "m:i:r:t:w:h:n:o:f:u")) != -1) {
+    while ((res = getopt(argc, argv, "m:i:r:t:w:h:n:o:f:s:u")) != -1) {
         switch (res) {
         case 'm':
             model_file = optarg;
@@ -294,6 +292,9 @@ int main(int argc, char* argv[]) {
         case 'f':
             frame = atoi(optarg);
             break;
+        case 's':
+            prob_threshold = (float)atof(optarg);
+            break;
         case 'u':
             show_usage();
             return 0;
@@ -304,7 +305,7 @@ int main(int argc, char* argv[]) {
 
     /* check files */
     if (nullptr == model_file || nullptr == image_file) {
-        fprintf(stderr, "[%s] Error: Tengine model or image file not specified!\n", __FUNCTION__);
+        log_error("Tengine model or image file not specified!\n");
         show_usage();
         return -1;
     }
@@ -322,15 +323,15 @@ int main(int argc, char* argv[]) {
     /* inital tengine */
     int ret = init_tengine();
     if (0 != ret) {
-        fprintf(stderr, "[%s] Initial tengine failed.\n", __FUNCTION__);
+        log_error("Initial tengine failed.\n");
         return -1;
     }
-    fprintf(stdout, "tengine-lite library version: %s\n", get_tengine_version());
+    log_echo("tengine-lite library version: %s\n", get_tengine_version());
 
     /* create graph, load tengine model xxx.tmfile */
     graph_t graph = create_graph(NULL, "tengine", model_file);
     if (nullptr == graph) {
-        fprintf(stderr, "[%s] Load model to graph failed: %d\n", __FUNCTION__, get_tengine_errno());
+        log_error("Load model to graph failed\n");
         return -1;
     }
 
@@ -339,12 +340,12 @@ int main(int argc, char* argv[]) {
 
     tensor_t input_tensor = get_graph_tensor(graph, input_name);
     if (nullptr == input_tensor) {
-        fprintf(stderr, "[%s] Get input tensor failed\n", __FUNCTION__);
+        log_error("Get input tensor failed\n");
         return -1;
     }
 
     if (0 != set_tensor_shape(input_tensor, dims, 4)) {
-        fprintf(stderr, "[%s] Set input tensor shape failed\n", __FUNCTION__);
+        log_error("Set input tensor shape failed\n");
         return -1;
     }
 
@@ -352,13 +353,13 @@ int main(int argc, char* argv[]) {
     int img_size = img.w * img.h * img.c, channel = 3, bgr = 0;
     /* set the data mem to input tensor */
     if (set_tensor_buffer(input_tensor, img.data, img_size * sizeof(float)) < 0) {
-        fprintf(stderr, "[%s] Set input tensor buffer failed\n", __FUNCTION__);
+        log_error("Set input tensor buffer failed\n");
         return -1;
     }
 
     /* prerun graph, set work options(num_thread, cluster, precision) */
     if (0 != prerun_graph_multithread(graph, opt)) {
-        fprintf(stderr, "[%s] Prerun multithread graph failed.\n", __FUNCTION__);
+        log_error("Prerun multithread graph failed.\n");
         return -1;
     }
 
@@ -390,13 +391,13 @@ int main(int argc, char* argv[]) {
     else if (strstr(image_file, "rgba")) channel = 4, bgr = 0;
     else if (strstr(image_file, "rgb")) channel = 3, bgr = 0;
     else {
-        fprintf(stderr, "[%s] unknown test data format!\n", __FUNCTION__);
+        log_error("unknown test data format!\n");
         goto exit;
     }
 
 read_data:
-    if (1 != (ret = imi_utils_load_image(fp, img, bgr, channel))) {
-        fprintf(stderr, "%s\n", ret ? "get_input_data error!" : "read input data fin");
+    if (1 != (ret = imi_utils_image_load_bgr(fp, img, bgr, channel))) {
+        log_error("%s\n", ret ? "get_input_data error!" : "read input data fin");
         goto exit;
     }
 #if 0
@@ -429,28 +430,23 @@ read_data:
 
     // save result to output
     if (fout) {
-        unsigned char uc[3];
-        int img_size_ = img.w * img.h;
-        for (int i = 0; i < img_size_; i++) {
-            uc[0] = (unsigned char)(*(img.data + i + 2 * img_size_)); // b
-            uc[1] = (unsigned char)(*(img.data + i + 1 * img_size_)); // g
-            uc[2] = (unsigned char)(*(img.data + i + 0 * img_size_)); // r
-            fwrite(uc, sizeof(unsigned char), 3, fout);
-        }
+        imi_utils_image_save_permute_chw2hwc(fout, img, bgr);
     }
 
     if (fc < frame) goto read_data;
 
 exit:
-    fclose(fp);
+    free_image(img);
+    if (fp) fclose(fp);
     if (fout) fclose(fout);
-    free(img.data);
-    printf("total frame: %d\n", fc);
+    if (1 < fc) log_echo("total frame: %d\n", fc);
 
     /* release tengine */
     postrun_graph(graph);
     destroy_graph(graph);
     release_tengine();
 
+    /* show test status */
+    imi_utils_tm_run_status(NULL);
     return 0;
 }

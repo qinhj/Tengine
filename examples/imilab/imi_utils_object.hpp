@@ -7,12 +7,10 @@
 #ifndef __IMI_UTILS_OBJECT_HPP__
 #define __IMI_UTILS_OBJECT_HPP__
 
-/* std c includes */
-#include <stdio.h>  // for: stdout
 /* std c++ includes */
 #include <vector>
 /* imilab includes */
-#include "imi_utils_elog.h"
+#include "imi_utils_elog.h" // for: log_xxxx
 #include "imi_utils_common.hpp" // for: Object
 
 #define DFLT_THRESHOLD_NMS  0.45f
@@ -63,13 +61,13 @@ void imi_utils_objects_nms(const std::vector<_Tp>& objects, std::vector<int>& pi
     picked.clear();
 
     const int n = objects.size();
-    log_debug("[%s] proposal num: %d\n", __FUNCTION__, n);
+    log_verbose("proposal num: %d\n", n);
 
     std::vector<float> areas(n);
     for (int i = 0; i < n; i++) {
         const _Tp &obj = objects[i];
         areas[i] = obj.rect.area();
-        log_debug("[%s] object[%d] class[%d] (%.3f, %.3f), w: %.3f, h: %.3f\n", __FUNCTION__,
+        log_verbose("object[%d] class[%d] (%.3f, %.3f), w: %.3f, h: %.3f\n",
             i, obj.label, obj.rect.x, obj.rect.y, obj.rect.width, obj.rect.height);
     }
 
@@ -84,7 +82,7 @@ void imi_utils_objects_nms(const std::vector<_Tp>& objects, std::vector<int>& pi
             float inter_area = (a.rect & b.rect).area();
             float union_area = areas[i] + areas[picked[j]] - inter_area;
             float iou = inter_area / union_area;
-            log_debug("[%s] IOU(%d, %d)=%.3f/%.3f=%.3f\n", __FUNCTION__, i, j, inter_area, union_area, iou);
+            log_verbose("IOU(%d, %d)=%.3f/%.3f=%.3f\n", i, j, inter_area, union_area, iou);
             // float IoU = inter_area / union_area
             if (iou > nms_threshold) {
                 keep = 0;
@@ -93,7 +91,7 @@ void imi_utils_objects_nms(const std::vector<_Tp>& objects, std::vector<int>& pi
 
         if (keep) {
             picked.push_back(i);
-            log_debug("[%s] push face(%d) into picked list\n", __FUNCTION__, i);
+            log_verbose("push obj(%d) into picked list\n", i);
         }
     }
 }
@@ -107,7 +105,7 @@ std::vector<_Tp> imi_utils_proposals_filter(const std::vector<_Tp> &proposals,
     imi_utils_objects_nms(proposals, picked, nms_threshold);
 
     int count = picked.size();
-    log_debug("[%s] %d objects are picked\n", __FUNCTION__, count);
+    log_verbose("%d objects are picked\n", count);
 
     // post process: scale and offset for letter box
     Size2i lb_offset;
@@ -120,8 +118,8 @@ std::vector<_Tp> imi_utils_proposals_filter(const std::vector<_Tp> &proposals,
         lb_offset.height = int(lb_scale * image_size.height);
         lb_offset.width = (letter_box.width - lb_offset.width) / 2;
         lb_offset.height = (letter_box.height - lb_offset.height) / 2;
-        log_debug("[%s] letter box scale: %3.4f, offset: (%d, %d)\n",
-            __FUNCTION__, lb_scale, lb_offset.width, lb_offset.height);
+        log_verbose("letter box scale: %3.4f, offset: (%d, %d)\n",
+            lb_scale, lb_offset.width, lb_offset.height);
     }
 
     std::vector<_Tp> objects(count);

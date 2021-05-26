@@ -12,6 +12,7 @@
 /* std c++ includes */
 #include <vector>
 /* imilab includes */
+#include "imi_utils_elog.h"     // for: log_xxxx
 #include "imi_utils_common.hpp" // for: Object
 
 #ifdef USE_OPENCV
@@ -27,7 +28,7 @@ void imi_utils_objects_draw(const std::vector<_Tp> &objects,
     for (size_t i = 0; i < objects.size(); i++) {
         const _Tp &obj = objects[i];
 
-        fprintf(stdout, "[%2d]: %3.3f%%, [(%4.0f, %4.0f), (%4.0f, %4.0f)], %s\n",
+        log_echo("[%2d]: %3.3f%%, [(%4.0f, %4.0f), (%4.0f, %4.0f)], %s\n",
             obj.label, obj.prob * 100, obj.rect.x, obj.rect.y,
             obj.rect.x + obj.rect.width, obj.rect.y + obj.rect.height, labels[obj.label]);
 
@@ -67,12 +68,12 @@ template<typename _Tp>
 int imi_utils_objects_draw(const std::vector<_Tp> &objects,
     image &img, int cls, const char * const *labels) {
     size_t size = objects.size();
-    fprintf(stdout, "detected objects num: %zu\n", size);
+    log_echo("detected objects num: %zu\n", size);
 
     for (size_t i = 0; i < size; i++) {
         const _Tp &obj = objects[i];
         if (labels) {
-            fprintf(stdout, "[%2d]: %3.3f%%, [(%.3f, %.3f), (%.3f, %.3f)], %s\n",
+            log_echo("[%2d]: %3.3f%%, [(%.3f, %.3f), (%.3f, %.3f)], %s\n",
                 obj.label, obj.prob * 100, obj.rect.x, obj.rect.y,
                 obj.rect.x + obj.rect.width, obj.rect.y + obj.rect.height, labels[obj.label]);
         }
@@ -88,11 +89,11 @@ int imi_utils_objects_draw(const std::vector<_Tp> &objects,
 template<typename _Tp>
 int imi_utils_faces_draw(const std::vector<_Tp> &faces, image &img) {
     size_t size = faces.size();
-    fprintf(stdout, "detected faces num: %zu\n", size);
+    log_echo("detected faces num: %zu\n", size);
 
     for (size_t i = 0; i < size; i++) {
         const _Tp &face = faces[i];
-        fprintf(stdout, "Face[%2d]: %3.3f%%, [(%.3f, %.3f), (%.3f, %.3f)]\n",
+        log_echo("Face[%2d]: %3.3f%%, [(%.3f, %.3f), (%.3f, %.3f)]\n",
             (int)i, face.prob * 100, face.rect.x, face.rect.y, face.rect.width, face.rect.height);
 
         draw_box(img, face.rect.x, face.rect.y, face.rect.x + face.rect.width, face.rect.y + face.rect.height, 2, 0, 255, 0);

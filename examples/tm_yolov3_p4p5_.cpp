@@ -18,7 +18,7 @@
  */
 
 /*
- * Copyright (c) 2021, OPEN AI LAB
+ * Copyright (c) 2021, OPEN AI LAB && IMILAB
  * Author: xwwang@openailab.com
  * Author: stevenwudi@fiture.com
  * Author: qinhongjie@imilab.com
@@ -28,7 +28,7 @@
 //#define _DEBUG
 
 /* std c includes */
-#include <stdio.h>  // for: fprintf
+#include <stdio.h>
 #include <stdlib.h>
 /* std c++ includes */
 #include <vector>
@@ -36,13 +36,20 @@
 #include "imilab/imi_utils_object.hpp"
 #include "imilab/imi_utils_visual.hpp"
 #include "imilab/imi_utils_yolov3.hpp"
-#include "imilab/imi_utils_imread.h"
 #include "imilab/imi_utils_tm.h"    // for: imi_utils_tm_run_graph
+#include "imilab/imi_utils_elog.h"  // for: log_xxxx
+#include "imilab/imi_utils_image.h" // for: imi_utils_image_load_letterbox
 #include "imilab/imi_utils_tm_debug.h"
 
 // postprocess threshold
-static const float prob_threshold = 0.6f; // 0.25f
-static const float nms_threshold = 0.40f; // 0.45f
+static float prob_threshold = 0.6f; // 0.25f
+static float nms_threshold = 0.40f; // 0.45f
+
+// example models for show usage
+static const char *models[] = {
+    "yolov3-p4p5.v9.5.tmfile", // official model
+    "yolov3-p4p5.tmfile",      // imilab model
+};
 
 #ifdef USE_OPENCV
 
@@ -123,22 +130,6 @@ static int proposals_objects_get(const yolov3 &model,
     return imi_utils_yolov3_proposals_generate(model, buffer, proposals, prob_threshold);
 }
 
-static void show_usage(const char *exe) {
-    fprintf(stdout, "[Usage]:  [-u]\n");
-    fprintf(stdout, "    [-m model_file] [-i input_file] [-o output_file] [-n class_number] [-c target_class]\n");
-    fprintf(stdout, "    [-w width] [-h height] [-f max_frame] [-r repeat_count] [-t thread_count]\n");
-    fprintf(stdout, "[Examples]:\n");
-    fprintf(stdout, "   # coco 80 classes\n");
-    fprintf(stdout, "   %s -m yolov3-p4p5.v9.5.tmfile -i imilab_640x360x3_bgr_catdog.rgb24 -o output/imilab_640x360x3_bgr_catdog.rgb24 -t 4 -f 200\n", exe);
-    fprintf(stdout, "   # specific class of coco 80 classes(e.g. person)\n");
-    fprintf(stdout, "   %s -m yolov3-p4p5.v9.5.tmfile -i imilab_640x360x3_bgr_human1.rgb24 -o output/imilab_640x360x3_bgr_human1.rgb24 -t 4 -f 100 -c 0\n", exe);
-    fprintf(stdout, "   %s -m yolov3-p4p5.v9.5.tmfile -i imilab_640x360x3_bgr_human2.rgb24 -o output/imilab_640x360x3_bgr_human2.rgb24 -t 4 -f 500 -c 0\n", exe);
-    fprintf(stdout, "   # single class(e.g. person)\n");
-    fprintf(stdout, "   %s -m yolov3-p4p5.tmfile -i imilab_640x360x3_bgr_catdog.rgb24 -o output/imilab_640x360x3_bgr_catdog.rgb24 -t 4 -f 200 -n 1\n", exe);
-    fprintf(stdout, "   %s -m yolov3-p4p5.tmfile -i imilab_640x360x3_bgr_human1.rgb24 -o output/imilab_640x360x3_bgr_human1.rgb24 -t 4 -f 100 -n 1\n", exe);
-    fprintf(stdout, "   %s -m yolov3-p4p5.tmfile -i imilab_640x360x3_bgr_human2.rgb24 -o output/imilab_640x360x3_bgr_human2.rgb24 -t 4 -f 500 -n 1\n", exe);
-}
-
 int main(int argc, char* argv[]) {
     int repeat_count = 1;
     int num_thread = 1;
@@ -163,7 +154,7 @@ int main(int argc, char* argv[]) {
     image input = make_empty_image(640, 360, 3);
 
     int res, frame = 1, fc = 0;
-    while ((res = getopt(argc, argv, "c:m:i:r:t:w:h:n:o:f:u")) != -1) {
+    while ((res = getopt(argc, argv, "c:m:i:r:t:w:h:n:o:f:s:u")) != -1) {
         switch (res) {
         case 'c':
             target_class = atoi(optarg);
@@ -199,8 +190,11 @@ int main(int argc, char* argv[]) {
         case 'f':
             frame = atoi(optarg);
             break;
+        case 's':
+            prob_threshold = (float)atof(optarg);
+            break;
         case 'u':
-            show_usage(argv[0]);
+            show_usage(argv[0], models);
             return 0;
         default:
             break;
@@ -209,8 +203,8 @@ int main(int argc, char* argv[]) {
 
     /* check files */
     if (nullptr == model_file || nullptr == image_file) {
-        fprintf(stderr, "[%s] Error: Tengine model or image file not specified!\n", __FUNCTION__);
-        show_usage(argv[0]);
+        log_error("Tengine model or image file not specified!\n");
+        show_usage(argv[0], models);
         return -1;
     }
     if (!check_file_exist(model_file) || !check_file_exist(image_file)) {
@@ -227,15 +221,15 @@ int main(int argc, char* argv[]) {
     /* inital tengine */
     int ret = init_tengine();
     if (0 != ret) {
-        fprintf(stderr, "[%s] Initial tengine failed.\n", __FUNCTION__);
+        log_error("Initial tengine failed.\n");
         return -1;
     }
-    fprintf(stdout, "tengine-lite library version: %s\n", get_tengine_version());
+    log_echo("tengine-lite library version: %s\n", get_tengine_version());
 
     /* create graph, load tengine model xxx.tmfile */
     graph_t graph = create_graph(nullptr, "tengine", model_file);
     if (nullptr == graph) {
-        fprintf(stderr, "[%s] Load model to graph failed: %d\n", __FUNCTION__, get_tengine_errno());
+        log_error("Load model to graph failed\n");
         return -1;
     }
 
@@ -244,25 +238,25 @@ int main(int argc, char* argv[]) {
 
     tensor_t input_tensor = get_graph_input_tensor(graph, 0, 0);
     if (nullptr == input_tensor) {
-        fprintf(stderr, "[%s] Get input tensor failed\n", __FUNCTION__);
+        log_error("Get input tensor failed\n");
         return -1;
     }
 
     if (0 != set_tensor_shape(input_tensor, dims, 4)) {
-        fprintf(stderr, "[%s] Set input tensor shape failed\n", __FUNCTION__);
+        log_error("Set input tensor shape failed\n");
         return -1;
     }
 
     int img_size = lb.c * lb.h * lb.w, bgr = 0;
     /* set the data mem to input tensor */
     if (set_tensor_buffer(input_tensor, lb.data, img_size * sizeof(float)) < 0) {
-        fprintf(stderr, "[%s] Set input tensor buffer failed\n", __FUNCTION__);
+        log_error("Set input tensor buffer failed\n");
         return -1;
     }
 
     /* prerun graph, set work options(num_thread, cluster, precision) */
     if (prerun_graph_multithread(graph, opt) < 0) {
-        fprintf(stderr, "[%s] Prerun multithread graph failed\n", __FUNCTION__);
+        log_error("Prerun multithread graph failed.\n");
         return -1;
     }
     imi_utils_tm_show_graph(graph, 0, IMI_MASK_NODE_OUTPUT);
@@ -270,7 +264,7 @@ int main(int argc, char* argv[]) {
     /* get output parameter info */
     const void *buffer[NODE_CNT_YOLOV3_TINY] = { 0 };
     if (imi_utils_yolov3_get_output_parameter(graph, buffer, NODE_CNT_YOLOV3_TINY, 0) < 0) {
-        fprintf(stderr, "[%s] get output parameter failed\n", __FUNCTION__);
+        log_error("get output parameter failed\n");
         return -1;
     }
 
@@ -280,7 +274,7 @@ int main(int argc, char* argv[]) {
 #ifdef USE_OPENCV
     cv::Mat img = cv::imread(image_file, 1);
     if (img.empty()) {
-        fprintf(stderr, "[%s] cv::imread %s failed\n", __FUNCTION__, image_file);
+        log_error("cv::imread %s failed\n", image_file);
         return -1;
     }
     input.w = img.cols, input.h = img.rows;
@@ -294,7 +288,7 @@ int main(int argc, char* argv[]) {
     else if (strstr(image_file, "rgba")) input.c = 4, bgr = 0;
     else if (strstr(image_file, "rgb")) input.c = 3, bgr = 0;
     else {
-        fprintf(stderr, "[%s] unknown test data format!\n", __FUNCTION__);
+        log_error("unknown test data format!\n");
         goto exit;
     }
     input.data = (float *)calloc(sizeof(float), input.c * input.w * input.h);
@@ -305,8 +299,8 @@ read_data:
 #ifdef USE_OPENCV
     get_input_data(image_file, lb);
 #else // !USE_OPENCV
-    if (1 != (ret = imi_utils_load_letterbox(fp, input, bgr, lb, (const float (*)[3])model.usr_data))) {
-        fprintf(stderr, "%s\n", ret ? "get_input_data error!" : "read input data fin");
+    if (1 != (ret = imi_utils_image_load_letterbox(fp, input, bgr, lb, (const float (*)[3])model.usr_data))) {
+        log_error("%s\n", ret ? "get_input_data error!" : "read input data fin");
         goto exit;
     }
     fc++;
@@ -336,30 +330,26 @@ exit:
 
     // save result to output
     if (fout) {
-        unsigned char uc[3];
-        int img_size_ = input.w * input.h;
-        for (int i = 0; i < img_size_; i++) {
-            uc[0] = (unsigned char)(*(input.data + i + 2 * img_size_)); // b
-            uc[1] = (unsigned char)(*(input.data + i + 1 * img_size_)); // g
-            uc[2] = (unsigned char)(*(input.data + i + 0 * img_size_)); // r
-            fwrite(uc, sizeof(unsigned char), 3, fout);
-        }
+        imi_utils_image_save_permute_chw2hwc(fout, input, bgr);
     }
 
     if (fc < frame) goto read_data;
 
 exit:
-    fclose(fp);
+    if (fp) fclose(fp);
     if (fout) fclose(fout);
-    free(input.data);
-    printf("total frame: %d\n", fc);
+    free_image(input);
+
 #endif // USE_OPENCV
-    free(lb.data);
+    free_image(lb);
+    if (1 < fc) log_echo("total frame: %d\n", fc);
 
     /* release tengine */
     postrun_graph(graph);
     destroy_graph(graph);
     release_tengine();
 
+    /* show test status */
+    imi_utils_tm_run_status(NULL);
     return 0;
 }

@@ -25,9 +25,7 @@ typedef struct object_s {
     float prob;
 } Object;
 
-typedef struct face_s {
-    float prob;
-    Rect2f rect;
+typedef struct face_s : public Object {
     Point2f landmark[5];
 } Face2f;
 

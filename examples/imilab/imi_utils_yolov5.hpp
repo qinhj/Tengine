@@ -46,7 +46,7 @@ static yolov3 yolov5s_tiny = {
 /* std c++ includes */
 #include <cmath>    // for: round
 /* imilab includes */
-#include "imi_utils_imread.h"
+#include "imi_utils_image.h"
 
 /* focus process: 3x640x640 -> 12x320x320 */
 /*
@@ -56,6 +56,11 @@ static yolov3 yolov5s_tiny = {
                   C0-3, C1-3, C2-3,
 */
 static int imi_utils_yolov5_focus_data(const float *data, image &lb) {
+    // check inputs
+    if (NULL == data || NULL == lb.data) {
+        return -1;
+    }
+
     for (int i = 0; i < 2; i++) {       // corresponding to rows
         for (int g = 0; g < 2; g++) {   // corresponding to cols
             for (int c = 0; c < lb.c; c++) {
@@ -80,6 +85,11 @@ static int imi_utils_yolov5_focus_data(const float *data, image &lb) {
     return 0;
 }
 static int imi_utils_yolov5_focus_data(const float *data, image &lb, float input_scale, int zero_point) {
+    // check inputs
+    if (NULL == data || NULL == lb.data) {
+        return -1;
+    }
+
     uint8_t *input_data = (uint8_t *)(lb.data);
     for (int i = 0; i < 2; i++) {       // corresponding to rows
         for (int g = 0; g < 2; g++) {   // corresponding to cols
@@ -113,14 +123,14 @@ static int imi_utils_yolov5_load_data(FILE *fp, image &img, char bgr, image &lb,
     // todo: optimize/resize input image
     if ((img.w <= img.h && lb.h != img.h) ||
         (img.h <= img.w && lb.w != img.w)) {
-        fprintf(stderr, "[%s] input size (%d, %d) not match letter box size (%d, %d)!\n", __FUNCTION__, img.w, img.h, lb.w, lb.h);
-        fprintf(stderr, "[%s] please try to resize the input image first!\n", __FUNCTION__);
+        log_error("input size (%d, %d) not match letter box size (%d, %d)!\n", img.w, img.h, lb.w, lb.h);
+        log_error("please try to resize the input image first!\n");
         exit(0);
     }
 
     // check buffer data
     if (NULL == lb.data) {
-        fprintf(stderr, "[%s] letter box data buffer is NULL\n", __FUNCTION__);
+        log_error("letter box data buffer is NULL\n");
         return -2;
         //lb.data = (float *)calloc(sizeof(float), lb_size);
     }
@@ -138,7 +148,7 @@ static int imi_utils_yolov5_load_data(FILE *fp, image &img, char bgr, image &lb,
     float *swap = lb.data;
     lb.data = data;
     // load image to letter box
-    int rc = imi_utils_load_letterbox(fp, img, bgr, lb, cov);
+    int rc = imi_utils_image_load_letterbox(fp, img, bgr, lb, cov);
     lb.data = swap;
     if (1 != rc) {
         free(data);

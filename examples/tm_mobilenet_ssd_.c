@@ -23,12 +23,13 @@
  * Author: qinhongjie@imilab.com
  */
 
-/* stdc includes */
+/* std c includes */
 #include <stdio.h>  // for: fprintf
 #include <string.h> // for: strstr
 /* imilab includes */
 #include "imilab/imi_utils_tm.h"    // for: imi_utils_tm_run_graph
 #include "imilab/imi_utils_voc.h"   // for: voc_class_names, ...
+#include "imilab/imi_utils_elog.h"  // for: log_xxxx
 #include "imilab/imi_utils_image.h" // for: imi_utils_image_load_bgr
 
 #define DIM_NUM     4
@@ -52,6 +53,12 @@ typedef struct Box {
 
 static const char* const *class_names = voc_class_names;
 
+// example models for show usage
+static const char *models[] = {
+    "mobilenet_ssd.tmfile",     // online model
+    "mobilenet_ssd.imi.tmfile", // imilab model
+};
+
 // @return: box count
 static int post_process_ssd(image im, float threshold, const void *data, int num, int tc) {
     const float *outdata = (const float *)data;
@@ -71,38 +78,14 @@ static int post_process_ssd(image im, float threshold, const void *data, int num
                 draw_box(im, box.x0, box.y0, box.x1, box.y1, 2, 125, 0, 125);
             }
 
-            fprintf(stdout, "score: %.3f%%, box: (%.3f, %.3f) (%.3f, %.3f), label: %s\n",
+            log_echo("score: %.3f%%, box: (%.3f, %.3f) (%.3f, %.3f), label: %s\n",
                 box.score * 100, box.x0, box.y0, box.x1, box.y1, class_names[box.class_idx]);
             cnt++;
         }
         outdata += 6;
     }
-    fprintf(stdout, "detect box num: %d, select box num: %d\n", num, cnt);
+    log_echo("detect box num: %d, select box num: %d\n", num, cnt);
     return cnt;
-}
-
-static void show_usage(const char *exe) {
-    const char *model = "mobilenet_ssd.tmfile";
-    const char *tests[] = {
-        "imilab_640x360x3_bgr_catdog.rgb24",
-        "imilab_640x360x3_bgr_human1.rgb24",
-        "imilab_640x360x3_bgr_human2.rgb24",
-        "imilab_960x512x3_bgr_human3.rgb24",
-    };
-    fprintf(stdout, "[Usage]:  [-u]\n");
-    fprintf(stdout, "    [-m model_file] [-i input_file] [-o output_file] [-n class_number] [-c target_class]\n");
-    fprintf(stdout, "    [-w width] [-h height] [-f max_frame] [-r repeat_count] [-t thread_count]\n");
-    fprintf(stdout, "[Examples]:\n");
-    fprintf(stdout, "   # voc 21 classes\n");
-    fprintf(stdout, "   %s -m %s -i %s -o output/%s -t 4 -f 200\n", exe, model, tests[0], tests[0]);
-    fprintf(stdout, "   # specific class of voc 21 classes(e.g. person)\n");
-    fprintf(stdout, "   %s -m %s -i %s -o output/%s -t 4 -f 100 -c 15\n", exe, model, tests[1], tests[1]);
-    fprintf(stdout, "   %s -m %s -i %s -o output/%s -t 4 -f 500 -c 15\n", exe, model, tests[2], tests[2]);
-    fprintf(stdout, "   # single class(e.g. person)\n");
-    fprintf(stdout, "   %s -m %s -i %s -o output/%s -t 4 -f 200 -n 1\n", exe, model, tests[0], tests[0]);
-    fprintf(stdout, "   %s -m %s -i %s -o output/%s -t 4 -f 100 -n 1\n", exe, model, tests[1], tests[1]);
-    fprintf(stdout, "   %s -m %s -i %s -o output/%s -t 4 -f 500 -n 1\n", exe, model, tests[2], tests[2]);
-    fprintf(stdout, "   %s -m %s -i %s -o output/%s -t 4 -f 500 -n 1 -w 960 -h 512\n", exe, model, tests[3], tests[3]);
 }
 
 int main(int argc, char* argv[]) {
@@ -159,7 +142,7 @@ int main(int argc, char* argv[]) {
             threshold = (float)atof(optarg);
             break;
         case 'u':
-            show_usage(argv[0]);
+            show_usage(argv[0], models);
             return 0;
         default:
             break;
@@ -168,8 +151,8 @@ int main(int argc, char* argv[]) {
 
     /* check files */
     if (NULL == model_file || NULL == image_file) {
-        fprintf(stderr, "[%s] Error: Tengine model or image file not specified!\n", __FUNCTION__);
-        show_usage(argv[0]);
+        log_error("Tengine model or image file not specified!\n");
+        show_usage(argv[0], models);
         return -1;
     }
     if (!check_file_exist(model_file) || !check_file_exist(image_file)) {
@@ -186,22 +169,22 @@ int main(int argc, char* argv[]) {
     /* inital tengine */
     int ret = init_tengine();
     if (0 != ret) {
-        fprintf(stderr, "[%s] Initial tengine failed.\n", __FUNCTION__);
+        log_error("Initial tengine failed.\n");
         return -1;
     }
-    fprintf(stdout, "tengine-lite library version: %s\n", get_tengine_version());
+    log_echo("tengine-lite library version: %s\n", get_tengine_version());
 
     /* create graph, load tengine model xxx.tmfile */
     graph_t graph = create_graph(NULL, "tengine", model_file);
     if (NULL == graph) {
-        fprintf(stderr, "[%s] Load model to graph failed: %d\n", __FUNCTION__, get_tengine_errno());
+        log_error("Load model to graph failed\n");
         return -1;
     }
 
     /* get input tensor of graph */
     tensor_t tensor = get_graph_input_tensor(graph, 0, 0);
     if (NULL == tensor) {
-        fprintf(stderr, "[%s] Get input tensor failed\n", __FUNCTION__);
+        log_error("Get input tensor failed\n");
         return -1;
     }
 
@@ -209,13 +192,13 @@ int main(int argc, char* argv[]) {
     /* get shape of input tensor */
     int i, dims[DIM_NUM]; // nchw
     int dim_num = get_tensor_shape(tensor, dims, DIM_NUM);
-    fprintf(stdout, "input tensor shape: %d(", dim_num);
+    log_echo("input tensor shape: %d(", dim_num);
     for (i = 0; i < dim_num; i++) {
-        fprintf(stdout, " %d", dims[i]);
+        log_echo(" %d", dims[i]);
     }
-    fprintf(stdout, ")\n");
+    log_echo(")\n");
     if (DIM_NUM != dim_num) {
-        fprintf(stderr, "[%s] Get input tensor shape error\n", __FUNCTION__);
+        log_error("Get input tensor shape error\n");
         return -1;
     }
 #else // customer shape
@@ -223,7 +206,7 @@ int main(int argc, char* argv[]) {
     /* set input tensor shape (if necessary) */
     int dims[DIM_NUM] = { INPUT_TENSOR_SHAPE };
     if (set_tensor_shape(tensor, dims, DIM_NUM) < 0) {
-        fprintf(stderr, "[%s] Set input tensor shape failed\n", __FUNCTION__);
+        log_error("Set input tensor shape failed\n");
         return -1;
     }
 #endif // !ENABLE_CUSTOMER_SHAPE
@@ -232,13 +215,13 @@ int main(int argc, char* argv[]) {
     int img_size = lb.w * lb.h * lb.c;
     /* set the data mem to input tensor */
     if (set_tensor_buffer(tensor, lb.data, img_size * sizeof(float)) < 0) {
-        fprintf(stderr, "[%s] Set input tensor buffer failed\n", __FUNCTION__);
+        log_error("Set input tensor buffer failed\n");
         return -1;
     }
 
     /* prerun graph, set work options(num_thread, cluster, precision) */
     if (prerun_graph_multithread(graph, opt) < 0) {
-        fprintf(stderr, "[%s] Prerun multithread graph failed\n", __FUNCTION__);
+        log_error("Prerun multithread graph failed\n");
         return -1;
     }
     //imi_utils_tm_show_graph(graph, 0, IMI_MASK_NODE_OUTPUT);
@@ -246,17 +229,17 @@ int main(int argc, char* argv[]) {
     /* get output tensor of graph */
     tensor = get_graph_output_tensor(graph, 0, 0);
     if (NULL == tensor) {
-        fprintf(stderr, "[%s] Get output tensor failed\n", __FUNCTION__);
+        log_error("Get output tensor failed\n");
         return -1;
     }
 #if 0 // it seems that get output tensor shape could cost more time during run graph
     /* get output tensor shape: (1, 100, 6, 1) */
     dim_num = get_tensor_shape(tensor, dims, DIM_NUM);
     if (dim_num < 2) {
-        fprintf(stderr, "[%s] Get output tensor shape error\n", __FUNCTION__);
+        log_error("Get output tensor shape error\n");
         return -1;
     }
-    fprintf(stdout, "maximum output box num: %d\n", dims[1]);
+    log_echo("maximum output box num: %d\n", dims[1]);
 #endif
 
     // to support read/load video.rgb or video.bgr
@@ -282,8 +265,8 @@ read_data:
             goto exit;
         }
         fc++;
-        fprintf(stdout, "======================================\n");
-        fprintf(stdout, "Frame No.%03d:\n", fc);
+        log_echo("======================================\n");
+        log_echo("Frame No.%03d:\n", fc);
 
         const float *_data = im.data;
         // define resized image
@@ -317,11 +300,11 @@ read_data:
     /* Note: For mobilenet ssd caffe model, the output tensor shape isn't fixed.
         Everything is hard coded in the model, even the confidence and nms threshold.
         So we need to update output tensor shape here, which is different from yolo.
-    fprintf(stdout, "output tensor[%p] shape: %d(", tensor, dim_num);
+    log_echo("output tensor[%p] shape: %d(", tensor, dim_num);
     for (i = 0; i < dim_num; i++) {
-        fprintf(stdout, " %d", dims[i]);
+        log_echo(" %d", dims[i]);
     }
-    fprintf(stdout, ")\n");
+    log_echo(")\n");
     */
 
     /* process the detection result */
@@ -341,7 +324,7 @@ exit:
     free_image(lb);
     if (fp) fclose(fp);
     if (fout) fclose(fout);
-    if (1 < fc) fprintf(stdout, "total frame: %d\n", fc);
+    if (1 < fc) log_echo("total frame: %d\n", fc);
 
     /* release tengine */
     postrun_graph(graph);

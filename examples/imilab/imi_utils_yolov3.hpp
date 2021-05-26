@@ -8,7 +8,6 @@
 #define __IMI_UTILS_YOLOV3_HPP__
 
 /* std c includes */
-#include <stdio.h>
 #include <assert.h>
 /* std c++ includes */
 #include <cmath>    // for: exp
@@ -16,6 +15,7 @@
 #include "tengine/c_api.h"      // for: graph_t, run_graph
 #include "tengine_operations.h" // for: image
 /* imilab includes */
+#include "imi_utils_elog.h"     // for: log_xxxx
 #include "imi_utils_coco.h"     // for: coco_class_names
 #include "imi_utils_object.hpp"
 #include "imi_utils_tm_quant.h" // for: tm_quant_t
@@ -96,7 +96,7 @@ static int imi_utils_yolov3_get_output_parameter(
         tensor = get_graph_output_tensor(graph, i, 0);
         param[i] = tensor ? get_tensor_buffer(tensor) : NULL;
         if (NULL == param[i]) {
-            fprintf(stderr, "[%s] get tensor[%d] buffer NULL\n", __FUNCTION__, i);
+            log_error("get tensor[%d] buffer NULL\n", i);
             return -1;
         }
 #if defined(_DEBUG) //&& 0
@@ -110,7 +110,7 @@ static int imi_utils_yolov3_get_output_parameter(
         tm_quant_t quant = (tm_quant_t)param[i];
         if (tensor && NULL == quant) quant = (tm_quant_t)calloc(1, sizeof(tm_quant));
         if (0 != imi_utils_tm_quant_get(tensor, quant)) {
-            fprintf(stderr, "[%s] get tensor[%d] quant info failed\n", __FUNCTION__, i);
+            log_error("get tensor[%d] quant info failed\n", i);
             return -1;
         }
 #if defined(_DEBUG) //&& 0

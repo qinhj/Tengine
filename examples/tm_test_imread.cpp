@@ -11,7 +11,8 @@
 //#include "tengine/c_api.h"
 #include "tengine_operations.h" // for: imread
 /* imilab includes */
-#include "imilab/imi_utils_imread.h"
+#include "imilab/imi_utils_elog.h"
+#include "imilab/imi_utils_image.h"
 
 #define IMAGE_PATH  "/media/sf_Workshop/color_375x375_rgb888.bmp"
 #define OUTPUT_PATH "output.rgb"
@@ -31,7 +32,7 @@ static int get_input_data(const char* image_file, std::vector<float>& image_data
 
     size.width = img.w;
     size.height = img.h;
-    printf("%s w: %d, h: %d\n", image_file, img.w, img.h);
+    log_echo("%s w: %d, h: %d\n", image_file, img.w, img.h);
 
     // check whole image data(default: float32)
     FILE *fp = fopen("image.dat", "wb");
@@ -51,19 +52,17 @@ static int get_input_data(const char* image_file, std::vector<float>& image_data
 #endif
 
     image_data.resize(img_size);
-
     memcpy(image_data.data(), img.data, img_size * sizeof(float));
-
     free_image(img);
 
     return img_size;
 }
 
 static void show_usage() {
-    printf("[Usage]:  [-u]\n");
-    printf("    [-i input_file] [-o output_file] [-w width] [-h height] [-f max_frame]\n");
-    printf("[Example]:\n");
-    printf("    ./examples/tm_test_imread -i /media/sf_Workshop/imilab_640x360x4_bgra_catdog.rgb -f 2\n");
+    log_echo("[Usage]:  [-u]\n");
+    log_echo("    [-i input_file] [-o output_file] [-w width] [-h height] [-f max_frame]\n");
+    log_echo("[Example]:\n");
+    log_echo("    ./examples/tm_test_imread -i /media/sf_Workshop/imilab_640x360x4_bgra_catdog.rgb -f 2\n");
 }
 
 static void test_load_data(int channel, char bgr) {
@@ -74,8 +73,8 @@ static void test_load_data(int channel, char bgr) {
     int img_size = img.w * img.h * img.c, rc = 0;
     unsigned char uc;
     while (rc < frame) {
-        if (imi_utils_load_image(fin, img, bgr, channel) != 1) {
-            printf("get_input_data error!\n");
+        if (imi_utils_image_load_bgr(fin, img, bgr, channel) != 1) {
+            log_echo("get_input_data error!\n");
             break;
         }
         else {
@@ -94,7 +93,7 @@ static void test_load_data(int channel, char bgr) {
     fclose(fin);
     if (fout) fclose(fout);
     free(img.data);
-    printf("total frame: %d\n", rc);
+    log_echo("total frame: %d\n", rc);
 }
 
 
@@ -127,7 +126,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (image_file == nullptr) {
-        printf("Error: Image file not specified!\n");
+        log_error("Image file not specified!\n");
         show_usage();
         return -1;
     }

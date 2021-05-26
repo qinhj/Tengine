@@ -7,8 +7,8 @@
 #ifndef __IMI_UTILS_IMAGE_H__
 #define __IMI_UTILS_IMAGE_H__
 
-/* std c includes */
-#include <stdio.h>  // for: FILE
+/* imilab includes */
+#include "imi_utils_elog.h" // for: log_xxxx
 /* tengine includes */
 #include "tengine_operations.h" // for: image
 
@@ -19,6 +19,40 @@
 #define IMG_DT_UINT8    3
 #define IMG_DT_INT32    4
 #define IMG_DT_INT16    5
+
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
+// Q: How to verify the output r/g/b data with origin data?
+// A: try "cat image_r.dat image_g.dat image_b.dat > image.dat",
+//  and "diff image.dat image__.dat" .
+static __inline void _imi_utils_check_channel_1by1(const image img) {
+    // check inputs
+    if (NULL == img.data) {
+        log_error("input image data invalid: NULL\n");
+        return;
+    }
+
+    FILE *fp_rgb[] = {
+        fopen("image_r.dat", "wb"),
+        fopen("image_g.dat", "wb"),
+        fopen("image_b.dat", "wb"),
+        fopen("image__.dat", "wb"),
+    };
+    for (int c = 0; c < 3; c++) {
+        int off_c = img.w * img.h * c;
+        for (int h = 0; h < img.h; h++) {
+            int off_h = off_c + h * img.w;
+            for (int w = 0; w < img.w; w++) {
+                unsigned char uc = (unsigned char)(*(img.data + w + off_h));
+                fwrite(&uc, sizeof(uc), 1, fp_rgb[c]);
+                fwrite(&uc, sizeof(uc), 1, fp_rgb[3]);
+            }
+        }
+        fclose(fp_rgb[c]);
+    }
+}
 
 // @brief:  load image raw data as it is
 // @param:  im[out] image info
@@ -150,5 +184,57 @@ static int imi_utils_image_save_permute_chw2hwc(FILE *fp, const image im, char c
     }
     return !(rc == img_size);
 }
+
+// load bgr24/bgra32 as rgb planar to letter box without resize
+// @param:  img[out] input raw image
+// @param:  bgr[in]  input raw data format
+// @param:  lb[out]  output letter box
+// @param:  cov[in]  mean and scale
+static int imi_utils_image_load_letterbox(
+    FILE *fp, const image img, char bgr, const image lb, const float cov[][3]) {
+    // check inputs
+    if (NULL == fp || NULL == img.data || NULL == lb.data) {
+        log_error("invalid input param NULL\n");
+        return -1;
+    }
+
+    int rc = -1, idx, idx_;
+    int lb_size = lb.w * lb.h * lb.c;
+    // init letter box
+    for (idx = 0; idx < lb_size; idx++) {
+        lb.data[idx] = .5;
+    }
+
+    // Note: Here we must use unsigned type!
+    unsigned char uc;
+    int dw = (lb.w - img.w) / 2, dh = (lb.h - img.h) / 2;
+    for (int h = 0; h < img.h; h++) {
+        for (int w = 0; w < img.w; w++) {
+            for (int c = 0; c < img.c; c++) {
+                rc = fread(&uc, sizeof(unsigned char), 1, fp);
+                if (1 != rc) {
+                    return feof(fp) ? 0 : -1;
+                }
+                if (c < lb.c) {
+                    if (bgr) idx = w + img.w * h + (img.c - 1 - c) * img.w * img.h;
+                    else idx = w + img.w * h + c * img.w * img.h;
+                    //printf("w=%d h=%d c=%d idx=%d\n", w, h, c, idx);
+                    img.data[idx] = (float)uc;
+                    if (bgr) idx_ = (w + dw) + lb.w * (h + dh) + (img.c - 1 - c) * lb.w * lb.h;
+                    else idx_ = (w + dw) + lb.w * (h + dh) + c * lb.w * lb.h;
+                    lb.data[idx_] = (img.data[idx] - cov[0][c]) * cov[1][c];
+                }
+            }
+        }
+    }
+
+    // check channel one by one(default: R G B)
+    //_imi_utils_check_channel_1by1(img);
+    return rc;
+}
+
+#ifdef __cplusplus
+}
+#endif // __cplusplus
 
 #endif // !__IMI_UTILS_IMAGE_H__

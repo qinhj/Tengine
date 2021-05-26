@@ -7,12 +7,15 @@
 #ifndef __IMI_UTILS_TM_QUANT_H__
 #define __IMI_UTILS_TM_QUANT_H__
 
-/* std c includes */
-#include <stdio.h>  // for: fprintf
 /* tengine includes */
 #include "tengine/c_api.h"  // for: tensor_t, get_tensor_buffer
 /* imilab includes */
+#include "imi_utils_elog.h" // for: log_xxxx
 #include "imi_utils_tm-inl.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
 
 typedef struct tm_quant_s *tm_quant_t;
 typedef struct tm_quant_s {
@@ -47,15 +50,19 @@ static int imi_utils_tm_quant_get(tensor_t tensor, tm_quant_t quant) {
     // ===========================================================
     quant->buffer = get_tensor_buffer(tensor);
     if (NULL == quant->buffer) {
-        fprintf(stderr, "[%s] get tensor[%p] buffer NULL\n", __FUNCTION__, tensor);
+        log_error("get tensor[%p] buffer NULL\n", tensor);
         return -1;
     }
     quant->size = get_tensor_buffer_size(tensor) / imi_utils_tm_get_tensor_datasize(dt);
     // todo: update to quant param array
     get_tensor_quant_param(tensor, &quant->scale, &quant->zero_point, 1);
-    fprintf(stdout, "tensor[%p] data: %p, size: %d, scale: %.4f, zero_point: %d\n",
+    log_echo("tensor[%p] data: %p, size: %d, scale: %.4f, zero_point: %d\n",
         tensor, quant->buffer, quant->size, quant->scale, quant->zero_point);
     return 0;
 }
+
+#ifdef __cplusplus
+}
+#endif // __cplusplus
 
 #endif // !__IMI_UTILS_TM_QUANT_H__
