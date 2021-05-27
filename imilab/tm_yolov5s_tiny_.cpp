@@ -36,12 +36,12 @@
 /* std c++ includes */
 #include <vector>
 /* imilab includes */
-#include "imilab/imi_utils_object.hpp"
-#include "imilab/imi_utils_visual.hpp"
-#include "imilab/imi_utils_yolov5.hpp"
-#include "imilab/imi_utils_tm.h"    // for: imi_utils_tm_run_graph
-#include "imilab/imi_utils_elog.h"  // for: log_xxxx
-#include "imilab/imi_utils_tm_debug.h"
+#include "utils/imi_utils_object.hpp"
+#include "utils/imi_utils_visual.hpp"
+#include "utils/imi_utils_yolov5.hpp"
+#include "utils/imi_utils_tm.h"     // for: imi_utils_tm_run_graph
+#include "utils/imi_utils_elog.h"   // for: log_xxxx
+#include "utils/imi_utils_tm_debug.h"
 
 // postprocess threshold
 static float prob_threshold = 0.6f; // 0.25f

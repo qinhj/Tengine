@@ -41,11 +41,11 @@
 #include <stdio.h>  // for: fprintf
 #include <string.h> // for: strstr
 /* imilab includes */
-#include "imilab/imi_utils_tm.h"    // for: imi_utils_tm_run_graph
-#include "imilab/imi_utils_voc.h"   // for: voc_class_names, ...
-#include "imilab/imi_utils_elog.h"  // for: log_xxxx
-#include "imilab/imi_utils_image.h" // for: imi_utils_image_load_bgr
-#include "imilab/imi_utils_tm_debug.h"
+#include "utils/imi_utils_tm.h"     // for: imi_utils_tm_run_graph
+#include "utils/imi_utils_voc.h"    // for: voc_class_names, ...
+#include "utils/imi_utils_elog.h"   // for: log_xxxx
+#include "utils/imi_utils_image.h"  // for: imi_utils_image_load_bgr
+#include "utils/imi_utils_tm_debug.h"
 
 typedef struct Box {
     float x0, y0;

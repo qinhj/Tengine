@@ -22,12 +22,6 @@
 # Check CMake version
 CMAKE_MINIMUM_REQUIRED (VERSION 3.13 FATAL_ERROR)
 
-# linker options(remove useless lib/...)
-set(CMAKE_EXE_LINKER_FLAGS "-Wl,--as-needed")
-set(CMAKE_MODULE_LINKER_FLAGS "-Wl,--as-needed")
-set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--as-needed")
-#set(CMAKE_STATIC_LINKER_FLAGS "-Wl,--as-needed") # maybe not supported by android(aarch64)
-
 # Disable inplace builds to prevent source tree corruption.
 IF (" ${CMAKE_SOURCE_DIR}" STREQUAL " ${CMAKE_BINARY_DIR}")
     MESSAGE (FATAL_ERROR "Tengine Fatal: Building inplace are not allowed. You should create a separate directory for Building.")
@@ -142,6 +136,10 @@ ENDIF()
 
 IF (TENGINE_BUILD_CONVERT_TOOL)
     ADD_SUBDIRECTORY(tools/convert_tool)
+ENDIF()
+
+IF (TENGINE_BUILD_IMILAB)
+    ADD_SUBDIRECTORY(imilab)
 ENDIF()
 
 # Report summary

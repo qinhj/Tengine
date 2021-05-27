@@ -24,18 +24,12 @@
  * Author: qinhongjie@imilab.com
  */
 
+//#define CROSS_VALIDATION
 //#define _DEBUG
 
-/* It seems that enable customer shape can speed up a little(1~2ms in average). */
-#define ENABLE_CUSTOMER_SHAPE
-#ifdef ENABLE_CUSTOMER_SHAPE
-#ifndef DFLT_TENSOR_SHAPE
-#define DFLT_TENSOR_SHAPE   1,3,640,640 // nchw
-#endif // DFLT_TENSOR_SHAPE
 #ifndef INPUT_TENSOR_SHAPE
-#define INPUT_TENSOR_SHAPE  DFLT_TENSOR_SHAPE
+#define INPUT_TENSOR_SHAPE  1,3,640,640 // nchw
 #endif // !INPUT_TENSOR_SHAPE
-#endif // ENABLE_CUSTOMER_SHAPE
 
 /* std c includes */
 #include <stdio.h>
@@ -43,35 +37,45 @@
 /* std c++ includes */
 #include <vector>
 /* imilab includes */
-#include "imilab/imi_utils_object.hpp"
-#include "imilab/imi_utils_visual.hpp"
-#include "imilab/imi_utils_yolov3.hpp"
-#include "imilab/imi_utils_tm.h"    // for: imi_utils_tm_run_graph
-#include "imilab/imi_utils_elog.h"  // for: log_xxxx
-#include "imilab/imi_utils_image.h" // for: imi_utils_image_load_letterbox
-#include "imilab/imi_utils_tm_debug.h"
+#include "utils/imi_utils_object.hpp"
+#include "utils/imi_utils_visual.hpp"
+#include "utils/imi_utils_yolov5.hpp"
+#include "utils/imi_utils_tm.h"     // for: imi_utils_tm_run_graph
+#include "utils/imi_utils_elog.h"   // for: log_xxxx
+#include "utils/imi_utils_tm_debug.h"
 
 // postprocess threshold
-static float prob_threshold = 0.6f; // 0.25f
+static float prob_threshold = 0.4f; // 0.25f
 static float nms_threshold = 0.40f; // 0.45f
 
 // example models for show usage
 static const char *models[] = {
-    "yolov3-p4p5.v9.5.tmfile", // official model
-    "yolov3-p4p5.tmfile",      // imilab model
+    "yolov5s.v5.uint8.tmfile", // official model
+    "yolov5s.uint8.tmfile",    // imilab model
 };
 
-// @brief:  yolov3 output tensor postprocess
+// @brief:  yolov5 output tensor postprocess
 // P3 node[0].output[0]: (1, 3, 80, 80, 85), stride=640/80=8 ,  small obj
 // P4 node[1].output[0]: (1, 3, 40, 40, 85), stride=640/40=16, middle obj
 // P5 node[2].output[0]: (1, 3, 20, 20, 85), stride=640/20=32,  large obj
 // @param:  model[in]   input yolo model info
 // @param:  graph[in]   input yolo graph inst
-// @param:  buffer[in]  output tensor buffer
+// @param:  quant[in]   output quant info
 // @param:  proposals   output detected boxes
 static int proposals_objects_get(const yolov3 &model,
-    graph_t &graph, const void *buffer[], std::vector<Object> &proposals) {
+    graph_t &graph, const void *param[], std::vector<Object> &proposals) {
     proposals.clear();
+
+    static const void *buffer[NODE_CNT_YOLOV5S] = { 0 };
+    for (int i = 0; i < NODE_CNT_YOLOV5S; i++) {
+        tm_quant_t quant = (tm_quant_t)param[i];
+        uint8_t *data_u8 = (uint8_t *)quant->buffer;
+        if (NULL == buffer[i]) buffer[i] = calloc(quant->size, sizeof(float));
+        float *data_fp32 = (float *)buffer[i];
+        for (int c = 0; c < quant->size; c++) {
+            data_fp32[c] = ((float)data_u8[c] - quant->zero_point) * quant->scale;
+        }
+    }
 
     /* generate output proposals */
     return imi_utils_yolov3_proposals_generate(model, buffer, proposals, prob_threshold);
@@ -86,16 +90,7 @@ int main(int argc, char* argv[]) {
     const char *image_file = nullptr;
     const char *output_file = "output.rgb";
 
-    yolov3 model = {
-        make_empty_image(640, 640, 3), // reset letter box size if necessary
-        NODE_CNT_YOLOV3_TINY,
-        coco_class_num,
-        coco_class_names,
-        /* hyp */
-        strides_tiny,
-        3, &anchors[6],
-        coco_image_cov,
-    };
+    yolov3 &model = yolov5s;
     image input = make_empty_image(640, 360, 3);
 
     int res, frame = 1, fc = 0;
@@ -160,7 +155,7 @@ int main(int argc, char* argv[]) {
     struct options opt;
     opt.num_thread = num_thread;
     opt.cluster = TENGINE_CLUSTER_ALL;
-    opt.precision = TENGINE_MODE_FP32;
+    opt.precision = TENGINE_MODE_UINT8;
     opt.affinity = 0;
 
     /* inital tengine */
@@ -185,34 +180,21 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-#ifndef ENABLE_CUSTOMER_SHAPE
-    /* get shape of input tensor */
-    int i, dims[DIM_NUM]; // nchw
-    int dim_num = get_tensor_shape(tensor, dims, DIM_NUM);
-    log_echo("input tensor shape: %d(", dim_num);
-    for (i = 0; i < dim_num; i++) {
-        log_echo(" %d", dims[i]);
-    }
-    log_echo(")\n");
-    if (DIM_NUM != dim_num) {
-        log_error("Get input tensor shape error\n");
-        return -1;
-    }
-#else // customer shape
     int i, dim_num;
-    /* set input tensor shape (if necessary) */
+    /* set input tensor shape (necessary) */
     int dims[DIM_NUM] = { INPUT_TENSOR_SHAPE };
-    if (0 != set_tensor_shape(tensor, dims, DIM_NUM)) {
+    int dims_focus[DIM_NUM] = { INPUT_TENSOR_SHAPE };
+    dims_focus[DIM_IDX_W] /= 2, dims_focus[DIM_IDX_H] /= 2, dims_focus[DIM_IDX_C] *= 4;
+    if (0 != set_tensor_shape(tensor, dims_focus, DIM_NUM)) {
         log_error("Set input tensor shape failed\n");
         return -1;
     }
-#endif // !ENABLE_CUSTOMER_SHAPE
 
     image &lb = model.lb;
     lb = make_image(dims[DIM_IDX_W], dims[DIM_IDX_H], dims[DIM_IDX_C]);
     int img_size = lb.w * lb.h * lb.c;
     /* set the data mem to input tensor */
-    if (set_tensor_buffer(tensor, lb.data, img_size * sizeof(float)) < 0) {
+    if (set_tensor_buffer(tensor, lb.data, img_size/* * sizeof(float)*/) < 0) {
         log_error("Set input tensor buffer failed\n");
         return -1;
     }
@@ -222,11 +204,17 @@ int main(int argc, char* argv[]) {
         log_error("Prerun multithread graph failed.\n");
         return -1;
     }
-    imi_utils_tm_show_graph(graph, 0, IMI_MASK_NODE_OUTPUT);
+    //imi_utils_tm_show_graph(graph, 0, IMI_MASK_NODE_OUTPUT);
+
+    /* get input parameter info */
+    float input_scale = 0.f;
+    int input_zero_point = 0;
+    get_tensor_quant_param(tensor, &input_scale, &input_zero_point, 1);
 
     /* get output parameter info */
-    const void *buffer[NODE_CNT_YOLOV3_TINY] = { 0 };
-    if (imi_utils_yolov3_get_output_parameter(graph, buffer, NODE_CNT_YOLOV3_TINY, 0) < 0) {
+    tm_quant quant_param[NODE_CNT_YOLOV5S] = { 0 };
+    const void *buffer[NODE_CNT_YOLOV5S] = { &quant_param[0], &quant_param[1], &quant_param[2] };
+    if (imi_utils_yolov3_get_output_parameter(graph, buffer, NODE_CNT_YOLOV5S, 1) < 0) {
         log_error("get output parameter failed\n");
         return -1;
     }
@@ -251,11 +239,18 @@ int main(int argc, char* argv[]) {
 
 read_data:
     /* prepare process input data, set the data mem to input tensor */
-    if (1 != (ret = imi_utils_image_load_letterbox(fp, input, bgr, lb, (const float (*)[3])model.usr_data))) {
+    if (1 != (ret = imi_utils_yolov5_load_data(fp, input, bgr, lb, (const float (*)[3])model.usr_data, input_scale, input_zero_point))) {
         log_error("%s\n", ret ? "get_input_data error!" : "read input data fin");
         goto exit;
     }
     fc++;
+#ifdef CROSS_VALIDATION
+    {
+        FILE *fp1 = fopen("temp_.dat", "rb");
+        fread(lb.data, 1, img_size, fp1);
+        fclose(fp1);
+    }
+#endif // CROSS_VALIDATION
 
     /* run graph */
     if (imi_utils_tm_run_graph(graph, repeat_count) < 0) {

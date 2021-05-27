@@ -36,12 +36,12 @@
 /* std c++ includes */
 #include <vector>
 /* imilab includes */
-#include "imilab/imi_utils_object.hpp"
-#include "imilab/imi_utils_visual.hpp"
-#include "imilab/imi_utils_yolov5.hpp"
-#include "imilab/imi_utils_tm.h"    // for: imi_utils_tm_run_graph
-#include "imilab/imi_utils_elog.h"  // for: log_xxxx
-#include "imilab/imi_utils_tm_debug.h"
+#include "utils/imi_utils_object.hpp"
+#include "utils/imi_utils_visual.hpp"
+#include "utils/imi_utils_yolov5.hpp"
+#include "utils/imi_utils_tm.h"     // for: imi_utils_tm_run_graph
+#include "utils/imi_utils_elog.h"   // for: log_xxxx
+#include "utils/imi_utils_tm_debug.h"
 
 // postprocess threshold
 static float prob_threshold = 0.6f; // 0.25f
@@ -49,8 +49,8 @@ static float nms_threshold = 0.40f; // 0.45f
 
 // example models for show usage
 static const char *models[] = {
-    "yolov5s.v5.tmfile", // official model
-    "yolov5s.tmfile",    // imilab model
+    "yolov5s-p3p4.v5.tmfile", // official model
+    "yolov5s-p3p4.tmfile",    // imilab model
 };
 
 // @brief:  yolov5 output tensor postprocess
@@ -78,7 +78,16 @@ int main(int argc, char* argv[]) {
     const char *image_file = nullptr;
     const char *output_file = "output.rgb";
 
-    yolov3 &model = yolov5s;
+    yolov3 model = {
+        make_empty_image(640, 640, 3), // reset letter box size if necessary
+        NODE_CNT_YOLOV5S_TINY,
+        coco_class_num,
+        coco_class_names,
+        /* hyp */
+        strides,
+        3, anchors,
+        coco_image_cov,
+    };
     image input = make_empty_image(640, 360, 3);
 
     int res, frame = 1, fc = 0;
@@ -195,8 +204,8 @@ int main(int argc, char* argv[]) {
     //imi_utils_tm_show_graph(graph, 0, IMI_MASK_NODE_OUTPUT);
 
     /* get output parameter info */
-    const void *buffer[NODE_CNT_YOLOV5S] = { 0 };
-    if (imi_utils_yolov3_get_output_parameter(graph, buffer, NODE_CNT_YOLOV5S, 0) < 0) {
+    const void *buffer[NODE_CNT_YOLOV5S_TINY] = { 0 };
+    if (imi_utils_yolov3_get_output_parameter(graph, buffer, NODE_CNT_YOLOV5S_TINY, 0) < 0) {
         log_error("get output parameter failed\n");
         return -1;
     }

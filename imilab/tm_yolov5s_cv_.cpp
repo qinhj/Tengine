@@ -24,18 +24,12 @@
  * Author: qinhongjie@imilab.com
  */
 
+#define USE_OPENCV
 //#define _DEBUG
 
-/* It seems that enable customer shape can speed up a little(1~2ms in average). */
-#define ENABLE_CUSTOMER_SHAPE
-#ifdef ENABLE_CUSTOMER_SHAPE
-#ifndef DFLT_TENSOR_SHAPE
-#define DFLT_TENSOR_SHAPE   1,3,640,640 // nchw
-#endif // DFLT_TENSOR_SHAPE
 #ifndef INPUT_TENSOR_SHAPE
-#define INPUT_TENSOR_SHAPE  DFLT_TENSOR_SHAPE
+#define INPUT_TENSOR_SHAPE  1,3,640,640 // nchw
 #endif // !INPUT_TENSOR_SHAPE
-#endif // ENABLE_CUSTOMER_SHAPE
 
 /* std c includes */
 #include <stdio.h>
@@ -43,13 +37,12 @@
 /* std c++ includes */
 #include <vector>
 /* imilab includes */
-#include "imilab/imi_utils_object.hpp"
-#include "imilab/imi_utils_visual.hpp"
-#include "imilab/imi_utils_yolov3.hpp"
-#include "imilab/imi_utils_tm.h"    // for: imi_utils_tm_run_graph
-#include "imilab/imi_utils_elog.h"  // for: log_xxxx
-#include "imilab/imi_utils_image.h" // for: imi_utils_image_load_letterbox
-#include "imilab/imi_utils_tm_debug.h"
+#include "utils/imi_utils_object.hpp"
+#include "utils/imi_utils_visual.hpp"
+#include "utils/imi_utils_yolov5.hpp"
+#include "utils/imi_utils_tm.h"     // for: imi_utils_tm_run_graph
+#include "utils/imi_utils_elog.h"   // for: log_xxxx
+#include "utils/imi_utils_tm_debug.h"
 
 // postprocess threshold
 static float prob_threshold = 0.6f; // 0.25f
@@ -57,11 +50,74 @@ static float nms_threshold = 0.40f; // 0.45f
 
 // example models for show usage
 static const char *models[] = {
-    "yolov3.v9.5.tmfile", // official model
-    "yolov3.tmfile",      // imilab model
+    "yolov5s.v5.tmfile", // official model
+    "yolov5s.tmfile",    // imilab model
 };
 
-// @brief:  yolov3 output tensor postprocess
+// load input images
+static void get_input_data_focus(const char *image_file, image &lb) {
+    cv::Mat sample = cv::imread(image_file, 1);
+    cv::Mat img;
+
+    if (sample.channels() == 1)
+        cv::cvtColor(sample, img, cv::COLOR_GRAY2RGB);
+    else
+        cv::cvtColor(sample, img, cv::COLOR_BGR2RGB);
+
+    /* letterbox process to support different letterbox size */
+    float scale_letterbox;
+    //Size2i resize;
+    int resize_rows;
+    int resize_cols;
+    if ((lb.h * 1.0 / img.rows) < (lb.w * 1.0 / img.cols)) {
+        scale_letterbox = lb.h * 1.0 / img.rows;
+    }
+    else {
+        scale_letterbox = lb.w * 1.0 / img.cols;
+    }
+    resize_cols = int(scale_letterbox * img.cols);
+    resize_rows = int(scale_letterbox * img.rows);
+
+    // resize to part of letter box(e.g. 506x381 -> 640x481)
+    cv::resize(img, img, cv::Size(resize_cols, resize_rows));
+    //cv::imwrite("yolov5_resize.jpg", img);
+    img.convertTo(img, CV_32FC3);
+    //cv::imwrite("yolov5_resize_32FC3.jpg", img);
+
+    // Generate a gray image for letterbox using opencv
+    cv::Mat img_new(lb.w, lb.h, CV_32FC3,
+        cv::Scalar(0.5 / coco_image_cov[1][0] + coco_image_cov[0][0], 0.5 / coco_image_cov[1][1] + coco_image_cov[0][1], 0.5 / coco_image_cov[1][2] + coco_image_cov[0][2]));
+    int top = (lb.h - resize_rows) / 2;
+    int bot = (lb.h - resize_rows + 1) / 2;
+    int left = (lb.w - resize_cols) / 2;
+    int right = (lb.w - resize_cols + 1) / 2;
+    // Letterbox filling
+    cv::copyMakeBorder(img, img_new, top, bot, left, right, cv::BORDER_CONSTANT, cv::Scalar(0, 0, 0));
+    //cv::imwrite("yolov5_make_border.jpg", img_new);
+
+    img_new.convertTo(img_new, CV_32FC3);
+    //cv::imwrite("yolov5_make_border_32FC3.jpg", img_new);
+
+    float *img_data = (float *)img_new.data;
+    float *input_temp = (float *)malloc(3 * lb.w * lb.h * sizeof(float));
+
+    /* nhwc to nchw */
+    for (int h = 0; h < lb.h; h++) {
+        for (int w = 0; w < lb.w; w++) {
+            for (int c = 0; c < 3; c++) {
+                int in_index = h * lb.w * 3 + w * 3 + c;
+                int out_index = c * lb.w * lb.h + h * lb.w + w;
+                input_temp[out_index] = (img_data[in_index] - coco_image_cov[0][c]) * coco_image_cov[1][c];
+            }
+        }
+    }
+
+    /* focus process: 3x640x640 -> 12x320x320 */
+    imi_utils_yolov5_focus_data(input_temp, lb);
+    free(input_temp);
+}
+
+// @brief:  yolov5 output tensor postprocess
 // P3 node[0].output[0]: (1, 3, 80, 80, 85), stride=640/80=8 ,  small obj
 // P4 node[1].output[0]: (1, 3, 40, 40, 85), stride=640/40=16, middle obj
 // P5 node[2].output[0]: (1, 3, 20, 20, 85), stride=640/20=32,  large obj
@@ -86,10 +142,10 @@ int main(int argc, char* argv[]) {
     const char *image_file = nullptr;
     const char *output_file = "output.rgb";
 
-    yolov3 &model = yolov3_std;
+    yolov3 &model = yolov5s;
     image input = make_empty_image(640, 360, 3);
 
-    int res, frame = 1, fc = 0;
+    int res;
     while ((res = getopt(argc, argv, "c:m:i:r:t:w:h:n:o:f:s:u")) != -1) {
         switch (res) {
         case 'c':
@@ -124,7 +180,7 @@ int main(int argc, char* argv[]) {
             output_file = optarg;
             break;
         case 'f':
-            frame = atoi(optarg);
+            log_echo("ignore option: -f\n");
             break;
         case 's':
             prob_threshold = (float)atof(optarg);
@@ -176,28 +232,15 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-#ifndef ENABLE_CUSTOMER_SHAPE
-    /* get shape of input tensor */
-    int i, dims[DIM_NUM]; // nchw
-    int dim_num = get_tensor_shape(tensor, dims, DIM_NUM);
-    log_echo("input tensor shape: %d(", dim_num);
-    for (i = 0; i < dim_num; i++) {
-        log_echo(" %d", dims[i]);
-    }
-    log_echo(")\n");
-    if (DIM_NUM != dim_num) {
-        log_error("Get input tensor shape error\n");
-        return -1;
-    }
-#else // customer shape
     int i, dim_num;
-    /* set input tensor shape (if necessary) */
+    /* set input tensor shape (necessary) */
     int dims[DIM_NUM] = { INPUT_TENSOR_SHAPE };
-    if (0 != set_tensor_shape(tensor, dims, DIM_NUM)) {
+    int dims_focus[DIM_NUM] = { INPUT_TENSOR_SHAPE };
+    dims_focus[DIM_IDX_W] /= 2, dims_focus[DIM_IDX_H] /= 2, dims_focus[DIM_IDX_C] *= 4;
+    if (0 != set_tensor_shape(tensor, dims_focus, DIM_NUM)) {
         log_error("Set input tensor shape failed\n");
         return -1;
     }
-#endif // !ENABLE_CUSTOMER_SHAPE
 
     image &lb = model.lb;
     lb = make_image(dims[DIM_IDX_W], dims[DIM_IDX_H], dims[DIM_IDX_C]);
@@ -213,11 +256,11 @@ int main(int argc, char* argv[]) {
         log_error("Prerun multithread graph failed.\n");
         return -1;
     }
-    imi_utils_tm_show_graph(graph, 0, IMI_MASK_NODE_OUTPUT);
+    //imi_utils_tm_show_graph(graph, 0, IMI_MASK_NODE_OUTPUT);
 
     /* get output parameter info */
-    const void *buffer[NODE_CNT_YOLOV3] = { 0 };
-    if (imi_utils_yolov3_get_output_parameter(graph, buffer, NODE_CNT_YOLOV3, 0) < 0) {
+    const void *buffer[NODE_CNT_YOLOV5S] = { 0 };
+    if (imi_utils_yolov3_get_output_parameter(graph, buffer, NODE_CNT_YOLOV5S, 0) < 0) {
         log_error("get output parameter failed\n");
         return -1;
     }
@@ -226,27 +269,16 @@ int main(int argc, char* argv[]) {
     std::vector<Object> proposals;
     std::vector<Object> objects;
 
-    FILE *fout = output_file ? fopen(output_file, "wb") : NULL;
-    FILE *fp = fopen(image_file, "rb");
-
-    // load raw data(non-planar)
-    if (strstr(image_file, "bgra")) input.c = 4, bgr = 1;
-    else if (strstr(image_file, "bgr")) input.c = 3, bgr = 1;
-    else if (strstr(image_file, "rgba")) input.c = 4, bgr = 0;
-    else if (strstr(image_file, "rgb")) input.c = 3, bgr = 0;
-    else {
-        log_error("unknown test data format!\n");
-        goto exit;
+    cv::Mat img = cv::imread(image_file, 1);
+    if (img.empty()) {
+        log_error("cv::imread %s failed\n", image_file);
+        return -1;
     }
-    input.data = (float *)calloc(sizeof(float), input.c * input.w * input.h);
+    input.w = img.cols, input.h = img.rows;
 
 read_data:
     /* prepare process input data, set the data mem to input tensor */
-    if (1 != (ret = imi_utils_image_load_letterbox(fp, input, bgr, lb, (const float (*)[3])model.usr_data))) {
-        log_error("%s\n", ret ? "get_input_data error!" : "read input data fin");
-        goto exit;
-    }
-    fc++;
+    get_input_data_focus(image_file, lb);
 
     /* run graph */
     if (imi_utils_tm_run_graph(graph, repeat_count) < 0) {
@@ -264,21 +296,14 @@ read_data:
     objects = imi_utils_proposals_filter(proposals, Size2i(input.w, input.h), Size2i(lb.w, lb.h), nms_threshold);
 
     // draw objects
-    imi_utils_objects_draw(objects, input, target_class, model.class_names);
+    imi_utils_objects_draw(objects, img, target_class, model.class_names);
 
     // save result to output
-    if (fout) {
-        imi_utils_image_save_permute_chw2hwc(fout, input, bgr);
-    }
-
-    if (fc < frame) goto read_data;
+    cv::imwrite(output_file, img);
 
 exit:
-    if (fp) fclose(fp);
-    if (fout) fclose(fout);
     free_image(input);
     free_image(lb);
-    if (1 < fc) log_echo("total frame: %d\n", fc);
 
     /* release tengine */
     postrun_graph(graph);

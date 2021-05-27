@@ -11,8 +11,8 @@
 //#include "tengine/c_api.h"
 #include "tengine_operations.h" // for: imread
 /* imilab includes */
-#include "imilab/imi_utils_elog.h"
-#include "imilab/imi_utils_image.h"
+#include "utils/imi_utils_elog.h"
+#include "utils/imi_utils_image.h"
 
 #define IMAGE_PATH  "/media/sf_Workshop/color_375x375_rgb888.bmp"
 #define OUTPUT_PATH "output.rgb"
