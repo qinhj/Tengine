@@ -47,12 +47,13 @@ $ ./build/install/bin/convert_tool -f darknet -p yolov3.cfg -m yolov3.weights -o
 
 ## example(yolov5: pytorch => onnx => tmfile)
 $ cd yolov5 # yolov3 isn't so much compatible
-$ python models/export.py --weights weights/yolo5s.pt --simplify
+$ python models/export.py --weights weights/yolo5s.v5.pt --simplify
 $ cd tools/optimize
-$ python3 yolov5s-opt.py --input yolov5s-v4.onnx --output yolov5s-v4-opt.onnx --in_cut_name 167 --out_cut_names 381,420,459 --output_num 3
-$ python3 yolov5s-opt.py --input yolov5s-v5.onnx --output yolov5s-v5-opt.onnx --in_cut_name 167 --out_cut_names 397,417,437 --output_num 3
-$ python3 yolov5s-opt.py --input yolov5s.onnx --output yolov5s-opt.onnx --in_cut_name 167 --out_cut_names 397,458,519 --output_num 3
-$ ./install/bin/convert_tool -f onnx -m yolov5/yolov5s-opt.onnx -o yolov5/yolov5s.tmfile
+$ python3 yolov5s-opt.py --input yolov5s.v4.onnx --output yolov5s.v4.opt.onnx --in_tensor 167 --out_tensor 381,420,459
+$ python3 yolov5s-opt.py --input yolov5s.v5.onnx --output yolov5s.v5.opt.onnx --in_tensor 167 --out_tensor 397,458,519
+$ python3 yolov5s-opt.py --input yolov5s.v5.onnx --output yolov5s-p3p4.opt.onnx --in_tensor 167 --out_tensor 397,458
+$ python3 yolov5s-opt.py --input yolov5s-tiny.onnx --output yolov5s-tiny.opt.onnx --in_tensor 121 --out_tensor 272,333
+$ ./install/bin/convert_tool -f onnx -m yolov5/yolov5s.opt.onnx -o yolov5/yolov5s.opt.tmfile
 
 ## Note:
 1) see https://github.com/OAID/Tengine-Convert-Tools for more details;
