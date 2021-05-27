@@ -23,6 +23,20 @@
  * Author: qinhongjie@imilab.com
  */
 
+/* It's hard to say whether use letter box could have better results or not. */
+//#define TRY_LETTER_BOX
+
+/* It seems that enable customer shape can speed up a little(1~2ms in average). */
+//#define ENABLE_CUSTOMER_SHAPE
+#ifdef ENABLE_CUSTOMER_SHAPE
+#ifndef DFLT_TENSOR_SHAPE
+#define DFLT_TENSOR_SHAPE   1,3,300,300 // nchw
+#endif // DFLT_TENSOR_SHAPE
+#ifndef INPUT_TENSOR_SHAPE
+#define INPUT_TENSOR_SHAPE  DFLT_TENSOR_SHAPE // 1,3,360,640
+#endif // !INPUT_TENSOR_SHAPE
+#endif // ENABLE_CUSTOMER_SHAPE
+
 /* std c includes */
 #include <stdio.h>  // for: fprintf
 #include <string.h> // for: strstr
@@ -31,18 +45,7 @@
 #include "imilab/imi_utils_voc.h"   // for: voc_class_names, ...
 #include "imilab/imi_utils_elog.h"  // for: log_xxxx
 #include "imilab/imi_utils_image.h" // for: imi_utils_image_load_bgr
-
-#define DIM_NUM     4
-#define DIM_IDX_N   0
-#define DIM_IDX_C   1
-#define DIM_IDX_H   2
-#define DIM_IDX_W   3
-
-#ifdef ENABLE_CUSTOMER_SHAPE
-#ifndef INPUT_TENSOR_SHAPE
-#define INPUT_TENSOR_SHAPE  1,3,300,300 // nchw
-#endif // !INPUT_TENSOR_SHAPE
-#endif // ENABLE_CUSTOMER_SHAPE
+#include "imilab/imi_utils_tm_debug.h"
 
 typedef struct Box {
     float x0, y0;
@@ -59,20 +62,38 @@ static const char *models[] = {
     "mobilenet_ssd.imi.tmfile", // imilab model
 };
 
+#ifdef TRY_LETTER_BOX
+static float lb_scale = 0.f;    // letter box scale
+static int lb_ow = 0, lb_oh = 0;// letter box offset
+#endif // TRY_LETTER_BOX
+static image lb;
+
 // @return: box count
 static int post_process_ssd(image im, float threshold, const void *data, int num, int tc) {
     const float *outdata = (const float *)data;
 
     Box_t box;
     int i, cnt = 0;
+    int im_w = im.w, im_h = im.h; //im_w *= (640/300), im_h *= (360/300);
     for (i = 0; i < num; i++) {
         if (threshold <= outdata[1]) {
             box.class_idx = outdata[0];
             box.score = outdata[1];
-            box.x0 = outdata[2] < 0 ? 0 : 1 < outdata[2] ? im.w : outdata[2] * im.w;
-            box.y0 = outdata[3] < 0 ? 0 : 1 < outdata[3] ? im.h : outdata[3] * im.h;
-            box.x1 = outdata[4] < 0 ? 0 : 1 < outdata[4] ? im.w : outdata[4] * im.w;
-            box.y1 = outdata[5] < 0 ? 0 : 1 < outdata[5] ? im.h : outdata[5] * im.h;
+#ifndef TRY_LETTER_BOX
+            box.x0 = outdata[2] < 0 ? 0 : 1 < outdata[2] ? im_w : outdata[2] * im_w;
+            box.y0 = outdata[3] < 0 ? 0 : 1 < outdata[3] ? im_h : outdata[3] * im_h;
+            box.x1 = outdata[4] < 0 ? 0 : 1 < outdata[4] ? im_w : outdata[4] * im_w;
+            box.y1 = outdata[5] < 0 ? 0 : 1 < outdata[5] ? im_h : outdata[5] * im_h;
+#else // TRY_LETTER_BOX
+            box.x0 = (outdata[2] * lb.w - lb_ow) / lb_scale;
+            box.y0 = (outdata[3] * lb.h - lb_oh) / lb_scale;
+            box.x1 = (outdata[4] * lb.w - lb_ow) / lb_scale;
+            box.y1 = (outdata[5] * lb.h - lb_oh) / lb_scale;
+            box.x0 = box.x0 < 0 ? 0 : im_w < box.x0 ? im_w : box.x0;
+            box.y0 = box.y0 < 0 ? 0 : im_h < box.y0 ? im_h : box.y0;
+            box.x1 = box.x1 < 0 ? 0 : im_w < box.x1 ? im_w : box.x1;
+            box.y1 = box.y1 < 0 ? 0 : im_h < box.y1 ? im_h : box.y1;
+#endif // !TRY_LETTER_BOX
             // draw box to image
             if (tc < 0 || tc == box.class_idx) {
                 draw_box(im, box.x0, box.y0, box.x1, box.y1, 2, 125, 0, 125);
@@ -211,7 +232,7 @@ int main(int argc, char* argv[]) {
     }
 #endif // !ENABLE_CUSTOMER_SHAPE
 
-    image lb = make_image(dims[DIM_IDX_W], dims[DIM_IDX_H], dims[DIM_IDX_C]);
+    lb = make_image(dims[DIM_IDX_W], dims[DIM_IDX_H], dims[DIM_IDX_C]);
     int img_size = lb.w * lb.h * lb.c;
     /* set the data mem to input tensor */
     if (set_tensor_buffer(tensor, lb.data, img_size * sizeof(float)) < 0) {
@@ -219,9 +240,9 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    /* prerun graph, set work options(num_thread, cluster, precision) */
+    /* prerun graph to infer shape, and set work options(num_thread, cluster, precision) */
     if (prerun_graph_multithread(graph, opt) < 0) {
-        log_error("Prerun multithread graph failed\n");
+        log_error("Prerun multithread graph failed.\n");
         return -1;
     }
     //imi_utils_tm_show_graph(graph, 0, IMI_MASK_NODE_OUTPUT);
@@ -256,6 +277,16 @@ int main(int argc, char* argv[]) {
     }
     im = fp ? make_image(im.w, im.h, im.c) : imread(image_file);
 
+#ifdef TRY_LETTER_BOX
+    float lb_scale_w = (float)lb.w / im.w;
+    float lb_scale_h = (float)lb.h / im.h;
+    int im_rw = lb_scale_w < lb_scale_h ? lb.w : im.w * lb_scale_h;
+    int im_rh = lb_scale_w < lb_scale_h ? im.h * lb_scale_w : lb.h;
+    lb_scale = lb_scale_w < lb_scale_h ? lb_scale_w : lb_scale_h;
+    lb_ow = (lb.w - im_rw) / 2;
+    lb_oh = (lb.h - im_rh) / 2;
+#endif // TRY_LETTER_BOX
+
 read_data:
     /* prepare process input data, set the data mem to input tensor */
     if (fp) {
@@ -268,14 +299,33 @@ read_data:
         log_echo("======================================\n");
         log_echo("Frame No.%03d:\n", fc);
 
+        int i, j, k, idx;
         const float *_data = im.data;
-        // define resized image
+#ifndef TRY_LETTER_BOX
+        // strategy: resize to letter box directly
         if (im.w != lb.w || im.h != lb.h) {
             // resize to network input shape
             tengine_resize_f32(im.data, lb.data, lb.w, lb.h, im.c, im.h, im.w);
             _data = lb.data;
         }
-        int i, j, k, idx;
+        //else { log_debug("I didn't resize the image ^_^\n"); }
+#else // TRY_LETTER_BOX
+        // strategy: resize and attach to letter box
+        image resized = resize_image(im, im_rw, im_rh);
+        // init letter box
+        for (k = 0; k < lb.c; k++) {
+            idx = lb.h * lb.w * k;
+            for (i = 0; i < lb.h * lb.w; i++) {
+                lb.data[idx + i] = (0. - voc_image_cov[0][k]) * voc_image_cov[1][k];
+            }
+        }
+        // attach resized image to letter box
+        add_image(resized, lb, lb_ow, lb_oh);
+        // release resized image
+        free_image(resized);
+        // reset data buffer reference
+        _data = lb.data;
+#endif // !TRY_LETTER_BOX
         // nchw pre-process
         for (k = 0; k < lb.c; k++) {
             for (i = 0; i < lb.h; i++) {

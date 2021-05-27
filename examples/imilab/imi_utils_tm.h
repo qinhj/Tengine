@@ -16,6 +16,12 @@
 /* imilab includes */
 #include "imi_utils_elog.h" // for: log_xxxx
 
+#define DIM_NUM     4
+#define DIM_IDX_N   0
+#define DIM_IDX_C   1
+#define DIM_IDX_H   2
+#define DIM_IDX_W   3
+
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
