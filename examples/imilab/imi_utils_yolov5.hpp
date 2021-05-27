@@ -132,17 +132,14 @@ static int imi_utils_yolov5_load_data(FILE *fp, image &img, char bgr, image &lb,
     if (NULL == lb.data) {
         log_error("letter box data buffer is NULL\n");
         return -2;
-        //lb.data = (float *)calloc(sizeof(float), lb_size);
     }
 
-    int lb_size = lb.w * lb.h * lb.c;
     static float *data = (float *)calloc(sizeof(float), lb.w * lb.h * lb.c);
-    //printf("mean:  %.3f, %.3f, %.3f\n", cov[0][0], cov[0][1], cov[0][2]);
-    //printf("scale: %.3f, %.3f, %.3f\n", cov[1][0], cov[1][1], cov[1][2]);
+    //log_echo("mean:  %.3f, %.3f, %.3f\n", cov[0][0], cov[0][1], cov[0][2]);
+    //log_echo("scale: %.3f, %.3f, %.3f\n", cov[1][0], cov[1][1], cov[1][2]);
 
-    int img_size = img.w * img.h * img.c;
     if (NULL == img.data) {
-        img.data = (float *)calloc(sizeof(float), img_size);
+        img.data = (float *)calloc(sizeof(float), img.w * img.h * img.c);
     }
 
     float *swap = lb.data;
@@ -155,7 +152,7 @@ static int imi_utils_yolov5_load_data(FILE *fp, image &img, char bgr, image &lb,
         return rc;
     }
 
-    // todo: optimize
+    // todo: optimize (C, H, W) -> (C*4, H/2, W/2)
     if (input_scale < 0) {
         return (imi_utils_yolov5_focus_data(data, lb), rc);
     }

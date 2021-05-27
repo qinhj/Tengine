@@ -40,12 +40,14 @@ static __inline void _imi_utils_check_channel_1by1(const image img) {
         fopen("image_b.dat", "wb"),
         fopen("image__.dat", "wb"),
     };
-    for (int c = 0; c < 3; c++) {
-        int off_c = img.w * img.h * c;
-        for (int h = 0; h < img.h; h++) {
-            int off_h = off_c + h * img.w;
-            for (int w = 0; w < img.w; w++) {
-                unsigned char uc = (unsigned char)(*(img.data + w + off_h));
+    unsigned char uc;
+    int c, h, w, off_c, off_h;
+    for (c = 0; c < 3; c++) {
+        off_c = img.w * img.h * c;
+        for (h = 0; h < img.h; h++) {
+            off_h = off_c + h * img.w;
+            for (w = 0; w < img.w; w++) {
+                char uc = (unsigned char)(*(img.data + w + off_h));
                 fwrite(&uc, sizeof(uc), 1, fp_rgb[c]);
                 fwrite(&uc, sizeof(uc), 1, fp_rgb[3]);
             }
@@ -135,12 +137,12 @@ static int imi_utils_image_load_bgr(FILE *fp, const image im, char bgr, int chan
         return -1;
     }
 
-    int rc = -1, idx;
+    int rc = -1, idx, h, w, c;
     // Note: Here we must use unsigned type!
     unsigned char uc;
-    for (int h = 0; h < im.h; h++) {
-        for (int w = 0; w < im.w; w++) {
-            for (int c = 0; c < channels; c++) {
+    for (h = 0; h < im.h; h++) {
+        for (w = 0; w < im.w; w++) {
+            for (c = 0; c < channels; c++) {
                 rc = fread(&uc, sizeof(unsigned char), 1, fp);
                 if (1 != rc) {
                     return feof(fp) ? 0 : -1;
@@ -198,19 +200,21 @@ static int imi_utils_image_load_letterbox(
         return -1;
     }
 
-    int rc = -1, idx, idx_;
-    int lb_size = lb.w * lb.h * lb.c;
-    // init letter box
-    for (idx = 0; idx < lb_size; idx++) {
-        lb.data[idx] = .5;
+    int h, w, c, idx, idx_;
+    // init letter box (nchw)
+    for (c = 0; c < lb.c; c++) {
+        idx_ = lb.h * lb.w * c;
+        for (idx = 0; idx < lb.h * lb.w; idx++) {
+            lb.data[idx_ + idx] = (0. - cov[0][c]) * cov[1][c];
+        }
     }
 
     // Note: Here we must use unsigned type!
     unsigned char uc;
-    int dw = (lb.w - img.w) / 2, dh = (lb.h - img.h) / 2;
-    for (int h = 0; h < img.h; h++) {
-        for (int w = 0; w < img.w; w++) {
-            for (int c = 0; c < img.c; c++) {
+    int rc = -1, dw = (lb.w - img.w) / 2, dh = (lb.h - img.h) / 2;
+    for (h = 0; h < img.h; h++) {
+        for (w = 0; w < img.w; w++) {
+            for (c = 0; c < img.c; c++) {
                 rc = fread(&uc, sizeof(unsigned char), 1, fp);
                 if (1 != rc) {
                     return feof(fp) ? 0 : -1;

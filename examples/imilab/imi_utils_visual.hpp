@@ -21,24 +21,24 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-// @param:  file[in]    output image file path
 template<typename _Tp>
-void imi_utils_objects_draw(const std::vector<_Tp> &objects,
-    cv::Mat &image, int cls, const char * const *labels, const char *file) {
-    for (size_t i = 0; i < objects.size(); i++) {
+int imi_utils_objects_draw(const std::vector<_Tp> &objects,
+    cv::Mat &img, int cls, const char * const *labels) {
+    size_t size = objects.size();
+    log_echo("detected objects num: %zu\n", size);
+    for (size_t i = 0; i < size; i++) {
         const _Tp &obj = objects[i];
-
-        log_echo("[%2d]: %3.3f%%, [(%4.0f, %4.0f), (%4.0f, %4.0f)], %s\n",
-            obj.label, obj.prob * 100, obj.rect.x, obj.rect.y,
-            obj.rect.x + obj.rect.width, obj.rect.y + obj.rect.height, labels[obj.label]);
-
+        if (labels) {
+            log_echo("[%2d]: %3.3f%%, [(%7.3f, %7.3f), (%7.3f, %7.3f)], %s\n",
+                obj.label, obj.prob * 100, obj.rect.x, obj.rect.y,
+                obj.rect.x + obj.rect.width, obj.rect.y + obj.rect.height, labels[obj.label]);
+        }
         if (-1 != cls && obj.label != cls) continue;
-
-        cv::rectangle(image, obj.rect, cv::Scalar(255, 0, 0));
+        // draw object box
+        cv::rectangle(img, obj.rect, cv::Scalar(255, 0, 0));
 
         char text[256];
         sprintf(text, "%s %.1f%%", labels[obj.label], obj.prob * 100);
-
         int baseLine = 0;
         cv::Size label_size = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
 
@@ -46,17 +46,16 @@ void imi_utils_objects_draw(const std::vector<_Tp> &objects,
         int y = obj.rect.y - label_size.height - baseLine;
         if (y < 0)
             y = 0;
-        if (x + label_size.width > image.cols)
-            x = image.cols - label_size.width;
-
-        cv::rectangle(image, cv::Rect(cv::Point(x, y), cv::Size(label_size.width, label_size.height + baseLine)),
+        if (img.cols < x + label_size.width)
+            x = img.cols - label_size.width;
+        // draw label box
+        cv::rectangle(img, cv::Rect(cv::Point(x, y), cv::Size(label_size.width, label_size.height + baseLine)),
             cv::Scalar(255, 255, 255), -1);
-
-        cv::putText(image, text, cv::Point(x, y + label_size.height), cv::FONT_HERSHEY_SIMPLEX, 0.5,
+        // draw label text
+        cv::putText(img, text, cv::Point(x, y + label_size.height), cv::FONT_HERSHEY_SIMPLEX, 0.5,
             cv::Scalar(0, 0, 0));
     }
-
-    cv::imwrite(file, image);
+    return 0;
 }
 
 #else // !USE_OPENCV
@@ -73,11 +72,10 @@ int imi_utils_objects_draw(const std::vector<_Tp> &objects,
     for (size_t i = 0; i < size; i++) {
         const _Tp &obj = objects[i];
         if (labels) {
-            log_echo("[%2d]: %3.3f%%, [(%.3f, %.3f), (%.3f, %.3f)], %s\n",
+            log_echo("[%2d]: %3.3f%%, [(%7.3f, %7.3f), (%7.3f, %7.3f)], %s\n",
                 obj.label, obj.prob * 100, obj.rect.x, obj.rect.y,
                 obj.rect.x + obj.rect.width, obj.rect.y + obj.rect.height, labels[obj.label]);
         }
-
         if (-1 == cls || obj.label == cls) {
             draw_box(img, obj.rect.x, obj.rect.y,
                 obj.rect.x + obj.rect.width, obj.rect.y + obj.rect.height, 2, 0, 255, 0);
@@ -93,10 +91,11 @@ int imi_utils_faces_draw(const std::vector<_Tp> &faces, image &img) {
 
     for (size_t i = 0; i < size; i++) {
         const _Tp &face = faces[i];
-        log_echo("Face[%2d]: %3.3f%%, [(%.3f, %.3f), (%.3f, %.3f)]\n",
-            (int)i, face.prob * 100, face.rect.x, face.rect.y, face.rect.width, face.rect.height);
+        log_echo("Face[%2zu]: %3.3f%%, [(%7.3f, %7.3f), (%7.3f, %7.3f)]\n",
+            i, face.prob * 100, face.rect.x, face.rect.y, face.rect.width, face.rect.height);
 
-        draw_box(img, face.rect.x, face.rect.y, face.rect.x + face.rect.width, face.rect.y + face.rect.height, 2, 0, 255, 0);
+        draw_box(img, face.rect.x, face.rect.y,
+            face.rect.x + face.rect.width, face.rect.y + face.rect.height, 2, 0, 255, 0);
         for (int l = 0; l < 5; l++) {
             draw_circle(img, face.landmark[l].x, face.landmark[l].y, 1, 0, 128, 128);
         }
