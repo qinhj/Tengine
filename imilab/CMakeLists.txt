@@ -25,7 +25,7 @@ FILE (COPY ${CMAKE_SOURCE_DIR}/source/api/c_api.h DESTINATION ${CMAKE_CURRENT_BI
 
 # macro for adding test
 FUNCTION (TENGINE_EXAMPLE_IMILAB name file)
-    ADD_EXECUTABLE (${name} "${CMAKE_CURRENT_SOURCE_DIR}/${file}" "${CMAKE_SOURCE_DIR}/examples/common/tengine_operations.c")
+    ADD_EXECUTABLE (${name} "${CMAKE_CURRENT_SOURCE_DIR}/${file}" "${PROJECT_SOURCE_DIR}/examples/common/tengine_operations.c")
 
     TARGET_INCLUDE_DIRECTORIES (${name} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
     TARGET_INCLUDE_DIRECTORIES (${name} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
@@ -42,19 +42,19 @@ FUNCTION (TENGINE_EXAMPLE_IMILAB name file)
     INSTALL (TARGETS ${name} DESTINATION bin)
 ENDFUNCTION()
 
-# add hello world
-TENGINE_EXAMPLE (tm_hello_world              tm_hello_world.cpp)
-## add imilab examples
-TENGINE_EXAMPLE (tm_test_imread              tm_test_imread.cpp)
-TENGINE_EXAMPLE (tm_mobilenet_ssd_           tm_mobilenet_ssd_.c)
-TENGINE_EXAMPLE (tm_retinaface_              tm_retinaface_.cpp)
-TENGINE_EXAMPLE (tm_yolov3_                  tm_yolov3_.cpp)
-TENGINE_EXAMPLE (tm_yolov3_p4p5_             tm_yolov3_p4p5_.cpp)
-TENGINE_EXAMPLE (tm_yolov3_tiny_             tm_yolov3_tiny_.cpp)
-TENGINE_EXAMPLE (tm_yolov5s_                 tm_yolov5s_.cpp)
-TENGINE_EXAMPLE (tm_yolov5s_tiny_            tm_yolov5s_tiny_.cpp)
-TENGINE_EXAMPLE (tm_yolov5s_p3p4_            tm_yolov5s_p3p4_.cpp)
-TENGINE_EXAMPLE (tm_yolov5s_uint8_           tm_yolov5s_uint8_.cpp)
+## hello world
+TENGINE_EXAMPLE_IMILAB (tm_hello_world      tm_hello_world.cpp)
+## imilab examples
+TENGINE_EXAMPLE_IMILAB (tm_test_imread      tm_test_imread.cpp)
+TENGINE_EXAMPLE_IMILAB (tm_mobilenet_ssd_   tm_mobilenet_ssd_.c)
+TENGINE_EXAMPLE_IMILAB (tm_retinaface_      tm_retinaface_.cpp)
+TENGINE_EXAMPLE_IMILAB (tm_yolov3_          tm_yolov3_.cpp)
+TENGINE_EXAMPLE_IMILAB (tm_yolov3_p4p5_     tm_yolov3_p4p5_.cpp)
+TENGINE_EXAMPLE_IMILAB (tm_yolov3_tiny_     tm_yolov3_tiny_.cpp)
+TENGINE_EXAMPLE_IMILAB (tm_yolov5s_         tm_yolov5s_.cpp)
+TENGINE_EXAMPLE_IMILAB (tm_yolov5s_tiny_    tm_yolov5s_tiny_.cpp)
+TENGINE_EXAMPLE_IMILAB (tm_yolov5s_p3p4_    tm_yolov5s_p3p4_.cpp)
+TENGINE_EXAMPLE_IMILAB (tm_yolov5s_uint8_   tm_yolov5s_uint8_.cpp)
 
 # add examples with opencv
 # set(OpenCV_DIR /mnt/d/ubuntu/opencv_install/linux-armv7/lib/cmake/opencv4)
@@ -62,8 +62,8 @@ FIND_PACKAGE(OpenCV QUIET)
 
 IF (OpenCV_FOUND AND ${TENGINE_TARGET_PROCESSOR} MATCHES "X86")
     # macro for adding examples
-    FUNCTION (TENGINE_EXAMPLE_CV name file)
-        ADD_EXECUTABLE (${name} "${CMAKE_CURRENT_SOURCE_DIR}/${file}" "${CMAKE_SOURCE_DIR}/examples/common/tengine_operations.c")
+    FUNCTION (TENGINE_EXAMPLE_IMILAB_CV name file)
+        ADD_EXECUTABLE (${name} "${CMAKE_CURRENT_SOURCE_DIR}/${file}" "${PROJECT_SOURCE_DIR}/examples/common/tengine_operations.c")
 
         TARGET_INCLUDE_DIRECTORIES (${name} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
         TARGET_INCLUDE_DIRECTORIES (${name} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
@@ -73,9 +73,9 @@ IF (OpenCV_FOUND AND ${TENGINE_TARGET_PROCESSOR} MATCHES "X86")
         INSTALL (TARGETS ${name} DESTINATION bin)
     ENDFUNCTION()
 
-    ## imilab examples
-    TENGINE_EXAMPLE_CV (tm_yolov3_cv_            tm_yolov3_cv_.cpp)
-    TENGINE_EXAMPLE_CV (tm_yolov5s_cv_           tm_yolov5s_cv_.cpp)
+    ## imilab opencv examples
+    TENGINE_EXAMPLE_IMILAB_CV (tm_yolov3_cv_        tm_yolov3_cv_.cpp)
+    TENGINE_EXAMPLE_IMILAB_CV (tm_yolov5s_cv_       tm_yolov5s_cv_.cpp)
 ELSE()
     MESSAGE (WARNING "OpenCV not found, some examples won't be built")
 ENDIF()
