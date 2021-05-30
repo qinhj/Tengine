@@ -1,3 +1,5 @@
+## API ##
+```
 c_api.c:
 
 1. create_graph -> find_serializer_via_name:
@@ -21,3 +23,16 @@ c_api.c:
       operator/prototype/pad.c: infer_shape
       operator/prototype/interp.c: infer_shape
   device/cpu/op/interp/interp_ref.c: ...
+```
+
+## OP ##
+```
+* reshape
+  The reshape op in tengine is a constant op, which means it won't be updated
+automatically if one reset the input tensor shape of the graph(e.g. yolov3/...).
+  So one have no choice, but to re-export these models with target input size
+and convert to tmfile again, if the model contains the reshape op. Or one can
+update all reshape op by hand ...
+  For models without reshape op, one can reset the input tensor shape directly
+and test more(e.g. mobilenet_ssd/...).
+```
