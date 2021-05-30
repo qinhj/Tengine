@@ -7,8 +7,6 @@
 #ifndef __IMI_UTILS_YOLOV3_HPP__
 #define __IMI_UTILS_YOLOV3_HPP__
 
-/* std c includes */
-#include <assert.h>
 /* std c++ includes */
 #include <cmath>    // for: exp
 /* tengine includes */
@@ -87,8 +85,12 @@ static yolov3 yolov3_tiny = {
 // @param:  quant[in]   quant(uint8) or not
 static int imi_utils_yolov3_get_output_parameter(
     const graph_t &graph, const void **param, int count, char quant) {
-    assert(NULL != param);
-    assert(count == get_graph_output_node_number(graph));
+    // check inputs
+    if (NULL == param || get_graph_output_node_number(graph) != count) {
+        log_error("invalid input params: param=%p, %d=?%d\n",
+            param, count, get_graph_output_node_number(graph));
+        return -1;
+    }
 
     tensor_t tensor = NULL;
     for (int i = 0; i < count && 0 == quant; i++) {

@@ -140,7 +140,7 @@ int main(int argc, char* argv[]) {
 
     const char *model_file = nullptr;
     const char *image_file = nullptr;
-    const char *output_file = "output.rgb";
+    const char *output_file = "yolov5s_out.jpg";
 
     yolov3 &model = yolov5s;
     image input = make_empty_image(640, 360, 3);

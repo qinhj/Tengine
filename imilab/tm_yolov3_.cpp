@@ -26,17 +26,6 @@
 
 //#define _DEBUG
 
-/* It seems that enable customer shape can speed up a little(1~2ms in average). */
-#define ENABLE_CUSTOMER_SHAPE
-#ifdef ENABLE_CUSTOMER_SHAPE
-#ifndef DFLT_TENSOR_SHAPE
-#define DFLT_TENSOR_SHAPE   1,3,640,640 // nchw
-#endif // DFLT_TENSOR_SHAPE
-#ifndef INPUT_TENSOR_SHAPE
-#define INPUT_TENSOR_SHAPE  DFLT_TENSOR_SHAPE
-#endif // !INPUT_TENSOR_SHAPE
-#endif // ENABLE_CUSTOMER_SHAPE
-
 /* std c includes */
 #include <stdio.h>
 #include <stdlib.h>
@@ -176,7 +165,11 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-#ifndef ENABLE_CUSTOMER_SHAPE
+    /* Note: yolov3 isn't support to change input tensor shape within
+        tengine, since the reshape op is a constant op, unless one
+        also update all reshape op by hand. So is yolov5 within tengine.
+    */
+
     /* get shape of input tensor */
     int i, dims[DIM_NUM]; // nchw
     int dim_num = get_tensor_shape(tensor, dims, DIM_NUM);
@@ -189,15 +182,6 @@ int main(int argc, char* argv[]) {
         log_error("Get input tensor shape error\n");
         return -1;
     }
-#else // customer shape
-    int i, dim_num;
-    /* set input tensor shape (if necessary) */
-    int dims[DIM_NUM] = { INPUT_TENSOR_SHAPE };
-    if (0 != set_tensor_shape(tensor, dims, DIM_NUM)) {
-        log_error("Set input tensor shape failed\n");
-        return -1;
-    }
-#endif // !ENABLE_CUSTOMER_SHAPE
 
     image &lb = model.lb;
     lb = make_image(dims[DIM_IDX_W], dims[DIM_IDX_H], dims[DIM_IDX_C]);
@@ -213,7 +197,9 @@ int main(int argc, char* argv[]) {
         log_error("Prerun multithread graph failed.\n");
         return -1;
     }
-    imi_utils_tm_show_graph(graph, 0, IMI_MASK_NODE_OUTPUT);
+    //imi_utils_tm_show_graph(graph, 0, IMI_MASK_NODE_INPUT);
+    //imi_utils_tm_show_graph(graph, 0, IMI_MASK_NODE_OUTPUT);
+    //imi_utils_tm_show_graph(graph, 0, IMI_MASK_NODE_ANY);
 
     /* get output parameter info */
     const void *buffer[NODE_CNT_YOLOV3] = { 0 };

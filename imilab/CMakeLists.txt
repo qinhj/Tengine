@@ -76,6 +76,8 @@ IF (OpenCV_FOUND AND ${TENGINE_TARGET_PROCESSOR} MATCHES "X86")
     ## imilab opencv examples
     TENGINE_EXAMPLE_IMILAB_CV (tm_yolov3_cv_        tm_yolov3_cv_.cpp)
     TENGINE_EXAMPLE_IMILAB_CV (tm_yolov5s_cv_       tm_yolov5s_cv_.cpp)
+    ## smoke opencv examples
+    TENGINE_EXAMPLE_IMILAB_CV (tm_yolov5s_uint8     tm_yolov5s_uint8.cpp)
 ELSE()
     MESSAGE (WARNING "OpenCV not found, some examples won't be built")
 ENDIF()
