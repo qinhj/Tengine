@@ -191,8 +191,22 @@ int main(int argc, char* argv[]) {
         log_error("Get input tensor shape error\n");
         return -1;
     }
-    // revert from focus shape to origin image shape
-    dims[DIM_IDX_W] *= 2, dims[DIM_IDX_H] *= 2, dims[DIM_IDX_C] /= 4;
+    if (12 == dims[DIM_IDX_C]) {
+        // revert from focus shape to origin image shape
+        dims[DIM_IDX_W] *= 2, dims[DIM_IDX_H] *= 2, dims[DIM_IDX_C] /= 4;
+    }
+    else if (3 == dims[DIM_IDX_C]) {
+        // reset input shape as focus shape
+        int _dims[DIM_NUM] = { dims[0], dims[1] * 4, dims[2] / 2, dims[3] / 2 };
+        if (set_tensor_shape(tensor, _dims, DIM_NUM) < 0) {
+            log_error("Set input tensor shape failed\n");
+            return -1;
+        }
+    }
+    else {
+        log_error("Unavailable channel number: %d\n", dims[DIM_IDX_C]);
+        return -1;
+    }
 
     image &lb = model.lb;
     lb = make_image(dims[DIM_IDX_W], dims[DIM_IDX_H], dims[DIM_IDX_C]);
