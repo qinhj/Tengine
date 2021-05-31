@@ -22,6 +22,12 @@
 # Check CMake version
 CMAKE_MINIMUM_REQUIRED (VERSION 3.13 FATAL_ERROR)
 
+# linker options(remove useless lib/...)
+set(CMAKE_EXE_LINKER_FLAGS "-Wl,--as-needed")
+set(CMAKE_MODULE_LINKER_FLAGS "-Wl,--as-needed")
+set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--as-needed")
+#set(CMAKE_STATIC_LINKER_FLAGS "-Wl,--as-needed") # maybe not supported by android(aarch64)
+
 # Disable inplace builds to prevent source tree corruption.
 IF (" ${CMAKE_SOURCE_DIR}" STREQUAL " ${CMAKE_BINARY_DIR}")
     MESSAGE (FATAL_ERROR "Tengine Fatal: Building inplace are not allowed. You should create a separate directory for Building.")
@@ -54,6 +60,7 @@ OPTION (TENGINE_BUILD_EXAMPLES              "Build examples"                    
 OPTION (TENGINE_BUILD_DEMO                  "Build demos"                               OFF)
 OPTION (TENGINE_BUILD_TESTS                 "Build tests"                               OFF)
 OPTION (TENGINE_BUILD_CPP_API               "Build C++ API"                             OFF)
+OPTION (TENGINE_BUILD_IMILAB                "Build imilab examples"                     ON)
 
 # Tools options
 # Tools
@@ -88,6 +95,11 @@ OPTION (TENGINE_ENABLE_ALL_SYMBOL           "All symbol visible"                
 
 # Experimental optinos
 OPTION (TENGINE_ENABLE_MODEL_CACHE          "NPU kernel cache file option"              OFF)
+
+# Toolchain flag
+if (TENGINE_TOOLCHAIN_FLAG)
+    add_definitions ("${TENGINE_TOOLCHAIN_FLAG}")
+endif()
 
 # Do check list
 INCLUDE ("${CMAKE_CURRENT_SOURCE_DIR}/cmake/check.cmake")
