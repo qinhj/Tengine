@@ -51,6 +51,9 @@ static const char *models[] = {
     "yolov3.tmfile",      // imilab model
 };
 
+// time cost
+static double start_time = 0.;
+
 // load input images
 static void get_input_data(const char *image_file, image &lb) {
     cv::Mat sample = cv::imread(image_file, 1);
@@ -211,6 +214,9 @@ int main(int argc, char* argv[]) {
     }
     log_echo("tengine-lite library version: %s\n", get_tengine_version());
 
+    // cache start time
+    start_time = get_current_time();
+
     /* create graph, load tengine model xxx.tmfile */
     graph_t graph = create_graph(nullptr, "tengine", model_file);
     if (nullptr == graph) {
@@ -307,6 +313,7 @@ read_data:
 exit:
     free_image(input);
     free_image(lb);
+    log_echo("total time cost: %.2f s\n", (get_current_time() - start_time) / 1000.);
 
     /* release tengine */
     postrun_graph(graph);

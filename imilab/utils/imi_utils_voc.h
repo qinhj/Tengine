@@ -45,9 +45,9 @@ static __inline void show_usage(const char *exe, const char *model[2]) {
     log_echo("[Examples]:\n");
     log_echo("   # voc 21 classes\n");
     log_echo("   %s -m %s -i %s -o output/%s -t 4 -f 200\n", exe, model[0], tests[0], tests[0]);
-    log_echo("   # specific class of voc 21 classes(e.g. '-c 0' as person)\n");
-    log_echo("   %s -m %s -i %s -o output/%s -t 4 -f 100 -c 0\n", exe, model[0], tests[1], tests[1]);
-    log_echo("   %s -m %s -i %s -o output/%s -t 4 -f 500 -c 0\n", exe, model[0], tests[2], tests[2]);
+    log_echo("   # specific class of voc 21 classes(e.g. '-c 15' as person)\n");
+    log_echo("   %s -m %s -i %s -o output/%s -t 4 -f 100 -c 15\n", exe, model[0], tests[1], tests[1]);
+    log_echo("   %s -m %s -i %s -o output/%s -t 4 -f 500 -c 15\n", exe, model[0], tests[2], tests[2]);
     log_echo("   # single class(e.g. person)\n");
     log_echo("   %s -m %s -i %s -o output/%s -t 4 -f 200 -n 1\n", exe, model[1], tests[0], tests[0]);
     log_echo("   %s -m %s -i %s -o output/%s -t 4 -f 100 -n 1\n", exe, model[1], tests[1], tests[1]);

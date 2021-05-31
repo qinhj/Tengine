@@ -26,10 +26,6 @@
 
 //#define _DEBUG
 
-#ifndef INPUT_TENSOR_SHAPE
-#define INPUT_TENSOR_SHAPE  1,3,640,640 // nchw
-#endif // !INPUT_TENSOR_SHAPE
-
 /* std c includes */
 #include <stdio.h>
 #include <stdlib.h>
@@ -52,6 +48,9 @@ static const char *models[] = {
     "yolov5s-tiny.v5.tmfile", // official model
     "yolov5s-tiny.tmfile",    // imilab model
 };
+
+// time cost
+static double start_time = 0.;
 
 // @brief:  yolov5 output tensor postprocess
 // P3 node[0].output[0]: (1, 3, 80, 80, 85), stride=640/80=8 ,  small obj
@@ -154,6 +153,9 @@ int main(int argc, char* argv[]) {
     }
     log_echo("tengine-lite library version: %s\n", get_tengine_version());
 
+    // cache start time
+    start_time = get_current_time();
+
     /* create graph, load tengine model xxx.tmfile */
     graph_t graph = create_graph(nullptr, "tengine", model_file);
     if (nullptr == graph) {
@@ -168,15 +170,20 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    int i, dim_num;
-    /* set input tensor shape (necessary) */
-    int dims[DIM_NUM] = { INPUT_TENSOR_SHAPE };
-    int dims_focus[DIM_NUM] = { INPUT_TENSOR_SHAPE };
-    dims_focus[DIM_IDX_W] /= 2, dims_focus[DIM_IDX_H] /= 2, dims_focus[DIM_IDX_C] *= 4;
-    if (0 != set_tensor_shape(tensor, dims_focus, DIM_NUM)) {
-        log_error("Set input tensor shape failed\n");
+    /* get shape of input tensor */
+    int i, dims[DIM_NUM]; // nchw
+    int dim_num = get_tensor_shape(tensor, dims, DIM_NUM);
+    log_echo("input tensor shape: %d(", dim_num);
+    for (i = 0; i < dim_num; i++) {
+        log_echo(" %d", dims[i]);
+    }
+    log_echo(")\n");
+    if (DIM_NUM != dim_num) {
+        log_error("Get input tensor shape error\n");
         return -1;
     }
+    // revert from focus shape to origin image shape
+    dims[DIM_IDX_W] *= 2, dims[DIM_IDX_H] *= 2, dims[DIM_IDX_C] /= 4;
 
     image &lb = model.lb;
     lb = make_image(dims[DIM_IDX_W], dims[DIM_IDX_H], dims[DIM_IDX_C]);
@@ -226,6 +233,8 @@ read_data:
         goto exit;
     }
     fc++;
+    log_echo("======================================\n");
+    log_echo("Frame No.%03d:\n", fc);
 
     /* run graph */
     if (imi_utils_tm_run_graph(graph, repeat_count) < 0) {
@@ -258,6 +267,7 @@ exit:
     free_image(input);
     free_image(lb);
     if (1 < fc) log_echo("total frame: %d\n", fc);
+    log_echo("total time cost: %.2f s\n", (get_current_time() - start_time) / 1000.);
 
     /* release tengine */
     postrun_graph(graph);

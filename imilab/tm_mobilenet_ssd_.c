@@ -62,6 +62,9 @@ static const char *models[] = {
     "mobilenet_ssd.imi.tmfile", // imilab model
 };
 
+// time cost
+static double start_time = 0.;
+
 #ifdef TRY_LETTER_BOX
 static float lb_scale = 0.f;    // letter box scale
 static int lb_ow = 0, lb_oh = 0;// letter box offset
@@ -194,6 +197,9 @@ int main(int argc, char* argv[]) {
         return -1;
     }
     log_echo("tengine-lite library version: %s\n", get_tengine_version());
+
+    // cache start time
+    start_time = get_current_time();
 
     /* create graph, load tengine model xxx.tmfile */
     graph_t graph = create_graph(NULL, "tengine", model_file);
@@ -375,6 +381,7 @@ exit:
     if (fp) fclose(fp);
     if (fout) fclose(fout);
     if (1 < fc) log_echo("total frame: %d\n", fc);
+    log_echo("total time cost: %.2f s\n", (get_current_time() - start_time) / 1000.);
 
     /* release tengine */
     postrun_graph(graph);

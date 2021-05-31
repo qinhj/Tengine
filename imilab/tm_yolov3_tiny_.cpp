@@ -50,6 +50,9 @@ static const char *models[] = {
     "yolov3-tiny.tmfile",      // imilab model
 };
 
+// time cost
+static double start_time = 0.;
+
 // @brief:  yolov3-tiny output tensor postprocess
 // P4 node[0].output[0]: (1, 3, 26, 26, 5+nc), stride=416/26=16, middle obj
 // P5 node[1].output[0]: (1, 3, 13, 13, 5+nc), stride=416/13=32,  large obj
@@ -150,6 +153,9 @@ int main(int argc, char* argv[]) {
     }
     log_echo("tengine-lite library version: %s\n", get_tengine_version());
 
+    // cache start time
+    start_time = get_current_time();
+
     /* create graph, load tengine model xxx.tmfile */
     graph_t graph = create_graph(nullptr, "tengine", model_file);
     if (nullptr == graph) {
@@ -242,6 +248,8 @@ read_data:
         goto exit;
     }
     fc++;
+    log_echo("======================================\n");
+    log_echo("Frame No.%03d:\n", fc);
 
     /* run graph */
     if (imi_utils_tm_run_graph(graph, repeat_count) < 0) {
@@ -274,6 +282,7 @@ exit:
     free_image(input);
     free_image(lb);
     if (1 < fc) log_echo("total frame: %d\n", fc);
+    log_echo("total time cost: %.2f s\n", (get_current_time() - start_time) / 1000.);
 
     /* release tengine */
     postrun_graph(graph);
