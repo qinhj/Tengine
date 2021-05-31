@@ -36,3 +36,8 @@ update all reshape op by hand ...
   For models without reshape op, one can reset the input tensor shape directly
 and test more(e.g. mobilenet_ssd/...).
 ```
+
+## Onnx ##
+```
+1. It seems that tengine doesn't support onnxsim dynamic_input_shape;
+```
