@@ -45,9 +45,13 @@ $ ./build/install/bin/convert_tool -h
 $ ./build/install/bin/convert_tool -f onnx -m mobilenet.onnx -o mobilenet.tmfile
 $ ./build/install/bin/convert_tool -f darknet -p yolov3.cfg -m yolov3.weights -o yolov3.tmfile
 
-## example(yolov5: pytorch => onnx => tmfile)
+## examples(yolov3: pytorch => onnx => tmfile)
+$ python3 yolov3-tiny-opt.py --input yolov3-tiny.onnx --output yolov3-tiny.opt.onnx
+$ python3 yolov3-tiny-opt.py --input yolov3-tiny.dynamic.onnx --output yolov3-tiny.dynamic.opt.onnx --dynamic
+
+## examples(yolov5s: pytorch => onnx => tmfile)
 $ cd yolov5 # yolov3 isn't so much compatible
-$ python models/export.py --weights weights/yolo5s.v5.pt --simplify
+$ python3 models/export.py --weights weights/yolo5s.v5.pt --simplify
 $ cd tools/optimize
 $ python3 yolov5s-opt.py --input yolov5s.v4.onnx --output yolov5s.v4.opt.onnx --in_tensor 167 --out_tensor 381,420,459
 $ python3 yolov5s-opt.py --input yolov5s.v5.onnx --output yolov5s.v5.opt.onnx --in_tensor 167 --out_tensor 397,458,519

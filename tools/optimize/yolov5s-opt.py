@@ -51,6 +51,7 @@ def parse_args():
     parser.add_argument('--in_tensor', help='input tensor name', default='167', type=str)
     parser.add_argument('--out_tensor', help='output tensor names', default='381,420,459', type=str)
     parser.add_argument('--verbose', action='store_true', help='show verbose info')
+    parser.add_argument('--dynamic', action='store_true', help='dynamic ONNX axes')
     
     args = parser.parse_args()
     return args
@@ -170,7 +171,9 @@ def main():
     # load original onnx model, graph, nodes
     print("[Quant Tools Info]: Step 0, load original onnx model from %s." % (args.input))
     onnx_model = onnx.load(args.input)
-    onnx_model, check = simplify(onnx_model)
+    onnx_model, check = simplify(onnx_model,
+                                 dynamic_input_shape=args.dynamic,
+                                 input_shapes={'images': [1, 3, 640, 640]} if args.dynamic else None)
 
     graph = onnx_model.graph
     print(len(graph.value_info))
