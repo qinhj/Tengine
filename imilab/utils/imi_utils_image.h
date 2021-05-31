@@ -194,6 +194,14 @@ static int imi_utils_image_save_permute_chw2hwc(FILE *fp, const image im, char c
 // @param:  cov[in]  mean and scale
 static int imi_utils_image_load_letterbox(
     FILE *fp, const image img, char bgr, const image lb, const float cov[][3]) {
+    // todo: optimize/resize input image
+    if ((img.w <= img.h && lb.h != img.h) ||
+        (img.h <= img.w && lb.w != img.w)) {
+        log_error("input size (%d, %d) not match letter box size (%d, %d)!\n", img.w, img.h, lb.w, lb.h);
+        log_error("please try to resize the input image first!\n");
+        exit(0);
+    }
+
     // check inputs
     if (NULL == fp || NULL == img.data || NULL == lb.data) {
         log_error("invalid input param NULL\n");

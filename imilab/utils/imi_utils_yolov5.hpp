@@ -120,14 +120,6 @@ static int imi_utils_yolov5_focus_data(const float *data, image &lb, float input
 }
 
 static int imi_utils_yolov5_load_data(FILE *fp, image &img, char bgr, image &lb, const float cov[2][3], float input_scale, int zero_point) {
-    // todo: optimize/resize input image
-    if ((img.w <= img.h && lb.h != img.h) ||
-        (img.h <= img.w && lb.w != img.w)) {
-        log_error("input size (%d, %d) not match letter box size (%d, %d)!\n", img.w, img.h, lb.w, lb.h);
-        log_error("please try to resize the input image first!\n");
-        exit(0);
-    }
-
     // check buffer data
     if (NULL == lb.data) {
         log_error("letter box data buffer is NULL\n");
