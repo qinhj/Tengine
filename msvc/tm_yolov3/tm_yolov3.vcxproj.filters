@@ -86,7 +86,7 @@
     <ClCompile Include="..\..\examples\common\tengine_operations.c">
       <Filter>源文件\common</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\examples\tm_yolov3_.cpp">
+    <ClCompile Include="..\..\imilab\tm_yolov3_.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

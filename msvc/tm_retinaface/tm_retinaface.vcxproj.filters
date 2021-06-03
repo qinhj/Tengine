@@ -24,11 +24,11 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\examples\tm_retinaface_.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\examples\common\tengine_operations.c">
       <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\imilab\tm_retinaface_.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
