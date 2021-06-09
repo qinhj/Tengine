@@ -73,25 +73,27 @@ static image lb;
 
 // @return: box count
 static int post_process_ssd(image im, float threshold, const void *data, int num, int tc) {
-    const float *outdata = (const float *)data;
+    const float *buf = (const float *)data;
 
     Box_t box;
     int i, cnt = 0;
     int im_w = im.w, im_h = im.h; //im_w *= (640/300), im_h *= (360/300);
     for (i = 0; i < num; i++) {
-        if (threshold <= outdata[1]) {
-            box.class_idx = outdata[0];
-            box.score = outdata[1];
+        if (threshold <= buf[1]) {
+            box.class_idx = buf[0];
+            box.score = buf[1];
+            //log_debug("score: %2.3f%%, box: (%7.3f, %7.3f) (%7.3f, %7.3f), label: %s\n",
+            //    box.score * 100, buf[2], buf[3], buf[4], buf[5], class_names[box.class_idx]);
 #ifndef TRY_LETTER_BOX
-            box.x0 = outdata[2] < 0 ? 0 : 1 < outdata[2] ? im_w : outdata[2] * im_w;
-            box.y0 = outdata[3] < 0 ? 0 : 1 < outdata[3] ? im_h : outdata[3] * im_h;
-            box.x1 = outdata[4] < 0 ? 0 : 1 < outdata[4] ? im_w : outdata[4] * im_w;
-            box.y1 = outdata[5] < 0 ? 0 : 1 < outdata[5] ? im_h : outdata[5] * im_h;
+            box.x0 = buf[2] < 0 ? 0 : 1 < buf[2] ? im_w : buf[2] * im_w;
+            box.y0 = buf[3] < 0 ? 0 : 1 < buf[3] ? im_h : buf[3] * im_h;
+            box.x1 = buf[4] < 0 ? 0 : 1 < buf[4] ? im_w : buf[4] * im_w;
+            box.y1 = buf[5] < 0 ? 0 : 1 < buf[5] ? im_h : buf[5] * im_h;
 #else // TRY_LETTER_BOX
-            box.x0 = (outdata[2] * lb.w - lb_ow) / lb_scale;
-            box.y0 = (outdata[3] * lb.h - lb_oh) / lb_scale;
-            box.x1 = (outdata[4] * lb.w - lb_ow) / lb_scale;
-            box.y1 = (outdata[5] * lb.h - lb_oh) / lb_scale;
+            box.x0 = (buf[2] * lb.w - lb_ow) / lb_scale;
+            box.y0 = (buf[3] * lb.h - lb_oh) / lb_scale;
+            box.x1 = (buf[4] * lb.w - lb_ow) / lb_scale;
+            box.y1 = (buf[5] * lb.h - lb_oh) / lb_scale;
             box.x0 = box.x0 < 0 ? 0 : im_w < box.x0 ? im_w : box.x0;
             box.y0 = box.y0 < 0 ? 0 : im_h < box.y0 ? im_h : box.y0;
             box.x1 = box.x1 < 0 ? 0 : im_w < box.x1 ? im_w : box.x1;
@@ -102,11 +104,11 @@ static int post_process_ssd(image im, float threshold, const void *data, int num
                 draw_box(im, box.x0, box.y0, box.x1, box.y1, 2, 125, 0, 125);
             }
 
-            log_echo("score: %.3f%%, box: (%.3f, %.3f) (%.3f, %.3f), label: %s\n",
+            log_echo("score: %2.3f%%, box: (%7.3f, %7.3f) (%7.3f, %7.3f), label: %s\n",
                 box.score * 100, box.x0, box.y0, box.x1, box.y1, class_names[box.class_idx]);
             cnt++;
         }
-        outdata += 6;
+        buf += 6;
     }
     log_echo("detect box num: %d, select box num: %d\n", num, cnt);
     return cnt;
@@ -312,12 +314,14 @@ read_data:
         if (im.w != lb.w || im.h != lb.h) {
             // resize to network input shape
             tengine_resize_f32(im.data, lb.data, lb.w, lb.h, im.c, im.h, im.w);
+            log_debug("resize image from (%d,%d) to (%d,%d)\n", im.w, im.h, lb.w, lb.h);
             _data = lb.data;
         }
         //else { log_debug("I didn't resize the image ^_^\n"); }
 #else // TRY_LETTER_BOX
         // strategy: resize and attach to letter box
         image resized = resize_image(im, im_rw, im_rh);
+        log_debug("resize image from (%d,%d) to (%d,%d)\n", im.w, im.h, lb.w, lb.h);
         // init letter box
         for (k = 0; k < lb.c; k++) {
             idx = lb.h * lb.w * k;
