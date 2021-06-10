@@ -1,7 +1,4 @@
-* split_dat.c
-Split float32 image data into R/G/B and U8C3 data.
-
-# Tengine-Convert-Tools #
+## Tengine-Convert-Tools ##
 [Convert Toolkit](https://github.com/OAID/Tengine-Convert-Tools.git)  
 
 ## Convert Toolkit: Build ##
@@ -46,12 +43,12 @@ $ ./build/install/bin/convert_tool -f onnx -m mobilenet.onnx -o mobilenet.tmfile
 $ ./build/install/bin/convert_tool -f darknet -p yolov3.cfg -m yolov3.weights -o yolov3.tmfile
 
 ## examples(yolov3: pytorch => onnx => tmfile)
+$ python3 models/export.py --weights weights/yolov3.v9.5.pt --simplify
 $ python3 yolov3-tiny-opt.py --input yolov3-tiny.onnx --output yolov3-tiny.opt.onnx
 $ python3 yolov3-tiny-opt.py --input yolov3-tiny.dynamic.onnx --output yolov3-tiny.dynamic.opt.onnx --dynamic
 
 ## examples(yolov5s: pytorch => onnx => tmfile)
-$ cd yolov5 # yolov3 isn't so much compatible
-$ python3 models/export.py --weights weights/yolo5s.v5.pt --simplify
+$ python3 models/export.py --weights weights/yolov5s.v5.pt --simplify
 $ cd tools/optimize
 $ python3 yolov5s-opt.py --input yolov5s.v4.onnx --output yolov5s.v4.opt.onnx --in_tensor 167 --out_tensor 381,420,459
 $ python3 yolov5s-opt.py --input yolov5s.v5.onnx --output yolov5s.v5.opt.onnx --in_tensor 167 --out_tensor 397,458,519
@@ -92,6 +89,12 @@ $ ./quant_tool_uint8 -m $MODELS/retinaface.tmfile -i $IMAGES -o retinaface.uint8
 $ for img in $(ls $IMAGES/); do tm_yolov5s_uint8 -m yolov5s_uint8.tmfile -i $IMAGES/$img -r 1 -t 1 && mv yolov5s_uint8_out.jpg output/${img%.*}.jpg; done
 ## Todo: test quantized retinaface
 $ for img in $(ls $IMAGES/); do tm_retinaface_uint8 -m retinaface_uint8.tmfile -i $IMAGES/$img && mv retinaface_uint8_out.jpg output/${img%.*}.jpg; done
+```
+
+## Others ##
+```
+* split_dat.c
+Split float32 image data into R/G/B and U8C3 data.
 ```
 
 ## Quick FAQ ##
