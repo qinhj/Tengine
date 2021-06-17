@@ -14,7 +14,7 @@
 #define NODE_CNT_YOLOV5S_TINY   2
 
 // yolov5s-tiny anchors
-static const float anchors_tiny_v5s[] = {
+static const int anchors_tiny_v5s[] = {
      9,  17,  18,  39,  37, 67, // P3/8
     62, 132, 120, 242, 273, 363 // P4/16
 };

@@ -31,13 +31,13 @@ static const int strides[] = { 8, 16, 32 };
 static const int strides_tiny[] = { 16, 32 };
 
 // yolov3 anchors
-static const float anchors[] = {
+static const int anchors[] = {
     10, 13, 16, 30, 33, 23,     // P3/8
     30, 61, 62, 45, 59, 119,    // P4/16
     116, 90, 156, 198, 373, 326,// P5/32
 };
 // yolov3-tiny anchors
-static const float anchors_tiny[] = {
+static const int anchors_tiny[] = {
     10, 14, 23, 27, 37, 58,     // P4/16
     81, 82, 135, 169, 344, 319, // P5/32
 };
@@ -51,7 +51,7 @@ typedef struct yolov3_s {
     /* hyp */
     const int *strides;
     int anchors_num;// default: 3
-    const float *anchors;
+    const int *anchors;
     const void *usr_data;
 } yolov3;
 
@@ -141,8 +141,8 @@ static int imi_utils_yolov3_proposals_generate(const yolov3 &model,
         int feat_h = (model.lb).h / model.strides[i];
         // 1 x anchors_num x feature_map_w x feature_map_h x out_num
         for (int a = 0; a < model.anchors_num; a++) {
-            float anchor_w = model.anchors[i * model.anchors_num * 2 + a * 2 + 0];
-            float anchor_h = model.anchors[i * model.anchors_num * 2 + a * 2 + 1];
+            int anchor_w = model.anchors[i * model.anchors_num * 2 + a * 2 + 0];
+            int anchor_h = model.anchors[i * model.anchors_num * 2 + a * 2 + 1];
             // todo: check ahwo or awho plz
             for (int h = 0; h < feat_h; h++) {
                 for (int w = 0; w < feat_w; w++) {
