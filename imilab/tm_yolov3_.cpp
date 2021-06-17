@@ -214,33 +214,75 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    int bgr = -1;
     std::vector<Object> proposals;
     std::vector<Object> objects;
 
-    FILE *fout = output_file ? fopen(output_file, "wb") : NULL;
-    FILE *fp = fopen(image_file, "rb");
+    // to support read/load video.rgb or video.bgr
+    int bgr = -1;
+    FILE *fp = NULL, *fout = NULL;
 
     // load raw data(non-planar)
     if (strstr(image_file, "bgra")) input.c = 4, bgr = 1;
     else if (strstr(image_file, "bgr")) input.c = 3, bgr = 1;
     else if (strstr(image_file, "rgba")) input.c = 4, bgr = 0;
     else if (strstr(image_file, "rgb")) input.c = 3, bgr = 0;
-    else {
-        log_error("unknown test data format!\n");
-        goto exit;
+    else { ; }
+    if (-1 != bgr) {
+        fp = fopen(image_file, "rb");
+        fout = fopen(output_file, "wb");
+        if (NULL == fp || NULL == fout) {
+            log_error("open %s or %s failed\n", image_file, output_file);
+            goto exit;
+        }
+        input.data = (float *)calloc(sizeof(float), input.c * input.w * input.h);
     }
-    input.data = (float *)calloc(sizeof(float), input.c * input.w * input.h);
+    else {
+        // load encoded image
+        input = imread(image_file);
+        //input = rgb2bgr_premute(input);
+    }
 
 read_data:
     /* prepare process input data, set the data mem to input tensor */
-    if (1 != (ret = imi_utils_image_load_letterbox(fp, input, bgr, lb, (const float (*)[3])model.usr_data))) {
-        log_error("%s\n", ret ? "get_input_data error!" : "read input data fin");
-        goto exit;
+    if (fp) {
+        // load raw data from file and convert to bgr planar format
+    	if (1 != (ret = imi_utils_image_load_letterbox(fp, input, bgr, lb, (const float (*)[3])model.usr_data))) {
+            log_error("%s\n", ret ? "get_input_data error!" : "read input data fin");
+            goto exit;
+        }
+        fc++;
+        log_echo("======================================\n");
+        log_echo("Frame No.%03d:\n", fc);
     }
-    fc++;
-    log_echo("======================================\n");
-    log_echo("Frame No.%03d:\n", fc);
+    else {
+        const float *mean = (const float *)model.usr_data;
+        const float *scale = (const float *)model.usr_data + 3;
+        float lb_scale_w = (float)lb.w / input.w;
+        float lb_scale_h = (float)lb.h / input.h;
+        int im_rw = lb_scale_w < lb_scale_h ? lb.w : input.w * lb_scale_h;
+        int im_rh = lb_scale_w < lb_scale_h ? input.h * lb_scale_w : lb.h;
+        if (im_rw != input.w || im_rh != input.h) {
+            // resize to fit letter box
+            image resized = resize_image(input, im_rw, im_rh);
+            log_echo("resize image from (%d,%d) to (%d,%d)\n", input.w, input.h, im_rw, im_rh);
+            // attach resized image to letter box
+            add_image(resized, lb, (lb.w - im_rw) / 2, (lb.h - im_rh) / 2);
+            // release resized image
+            free_image(resized);
+        }
+        else {
+            // attach image to letter box directly
+            add_image(input, lb, (lb.w - im_rw) / 2, (lb.h - im_rh) / 2);
+        }
+        for (int idx, k = 0; k < lb.c; k++) {
+            for (int i = 0; i < lb.h; i++) {
+                for (int j = 0; j < lb.w; j++) {
+                    idx = k * lb.h * lb.w + i * lb.w + j;
+                    lb.data[idx] = (lb.data[idx] - mean[k]) * scale[k];
+                }
+            }
+        }
+    }
 
     /* run graph */
     if (imi_utils_tm_run_graph(graph, repeat_count) < 0) {
@@ -261,11 +303,13 @@ read_data:
     imi_utils_objects_draw(objects, input, target_class, model.class_names);
 
     // save result to output
-    if (fout) {
+    if (-1 != bgr) {
         imi_utils_image_save_permute_chw2hwc(fout, input, bgr);
+        if (fc < frame) goto read_data;
     }
-
-    if (fc < frame) goto read_data;
+    else {
+        save_image(input, output_file);
+    }
 
 exit:
     if (fp) fclose(fp);

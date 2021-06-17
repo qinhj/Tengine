@@ -321,14 +321,7 @@ read_data:
 #else // TRY_LETTER_BOX
         // strategy: resize and attach to letter box
         image resized = resize_image(im, im_rw, im_rh);
-        log_debug("resize image from (%d,%d) to (%d,%d)\n", im.w, im.h, lb.w, lb.h);
-        // init letter box
-        for (k = 0; k < lb.c; k++) {
-            idx = lb.h * lb.w * k;
-            for (i = 0; i < lb.h * lb.w; i++) {
-                lb.data[idx + i] = (0. - voc_image_cov[0][k]) * voc_image_cov[1][k];
-            }
-        }
+        log_debug("resize image from (%d,%d) to (%d,%d)\n", im.w, im.h, im_rw, im_rh);
         // attach resized image to letter box
         add_image(resized, lb, lb_ow, lb_oh);
         // release resized image
