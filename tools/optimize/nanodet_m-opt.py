@@ -62,6 +62,39 @@ def parse_args():
     return args
 
 
+def _onnx_graph_name_map(graph_prop_list):
+  m = {}
+  for n in graph_prop_list:
+    m[n.name] = n
+  return m
+
+
+def optimize_tensor_info(tensors, infos, names):
+    """
+    optimize tensor info
+    Args:
+        tensors:  tensor of ONNX model
+        infos:    the value info of ONNX model
+        names:    target tensors' name
+    Returns:
+        optimized graph tensor and value info
+    """
+    ## new tensor value for reshape nodes
+    for i, t in enumerate(tensors):
+        if t.name in names:
+            t_new = onnx.helper.make_tensor(t.name, onnx.TensorProto.INT64, [4], [1, 4, 8, -1])
+            tensors.remove(t)
+            tensors.insert(i, t_new)
+
+    for i, v in enumerate(infos):
+        if v.name in names:
+            v_new = onnx.helper.make_tensor_value_info(v.name, onnx.TensorProto.INT64, [4])
+            infos.remove(v)
+            infos.insert(i, v_new)
+
+    return tensors, infos
+
+
 def optimize_node_shape(nodes, names):
     """
     optimize input constant nodes of final reshape nodes in distance prediction branch
@@ -184,6 +217,15 @@ def main():
     # do check and simplify the onnx model
     print("[Opt Tools Info]: Step 4, check and simplify the new onnx model.")
     onnx_model, check = simplify(onnx_model)
+
+    #===========================================================================
+    # Note: If we simplify the onnx model 1st, then there will be more vars in
+    # the onnx_model.graph.input and onnx_model.graph.initialize. Although there
+    # is less onnx_model.graph, we still need to the optimize above nodes/params.
+    #
+    #optimize_tensor_info(onnx_model.graph.initializer, onnx_model.graph.input, constant_shape_list)
+    #onnx_model = onnx.shape_inference.infer_shapes(onnx_model)
+    #===========================================================================
 
     # save the new optimize onnx model
     print("[Opt Tools Info]: Step 5, save the new onnx model to %s" % (args.output))
