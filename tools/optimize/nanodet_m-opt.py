@@ -214,10 +214,6 @@ def main():
         print("[Opt Tools Info]: Step 3, update output tensor name and shape.")
         optimize_output_tensor(onnx_model.graph.output)
 
-    # do check and simplify the onnx model
-    print("[Opt Tools Info]: Step 4, check and simplify the new onnx model.")
-    onnx_model, check = simplify(onnx_model)
-
     #===========================================================================
     # Note: If we simplify the onnx model 1st, then there will be more vars in
     # the onnx_model.graph.input and onnx_model.graph.initialize. Although there
@@ -226,6 +222,10 @@ def main():
     #optimize_tensor_info(onnx_model.graph.initializer, onnx_model.graph.input, constant_shape_list)
     #onnx_model = onnx.shape_inference.infer_shapes(onnx_model)
     #===========================================================================
+
+    # do check and simplify the onnx model
+    print("[Opt Tools Info]: Step 4, check and simplify the new onnx model.")
+    onnx_model, check = simplify(onnx_model)
 
     # save the new optimize onnx model
     print("[Opt Tools Info]: Step 5, save the new onnx model to %s" % (args.output))
