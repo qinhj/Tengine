@@ -9,7 +9,7 @@ $ ...
 
 ## quick build
 $ mkdir -p build && cd build
-$ cmake .. -DTENGINE_BUILD_TESTS=ON -DTENGINE_FORCE_SKIP_OPENMP=OFF
+$ cmake .. -DTENGINE_BUILD_TESTS=ON -DTENGINE_FORCE_SKIP_OPENMP=OFF -DCMAKE_BUILD_TYPE=Debug
 $ make && make install
 
 * Note:
