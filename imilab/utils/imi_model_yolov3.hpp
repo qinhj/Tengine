@@ -1,16 +1,16 @@
 // ============================================================
-//                  Imilab Utils: Yolov3 APIs
+//                  Imilab Model: Yolov3 APIs
 // ------------------------------------------------------------
 // Author:  qinhongjie@imilab.com       Date:   2021/05/12
 // ============================================================
 
-#ifndef __IMI_UTILS_YOLOV3_HPP__
-#define __IMI_UTILS_YOLOV3_HPP__
+#ifndef __IMI_MODEL_YOLOV3_HPP__
+#define __IMI_MODEL_YOLOV3_HPP__
 
 /* std c++ includes */
 #include <cmath>    // for: exp
 /* tengine includes */
-#include "tengine/c_api.h"      // for: graph_t, run_graph
+#include "tengine/c_api.h"      // for: graph_t
 #include "tengine_operations.h" // for: image
 /* imilab includes */
 #include "imi_utils_elog.h"     // for: log_xxxx
@@ -188,4 +188,4 @@ static int imi_utils_yolov3_proposals_generate(const yolov3 &model,
     return objects.size();
 }
 
-#endif // !__IMI_UTILS_YOLOV3_HPP__
+#endif // !__IMI_MODEL_YOLOV3_HPP__

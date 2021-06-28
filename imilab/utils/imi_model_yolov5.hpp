@@ -1,14 +1,14 @@
 // ============================================================
-//                  Imilab Utils: Yolov5 APIs
+//                  Imilab Model: Yolov5 APIs
 // ------------------------------------------------------------
 // Author:  qinhongjie@imilab.com       Date:   2021/05/12
 // ============================================================
 
-#ifndef __IMI_UTILS_YOLOV5_HPP__
-#define __IMI_UTILS_YOLOV5_HPP__
+#ifndef __IMI_MODEL_YOLOV5_HPP__
+#define __IMI_MODEL_YOLOV5_HPP__
 
 /* imilab includes */
-#include "imi_utils_yolov3.hpp"
+#include "imi_model_yolov3.hpp"
 
 #define NODE_CNT_YOLOV5S        3
 #define NODE_CNT_YOLOV5S_TINY   2
@@ -153,4 +153,4 @@ static int imi_utils_yolov5_load_data(FILE *fp, image &img, char bgr, image &lb,
     }
 }
 
-#endif // !__IMI_UTILS_YOLOV5_HPP__
+#endif // !__IMI_MODEL_YOLOV5_HPP__

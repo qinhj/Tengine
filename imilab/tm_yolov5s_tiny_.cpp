@@ -34,10 +34,10 @@
 /* imilab includes */
 #include "utils/imi_utils_object.hpp"
 #include "utils/imi_utils_visual.hpp"
-#include "utils/imi_utils_yolov5.hpp"
 #include "utils/imi_utils_tm.h"     // for: imi_utils_tm_run_graph
 #include "utils/imi_utils_elog.h"   // for: log_xxxx
 #include "utils/imi_utils_tm_debug.h"
+#include "utils/imi_model_yolov5.hpp"
 
 // postprocess threshold
 static float prob_threshold = 0.6f; // 0.25f
@@ -80,9 +80,9 @@ int main(int argc, char* argv[]) {
     yolov3 &model = yolov5s_tiny;
     image input = make_empty_image(640, 360, 3);
 
-    int res, frame = 1, fc = 0;
-    while ((res = getopt(argc, argv, "c:m:i:r:t:w:h:n:o:f:s:u")) != -1) {
-        switch (res) {
+    int ret, frame = 1, fc = 0;
+    while ((ret = getopt(argc, argv, "c:m:i:r:t:w:h:n:o:f:s:u")) != -1) {
+        switch (ret) {
         case 'c':
             target_class = atoi(optarg);
             if (target_class < 0 || model.class_num <= target_class) {
@@ -146,8 +146,7 @@ int main(int argc, char* argv[]) {
     opt.affinity = 0;
 
     /* inital tengine */
-    int ret = init_tengine();
-    if (0 != ret) {
+    if (0 != (ret = init_tengine())) {
         log_error("Initial tengine failed.\n");
         return -1;
     }
