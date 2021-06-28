@@ -47,6 +47,7 @@ TENGINE_EXAMPLE_IMILAB (tm_hello_world      tm_hello_world.cpp)
 ## imilab examples
 TENGINE_EXAMPLE_IMILAB (tm_test_imread      tm_test_imread.cpp)
 TENGINE_EXAMPLE_IMILAB (tm_mobilenet_ssd_   tm_mobilenet_ssd_.c)
+TENGINE_EXAMPLE_IMILAB (tm_nanodet_m_       tm_nanodet_m_.cpp)
 TENGINE_EXAMPLE_IMILAB (tm_retinaface_      tm_retinaface_.cpp)
 TENGINE_EXAMPLE_IMILAB (tm_yolov3_          tm_yolov3_.cpp)
 TENGINE_EXAMPLE_IMILAB (tm_yolov3_p4p5_     tm_yolov3_p4p5_.cpp)
