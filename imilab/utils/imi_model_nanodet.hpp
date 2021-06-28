@@ -7,6 +7,8 @@
 #ifndef __IMI_MODEL_NANODET_HPP__
 #define __IMI_MODEL_NANODET_HPP__
 
+/* std c includes */
+#include <math.h>   // for: exp
 /* tengine includes */
 #include "tengine_operations.h" // for: image
 /* imilab includes */
@@ -66,7 +68,7 @@ static int softmax(const _Tp* src, _Tp* dst, int length) {
     _Tp denominator{ 0 };
  
     for (int i = 0; i < length; ++i) {
-        dst[i] = std::exp(src[i] - max_value);
+        dst[i] = /*std::*/exp(src[i] - max_value);
         denominator += dst[i];
     }
  
