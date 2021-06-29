@@ -44,8 +44,9 @@ $ ./build/install/bin/convert_tool -f darknet -p yolov3.cfg -m yolov3.weights -o
 
 ## examples(yolov3: pytorch => onnx => tmfile)
 $ python3 models/export.py --weights weights/yolov3.v9.5.pt --simplify
-$ python3 yolov3-tiny-opt.py --input yolov3-tiny.onnx --output yolov3-tiny.opt.onnx
-$ python3 yolov3-tiny-opt.py --input yolov3-tiny.dynamic.onnx --output yolov3-tiny.dynamic.opt.onnx --dynamic
+$ python3 yolov3-opt.py --input yolov3.onnx --output yolov3-opt.onnx --cut "Sigmoid_189,Sigmoid_238,Sigmoid_287"
+$ python3 yolov3-opt.py --input yolov3-spp.onnx --output yolov3-spp-opt.onnx --cut "Sigmoid_195,Sigmoid_244,Sigmoid_293"
+$ python3 yolov3-opt.py --input yolov3-tiny.onnx --output yolov3-tiny-opt.onnx --cut "Sigmoid_62,Sigmoid_111"
 
 ## examples(yolov5s: pytorch => onnx => tmfile)
 $ python3 models/export.py --weights weights/yolov5s.v5.pt --simplify
