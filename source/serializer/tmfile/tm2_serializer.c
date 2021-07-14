@@ -166,11 +166,11 @@ static int load_graph_tensors(struct tm2_serializer* tm2_s, struct graph* graph,
     graph->graph_layout = tm_graph->graph_layout;
     graph->model_layout = tm_graph->model_layout;
 
-    // premute layout from NHWC to HCHW
+    // permute layout from NHWC to HCHW
     if (graph->graph_layout == TENGINE_LAYOUT_NHWC)
     {
         graph->graph_layout = TENGINE_LAYOUT_NCHW;
-        TLOG_DEBUG("premute layout: graph_layout from nhwc to nchw\n");
+        TLOG_DEBUG("permute layout: graph_layout from nhwc to nchw\n");
     }
 
     for (int i = 0; i < v_tensors->v_num; i++)
@@ -541,7 +541,7 @@ static int load_graph_nodes(struct tm2_serializer* tm2_s, struct graph* ir_graph
             TLOG_ERR("node: %d has no output\n", ir_node->index);
             break;
         }
-        
+
         const TM2_Vector_indices* v_output_tensors =
                 ( TM2_Vector_indices* )(mem_base + tm_node->offset_vi_output_tensors);
 
