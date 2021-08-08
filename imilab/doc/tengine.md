@@ -58,3 +58,20 @@ may need to reset the output tensor node or find some runtime callback api.
 ```
 1. It seems that tengine doesn't support onnxsim dynamic_input_shape;
 ```
+
+## Optimize ##
+```
+CPU:
+»ã±à
+im2col + sgemm
+direct
+winograd
+int8
+
+GPU:
+cuda
+tensorRT
+
+NPU:
+tim-vx
+```

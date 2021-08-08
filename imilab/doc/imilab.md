@@ -17,10 +17,10 @@ $ make && make install
 -    TARGET_LINK_LIBRARIES (${name} PRIVATE ${CMAKE_PROJECT_NAME})
 +    TARGET_LINK_LIBRARIES (${name} PRIVATE ${CMAKE_PROJECT_NAME}-static)
 1) To build with arm-linux-gnueabi.toolchain.cmake
-SET(TENGINE_TOOLCHIN_FLAG "-march=armv7-a -mfloat-abi=softfp -mfpu=neon-vfpv4")
+SET(TENGINE_TOOLCHAIN_FLAG "-march=armv7-a -mfloat-abi=softfp -mfpu=neon-vfpv4")
 SET(TENGINE_FORCE_SKIP_OPENMP OFF)
 2) To build with arm-linux-gnueabihf.toolchain.cmake
-SET(TENGINE_TOOLCHIN_FLAG "-march=armv7-a -mfloat-abi=hard -mfpu=neon-vfpv4")
+SET(TENGINE_TOOLCHAIN_FLAG "-march=armv7-a -mfloat-abi=hard -mfpu=neon-vfpv4")
 SET(TENGINE_FORCE_SKIP_OPENMP OFF)
 3) To build with mips64-linux-gnu.toolchain.cmake
 set(CMAKE_C_FLAGS "-march=mips64r2 -mabi=64 -mmsa -mhard-float -mfp64")
