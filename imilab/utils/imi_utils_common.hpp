@@ -19,13 +19,15 @@
 using namespace cv;
 #endif // USE_OPENCV
 
-typedef struct object_s {
+typedef struct object_s
+{
     Rect2f rect;
     int label;
     float prob;
 } Object;
 
-typedef struct face_s : public Object {
+typedef struct face_s : public Object
+{
     Point2f landmark[5];
 } Face2f;
 

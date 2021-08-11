@@ -22,16 +22,19 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 template<typename _Tp>
-int imi_utils_objects_draw(const std::vector<_Tp> &objects,
-    cv::Mat &img, int cls, const char * const *labels) {
+int imi_utils_objects_draw(const std::vector<_Tp>& objects,
+                           cv::Mat& img, int cls, const char* const* labels)
+{
     size_t size = objects.size();
     log_echo("detected objects num: %zu\n", size);
-    for (size_t i = 0; i < size; i++) {
-        const _Tp &obj = objects[i];
-        if (labels) {
+    for (size_t i = 0; i < size; i++)
+    {
+        const _Tp& obj = objects[i];
+        if (labels)
+        {
             log_echo("[%2d]: %3.3f%%, [(%7.3f, %7.3f), (%7.3f, %7.3f)], %s\n",
-                obj.label, obj.prob * 100, obj.rect.x, obj.rect.y,
-                obj.rect.x + obj.rect.width, obj.rect.y + obj.rect.height, labels[obj.label]);
+                     obj.label, obj.prob * 100, obj.rect.x, obj.rect.y,
+                     obj.rect.x + obj.rect.width, obj.rect.y + obj.rect.height, labels[obj.label]);
         }
         if (-1 != cls && obj.label != cls) continue;
         // draw object box
@@ -50,10 +53,10 @@ int imi_utils_objects_draw(const std::vector<_Tp> &objects,
             x = img.cols - label_size.width;
         // draw label box
         cv::rectangle(img, cv::Rect(cv::Point(x, y), cv::Size(label_size.width, label_size.height + baseLine)),
-            cv::Scalar(255, 255, 255), -1);
+                      cv::Scalar(255, 255, 255), -1);
         // draw label text
         cv::putText(img, text, cv::Point(x, y + label_size.height), cv::FONT_HERSHEY_SIMPLEX, 0.5,
-            cv::Scalar(0, 0, 0));
+                    cv::Scalar(0, 0, 0));
     }
     return 0;
 }
@@ -64,39 +67,46 @@ int imi_utils_objects_draw(const std::vector<_Tp> &objects,
 
 // @param:  cls[in] target class(-1: all)
 template<typename _Tp>
-int imi_utils_objects_draw(const std::vector<_Tp> &objects,
-    image &img, int cls, const char * const *labels) {
+int imi_utils_objects_draw(const std::vector<_Tp>& objects,
+                           image& img, int cls, const char* const* labels)
+{
     size_t size = objects.size();
     log_echo("detected objects num: %zu\n", size);
 
-    for (size_t i = 0; i < size; i++) {
-        const _Tp &obj = objects[i];
-        if (labels) {
+    for (size_t i = 0; i < size; i++)
+    {
+        const _Tp& obj = objects[i];
+        if (labels)
+        {
             log_echo("[%2d]: %3.3f%%, [(%7.3f, %7.3f), (%7.3f, %7.3f)], %s\n",
-                obj.label, obj.prob * 100, obj.rect.x, obj.rect.y,
-                obj.rect.x + obj.rect.width, obj.rect.y + obj.rect.height, labels[obj.label]);
+                     obj.label, obj.prob * 100, obj.rect.x, obj.rect.y,
+                     obj.rect.x + obj.rect.width, obj.rect.y + obj.rect.height, labels[obj.label]);
         }
-        if (-1 == cls || obj.label == cls) {
+        if (-1 == cls || obj.label == cls)
+        {
             draw_box(img, obj.rect.x, obj.rect.y,
-                obj.rect.x + obj.rect.width, obj.rect.y + obj.rect.height, 2, 0, 255, 0);
+                     obj.rect.x + obj.rect.width, obj.rect.y + obj.rect.height, 2, 0, 255, 0);
         }
     }
     return 0;
 }
 
 template<typename _Tp>
-int imi_utils_faces_draw(const std::vector<_Tp> &faces, image &img) {
+int imi_utils_faces_draw(const std::vector<_Tp>& faces, image& img)
+{
     size_t size = faces.size();
     log_echo("detected faces num: %zu\n", size);
 
-    for (size_t i = 0; i < size; i++) {
-        const _Tp &face = faces[i];
+    for (size_t i = 0; i < size; i++)
+    {
+        const _Tp& face = faces[i];
         log_echo("Face[%2zu]: %3.3f%%, [(%7.3f, %7.3f), (%7.3f, %7.3f)]\n",
-            i, face.prob * 100, face.rect.x, face.rect.y, face.rect.width, face.rect.height);
+                 i, face.prob * 100, face.rect.x, face.rect.y, face.rect.width, face.rect.height);
 
         draw_box(img, face.rect.x, face.rect.y,
-            face.rect.x + face.rect.width, face.rect.y + face.rect.height, 2, 0, 255, 0);
-        for (int l = 0; l < 5; l++) {
+                 face.rect.x + face.rect.width, face.rect.y + face.rect.height, 2, 0, 255, 0);
+        for (int l = 0; l < 5; l++)
+        {
             draw_circle(img, face.landmark[l].x, face.landmark[l].y, 1, 0, 128, 128);
         }
     }

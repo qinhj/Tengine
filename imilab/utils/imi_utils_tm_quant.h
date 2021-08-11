@@ -8,7 +8,7 @@
 #define __IMI_UTILS_TM_QUANT_H__
 
 /* tengine includes */
-#include "tengine/c_api.h"  // for: tensor_t, get_tensor_buffer
+#include "tengine/c_api.h" // for: tensor_t, get_tensor_buffer
 /* imilab includes */
 #include "imi_utils_elog.h" // for: log_xxxx
 #include "imi_utils_tm-inl.h"
@@ -17,20 +17,23 @@
 extern "C" {
 #endif // __cplusplus
 
-typedef struct tm_quant_s *tm_quant_t;
-typedef struct tm_quant_s {
+typedef struct tm_quant_s* tm_quant_t;
+typedef struct tm_quant_s
+{
     /* buffer for outputs */
-    const void *buffer;
+    const void* buffer;
     int size;
     /* dequant parameter */
     float scale;
     int zero_point;
     /* user data */
-    void *_data;
+    void* _data;
 } tm_quant;
 
-static void __inline imi_utils_tm_quant_free(tm_quant_t quant) {
-    if (quant) {
+static void __inline imi_utils_tm_quant_free(tm_quant_t quant)
+{
+    if (quant)
+    {
         if (quant->_data) free(quant->_data);
         free(quant);
     }
@@ -39,8 +42,10 @@ static void __inline imi_utils_tm_quant_free(tm_quant_t quant) {
 // @brief:  get quant info from input tensor
 // @param:  tensor[in]
 // @param:  quant[out]
-static int imi_utils_tm_quant_get(tensor_t tensor, tm_quant_t quant) {
-    if (NULL == tensor || NULL == quant) {
+static int imi_utils_tm_quant_get(tensor_t tensor, tm_quant_t quant)
+{
+    if (NULL == tensor || NULL == quant)
+    {
         return -1;
     }
 
@@ -49,7 +54,8 @@ static int imi_utils_tm_quant_get(tensor_t tensor, tm_quant_t quant) {
     // ========== This part is to get quant information ==========
     // ===========================================================
     quant->buffer = get_tensor_buffer(tensor);
-    if (NULL == quant->buffer) {
+    if (NULL == quant->buffer)
+    {
         log_error("get tensor[%p] buffer NULL\n", tensor);
         return -1;
     }
@@ -57,7 +63,7 @@ static int imi_utils_tm_quant_get(tensor_t tensor, tm_quant_t quant) {
     // todo: update to quant param array
     get_tensor_quant_param(tensor, &quant->scale, &quant->zero_point, 1);
     log_echo("tensor[%p] data: %p, size: %d, scale: %.4f, zero_point: %d\n",
-        tensor, quant->buffer, quant->size, quant->scale, quant->zero_point);
+             tensor, quant->buffer, quant->size, quant->scale, quant->zero_point);
     return 0;
 }
 

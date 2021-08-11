@@ -11,32 +11,35 @@
 #include <stdint.h> // for: uint64_t
 #include <assert.h> // for: assert
 /* std c++ includes */
-#include <algorithm>// for: std::numeric_limits
+#include <algorithm> // for: std::numeric_limits
 
 #ifdef _DEBUG
-#define CV_DbgAssert    assert
+#define CV_DbgAssert assert
 #else // !_DEBUG
 #define CV_DbgAssert(...)
 #endif // _DEBUG
 
 #if defined _MSC_VER || defined __BORLANDC__
-   typedef __int64 int64;
-   typedef unsigned __int64 uint64;
-#  define CV_BIG_INT(n)   n##I64
-#  define CV_BIG_UINT(n)  n##UI64
+typedef __int64 int64;
+typedef unsigned __int64 uint64;
+#define CV_BIG_INT(n)  n##I64
+#define CV_BIG_UINT(n) n##UI64
 #else
-   typedef int64_t int64;
-   typedef uint64_t uint64;
-#  define CV_BIG_INT(n)   n##LL
-#  define CV_BIG_UINT(n)  n##ULL
+typedef int64_t int64;
+typedef uint64_t uint64;
+#define CV_BIG_INT(n)  n##LL
+#define CV_BIG_UINT(n) n##ULL
 #endif
 
-   //template<typename _Tp> class Complex;
-   template<typename _Tp> class Point_;
-   //template<typename _Tp> class Point3_;
-   template<typename _Tp> class Size_;
-   template<typename _Tp> class Rect_;
-   //template<typename _Tp> class Scalar_;
+//template<typename _Tp> class Complex;
+template<typename _Tp>
+class Point_;
+//template<typename _Tp> class Point3_;
+template<typename _Tp>
+class Size_;
+template<typename _Tp>
+class Rect_;
+//template<typename _Tp> class Scalar_;
 
 //////////////////////////////// Point_ ////////////////////////////////
 
@@ -75,7 +78,9 @@ Example:
     cout << pt.x << ", " << pt.y << endl;
 @endcode
 */
-template<typename _Tp> class Point_ {
+template<typename _Tp>
+class Point_
+{
 public:
     typedef _Tp value_type;
 
@@ -86,7 +91,7 @@ public:
     Point_(const Size_<_Tp>& sz);
     //Point_(const Vec<_Tp, 2>& v);
 
-    Point_& operator = (const Point_& pt);
+    Point_& operator=(const Point_& pt);
     //! conversion to another data type
     //template<typename _Tp2> operator Point_<_Tp2>() const;
 
@@ -111,7 +116,6 @@ typedef Point_<float> Point2f;
 typedef Point_<double> Point2d;
 typedef Point2i Point;
 
-
 //////////////////////////////// Size_ ////////////////////////////////
 
 /** @brief Template class for specifying the size of an image or rectangle.
@@ -127,7 +131,9 @@ OpenCV defines the following Size_\<\> aliases:
     typedef Size_<float> Size2f;
 @endcode
 */
-template<typename _Tp> class Size_ {
+template<typename _Tp>
+class Size_
+{
 public:
     typedef _Tp value_type;
 
@@ -137,7 +143,7 @@ public:
     Size_(const Size_& sz);
     Size_(const Point_<_Tp>& pt);
 
-    Size_& operator = (const Size_& sz);
+    Size_& operator=(const Size_& sz);
     //! the area (width*height)
     _Tp area() const;
     //! true if empty
@@ -146,7 +152,7 @@ public:
     //! conversion of another data type.
     //template<typename _Tp2> operator Size_<_Tp2>() const;
 
-    _Tp width; //!< the width
+    _Tp width;  //!< the width
     _Tp height; //!< the height
 };
 
@@ -155,7 +161,6 @@ typedef Size_<int64> Size2l;
 typedef Size_<float> Size2f;
 typedef Size_<double> Size2d;
 typedef Size2i Size;
-
 
 //////////////////////////////// Rect_ ////////////////////////////////
 
@@ -202,7 +207,9 @@ rect2):
 @endcode
 For your convenience, the Rect_\<\> alias is available: cv::Rect
 */
-template<typename _Tp> class Rect_ {
+template<typename _Tp>
+class Rect_
+{
 public:
     typedef _Tp value_type;
 
@@ -213,7 +220,7 @@ public:
     Rect_(const Point_<_Tp>& org, const Size_<_Tp>& sz);
     Rect_(const Point_<_Tp>& pt1, const Point_<_Tp>& pt2);
 
-    Rect_& operator = (const Rect_& r);
+    Rect_& operator=(const Rect_& r);
     //! the top-left corner
     Point_<_Tp> tl() const;
     //! the bottom-right corner
@@ -232,9 +239,9 @@ public:
     //! checks whether the rectangle contains the point
     bool contains(const Point_<_Tp>& pt) const;
 
-    _Tp x; //!< x coordinate of the top-left corner
-    _Tp y; //!< y coordinate of the top-left corner
-    _Tp width; //!< width of the rectangle
+    _Tp x;      //!< x coordinate of the top-left corner
+    _Tp y;      //!< y coordinate of the top-left corner
+    _Tp width;  //!< width of the rectangle
     _Tp height; //!< height of the rectangle
 };
 
@@ -249,30 +256,39 @@ typedef Rect2i Rect;
 
 //////////////////////////////// 2D Point ///////////////////////////////
 
-template<typename _Tp> inline
-Point_<_Tp>::Point_()
-    : x(0), y(0) {}
+template<typename _Tp>
+inline Point_<_Tp>::Point_()
+    : x(0), y(0)
+{
+}
 
-template<typename _Tp> inline
-Point_<_Tp>::Point_(_Tp _x, _Tp _y)
-    : x(_x), y(_y) {}
+template<typename _Tp>
+inline Point_<_Tp>::Point_(_Tp _x, _Tp _y)
+    : x(_x), y(_y)
+{
+}
 
-template<typename _Tp> inline
-Point_<_Tp>::Point_(const Point_& pt)
-    : x(pt.x), y(pt.y) {}
+template<typename _Tp>
+inline Point_<_Tp>::Point_(const Point_& pt)
+    : x(pt.x), y(pt.y)
+{
+}
 
-template<typename _Tp> inline
-Point_<_Tp>::Point_(const Size_<_Tp>& sz)
-    : x(sz.width), y(sz.height) {}
+template<typename _Tp>
+inline Point_<_Tp>::Point_(const Size_<_Tp>& sz)
+    : x(sz.width), y(sz.height)
+{
+}
 /*
 template<typename _Tp> inline
 Point_<_Tp>::Point_(const Vec<_Tp,2>& v)
     : x(v[0]), y(v[1]) {}
 */
-template<typename _Tp> inline
-Point_<_Tp>& Point_<_Tp>::operator = (const Point_& pt)
+template<typename _Tp>
+inline Point_<_Tp>& Point_<_Tp>::operator=(const Point_& pt)
 {
-    x = pt.x; y = pt.y;
+    x = pt.x;
+    y = pt.y;
     return *this;
 }
 /*
@@ -383,14 +399,14 @@ double norm(const Point_<_Tp>& pt)
     return std::sqrt((double)pt.x*pt.x + (double)pt.y*pt.y);
 }
 */
-template<typename _Tp> static inline
-bool operator == (const Point_<_Tp>& a, const Point_<_Tp>& b)
+template<typename _Tp>
+static inline bool operator==(const Point_<_Tp>& a, const Point_<_Tp>& b)
 {
     return a.x == b.x && a.y == b.y;
 }
 
-template<typename _Tp> static inline
-bool operator != (const Point_<_Tp>& a, const Point_<_Tp>& b)
+template<typename _Tp>
+static inline bool operator!=(const Point_<_Tp>& a, const Point_<_Tp>& b)
 {
     return a.x != b.x || a.y != b.y;
 }
@@ -463,24 +479,24 @@ Point3_<_Tp> operator * (const Matx<_Tp, 3, 3>& a, const Point_<_Tp>& b)
     return Point3_<_Tp>(tmp.val[0], tmp.val[1], tmp.val[2]);
 }
 */
-template<typename _Tp> static inline
-Point_<_Tp> operator / (const Point_<_Tp>& a, int b)
+template<typename _Tp>
+static inline Point_<_Tp> operator/(const Point_<_Tp>& a, int b)
 {
     Point_<_Tp> tmp(a);
     tmp /= b;
     return tmp;
 }
 
-template<typename _Tp> static inline
-Point_<_Tp> operator / (const Point_<_Tp>& a, float b)
+template<typename _Tp>
+static inline Point_<_Tp> operator/(const Point_<_Tp>& a, float b)
 {
     Point_<_Tp> tmp(a);
     tmp /= b;
     return tmp;
 }
 
-template<typename _Tp> static inline
-Point_<_Tp> operator / (const Point_<_Tp>& a, double b)
+template<typename _Tp>
+static inline Point_<_Tp> operator/(const Point_<_Tp>& a, double b)
 {
     Point_<_Tp> tmp(a);
     tmp /= b;
@@ -489,142 +505,172 @@ Point_<_Tp> operator / (const Point_<_Tp>& a, double b)
 
 ////////////////////////////////// Size /////////////////////////////////
 
-template<typename _Tp> inline
-Size_<_Tp>::Size_()
-    : width(0), height(0) {}
+template<typename _Tp>
+inline Size_<_Tp>::Size_()
+    : width(0), height(0)
+{
+}
 
-template<typename _Tp> inline
-Size_<_Tp>::Size_(_Tp _width, _Tp _height)
-    : width(_width), height(_height) {}
+template<typename _Tp>
+inline Size_<_Tp>::Size_(_Tp _width, _Tp _height)
+    : width(_width), height(_height)
+{
+}
 
-template<typename _Tp> inline
-Size_<_Tp>::Size_(const Size_& sz)
-    : width(sz.width), height(sz.height) {}
+template<typename _Tp>
+inline Size_<_Tp>::Size_(const Size_& sz)
+    : width(sz.width), height(sz.height)
+{
+}
 
-template<typename _Tp> inline
-Size_<_Tp>::Size_(const Point_<_Tp>& pt)
-    : width(pt.x), height(pt.y) {}
+template<typename _Tp>
+inline Size_<_Tp>::Size_(const Point_<_Tp>& pt)
+    : width(pt.x), height(pt.y)
+{
+}
 
 //template<typename _Tp> template<typename _Tp2> inline
 //Size_<_Tp>::operator Size_<_Tp2>() const {
 //    return Size_<_Tp2>(saturate_cast<_Tp2>(width), saturate_cast<_Tp2>(height));
 //}
 
-template<typename _Tp> inline
-Size_<_Tp>& Size_<_Tp>::operator = (const Size_<_Tp>& sz) {
-    width = sz.width; height = sz.height;
+template<typename _Tp>
+inline Size_<_Tp>& Size_<_Tp>::operator=(const Size_<_Tp>& sz)
+{
+    width = sz.width;
+    height = sz.height;
     return *this;
 }
 
-template<typename _Tp> inline
-_Tp Size_<_Tp>::area() const {
+template<typename _Tp>
+inline _Tp Size_<_Tp>::area() const
+{
     const _Tp result = width * height;
     CV_DbgAssert(!std::numeric_limits<_Tp>::is_integer
-        || width == 0 || result / width == height); // make sure the result fits in the return value
+                 || width == 0 || result / width == height); // make sure the result fits in the return value
     return result;
 }
 
-template<typename _Tp> inline
-bool Size_<_Tp>::empty() const {
+template<typename _Tp>
+inline bool Size_<_Tp>::empty() const
+{
     return width <= 0 || height <= 0;
 }
 
-
-template<typename _Tp> static inline
-Size_<_Tp>& operator *= (Size_<_Tp>& a, _Tp b) {
+template<typename _Tp>
+static inline Size_<_Tp>& operator*=(Size_<_Tp>& a, _Tp b)
+{
     a.width *= b;
     a.height *= b;
     return a;
 }
 
-template<typename _Tp> static inline
-Size_<_Tp> operator * (const Size_<_Tp>& a, _Tp b) {
+template<typename _Tp>
+static inline Size_<_Tp> operator*(const Size_<_Tp>& a, _Tp b)
+{
     Size_<_Tp> tmp(a);
     tmp *= b;
     return tmp;
 }
 
-template<typename _Tp> static inline
-Size_<_Tp>& operator /= (Size_<_Tp>& a, _Tp b) {
+template<typename _Tp>
+static inline Size_<_Tp>& operator/=(Size_<_Tp>& a, _Tp b)
+{
     a.width /= b;
     a.height /= b;
     return a;
 }
 
-template<typename _Tp> static inline
-Size_<_Tp> operator / (const Size_<_Tp>& a, _Tp b) {
+template<typename _Tp>
+static inline Size_<_Tp> operator/(const Size_<_Tp>& a, _Tp b)
+{
     Size_<_Tp> tmp(a);
     tmp /= b;
     return tmp;
 }
 
-template<typename _Tp> static inline
-Size_<_Tp>& operator += (Size_<_Tp>& a, const Size_<_Tp>& b) {
+template<typename _Tp>
+static inline Size_<_Tp>& operator+=(Size_<_Tp>& a, const Size_<_Tp>& b)
+{
     a.width += b.width;
     a.height += b.height;
     return a;
 }
 
-template<typename _Tp> static inline
-Size_<_Tp> operator + (const Size_<_Tp>& a, const Size_<_Tp>& b) {
+template<typename _Tp>
+static inline Size_<_Tp> operator+(const Size_<_Tp>& a, const Size_<_Tp>& b)
+{
     Size_<_Tp> tmp(a);
     tmp += b;
     return tmp;
 }
 
-template<typename _Tp> static inline
-Size_<_Tp>& operator -= (Size_<_Tp>& a, const Size_<_Tp>& b) {
+template<typename _Tp>
+static inline Size_<_Tp>& operator-=(Size_<_Tp>& a, const Size_<_Tp>& b)
+{
     a.width -= b.width;
     a.height -= b.height;
     return a;
 }
 
-template<typename _Tp> static inline
-Size_<_Tp> operator - (const Size_<_Tp>& a, const Size_<_Tp>& b) {
+template<typename _Tp>
+static inline Size_<_Tp> operator-(const Size_<_Tp>& a, const Size_<_Tp>& b)
+{
     Size_<_Tp> tmp(a);
     tmp -= b;
     return tmp;
 }
 
-template<typename _Tp> static inline
-bool operator == (const Size_<_Tp>& a, const Size_<_Tp>& b) {
+template<typename _Tp>
+static inline bool operator==(const Size_<_Tp>& a, const Size_<_Tp>& b)
+{
     return a.width == b.width && a.height == b.height;
 }
 
-template<typename _Tp> static inline
-bool operator != (const Size_<_Tp>& a, const Size_<_Tp>& b) {
+template<typename _Tp>
+static inline bool operator!=(const Size_<_Tp>& a, const Size_<_Tp>& b)
+{
     return !(a == b);
 }
 
-
 ////////////////////////////////// Rect /////////////////////////////////
 
-template<typename _Tp> inline
-Rect_<_Tp>::Rect_()
-    : x(0), y(0), width(0), height(0) {}
+template<typename _Tp>
+inline Rect_<_Tp>::Rect_()
+    : x(0), y(0), width(0), height(0)
+{
+}
 
-template<typename _Tp> inline
-Rect_<_Tp>::Rect_(_Tp _x, _Tp _y, _Tp _width, _Tp _height)
-    : x(_x), y(_y), width(_width), height(_height) {}
+template<typename _Tp>
+inline Rect_<_Tp>::Rect_(_Tp _x, _Tp _y, _Tp _width, _Tp _height)
+    : x(_x), y(_y), width(_width), height(_height)
+{
+}
 
-template<typename _Tp> inline
-Rect_<_Tp>::Rect_(const Rect_<_Tp>& r)
-    : x(r.x), y(r.y), width(r.width), height(r.height) {}
+template<typename _Tp>
+inline Rect_<_Tp>::Rect_(const Rect_<_Tp>& r)
+    : x(r.x), y(r.y), width(r.width), height(r.height)
+{
+}
 
-template<typename _Tp> inline
-Rect_<_Tp>::Rect_(const Point_<_Tp>& org, const Size_<_Tp>& sz)
-    : x(org.x), y(org.y), width(sz.width), height(sz.height) {}
+template<typename _Tp>
+inline Rect_<_Tp>::Rect_(const Point_<_Tp>& org, const Size_<_Tp>& sz)
+    : x(org.x), y(org.y), width(sz.width), height(sz.height)
+{
+}
 
-template<typename _Tp> inline
-Rect_<_Tp>::Rect_(const Point_<_Tp>& pt1, const Point_<_Tp>& pt2) {
+template<typename _Tp>
+inline Rect_<_Tp>::Rect_(const Point_<_Tp>& pt1, const Point_<_Tp>& pt2)
+{
     x = std::min(pt1.x, pt2.x);
     y = std::min(pt1.y, pt2.y);
     width = std::max(pt1.x, pt2.x) - x;
     height = std::max(pt1.y, pt2.y) - y;
 }
 
-template<typename _Tp> inline
-Rect_<_Tp>& Rect_<_Tp>::operator = (const Rect_<_Tp>& r) {
+template<typename _Tp>
+inline Rect_<_Tp>& Rect_<_Tp>::operator=(const Rect_<_Tp>& r)
+{
     x = r.x;
     y = r.y;
     width = r.width;
@@ -632,31 +678,36 @@ Rect_<_Tp>& Rect_<_Tp>::operator = (const Rect_<_Tp>& r) {
     return *this;
 }
 
-template<typename _Tp> inline
-Point_<_Tp> Rect_<_Tp>::tl() const {
+template<typename _Tp>
+inline Point_<_Tp> Rect_<_Tp>::tl() const
+{
     return Point_<_Tp>(x, y);
 }
 
-template<typename _Tp> inline
-Point_<_Tp> Rect_<_Tp>::br() const {
+template<typename _Tp>
+inline Point_<_Tp> Rect_<_Tp>::br() const
+{
     return Point_<_Tp>(x + width, y + height);
 }
 
-template<typename _Tp> inline
-Size_<_Tp> Rect_<_Tp>::size() const {
+template<typename _Tp>
+inline Size_<_Tp> Rect_<_Tp>::size() const
+{
     return Size_<_Tp>(width, height);
 }
 
-template<typename _Tp> inline
-_Tp Rect_<_Tp>::area() const {
+template<typename _Tp>
+inline _Tp Rect_<_Tp>::area() const
+{
     const _Tp result = width * height;
     CV_DbgAssert(!std::numeric_limits<_Tp>::is_integer
-        || width == 0 || result / width == height); // make sure the result fits in the return value
+                 || width == 0 || result / width == height); // make sure the result fits in the return value
     return result;
 }
 
-template<typename _Tp> inline
-bool Rect_<_Tp>::empty() const {
+template<typename _Tp>
+inline bool Rect_<_Tp>::empty() const
+{
     return width <= 0 || height <= 0;
 }
 
@@ -665,35 +716,39 @@ bool Rect_<_Tp>::empty() const {
 //    return Rect_<_Tp2>(saturate_cast<_Tp2>(x), saturate_cast<_Tp2>(y), saturate_cast<_Tp2>(width), saturate_cast<_Tp2>(height));
 //}
 
-template<typename _Tp> inline
-bool Rect_<_Tp>::contains(const Point_<_Tp>& pt) const {
+template<typename _Tp>
+inline bool Rect_<_Tp>::contains(const Point_<_Tp>& pt) const
+{
     return x <= pt.x && pt.x < x + width && y <= pt.y && pt.y < y + height;
 }
 
-
-template<typename _Tp> static inline
-Rect_<_Tp>& operator += (Rect_<_Tp>& a, const Point_<_Tp>& b) {
+template<typename _Tp>
+static inline Rect_<_Tp>& operator+=(Rect_<_Tp>& a, const Point_<_Tp>& b)
+{
     a.x += b.x;
     a.y += b.y;
     return a;
 }
 
-template<typename _Tp> static inline
-Rect_<_Tp>& operator -= (Rect_<_Tp>& a, const Point_<_Tp>& b) {
+template<typename _Tp>
+static inline Rect_<_Tp>& operator-=(Rect_<_Tp>& a, const Point_<_Tp>& b)
+{
     a.x -= b.x;
     a.y -= b.y;
     return a;
 }
 
-template<typename _Tp> static inline
-Rect_<_Tp>& operator += (Rect_<_Tp>& a, const Size_<_Tp>& b) {
+template<typename _Tp>
+static inline Rect_<_Tp>& operator+=(Rect_<_Tp>& a, const Size_<_Tp>& b)
+{
     a.width += b.width;
     a.height += b.height;
     return a;
 }
 
-template<typename _Tp> static inline
-Rect_<_Tp>& operator -= (Rect_<_Tp>& a, const Size_<_Tp>& b) {
+template<typename _Tp>
+static inline Rect_<_Tp>& operator-=(Rect_<_Tp>& a, const Size_<_Tp>& b)
+{
     const _Tp width = a.width - b.width;
     const _Tp height = a.height - b.height;
     CV_DbgAssert(width >= 0 && height >= 0);
@@ -702,8 +757,9 @@ Rect_<_Tp>& operator -= (Rect_<_Tp>& a, const Size_<_Tp>& b) {
     return a;
 }
 
-template<typename _Tp> static inline
-Rect_<_Tp>& operator &= (Rect_<_Tp>& a, const Rect_<_Tp>& b) {
+template<typename _Tp>
+static inline Rect_<_Tp>& operator&=(Rect_<_Tp>& a, const Rect_<_Tp>& b)
+{
     _Tp x1 = std::max(a.x, b.x);
     _Tp y1 = std::max(a.y, b.y);
     a.width = std::min(a.x + a.width, b.x + b.width) - x1;
@@ -715,12 +771,15 @@ Rect_<_Tp>& operator &= (Rect_<_Tp>& a, const Rect_<_Tp>& b) {
     return a;
 }
 
-template<typename _Tp> static inline
-Rect_<_Tp>& operator |= (Rect_<_Tp>& a, const Rect_<_Tp>& b) {
-    if (a.empty()) {
+template<typename _Tp>
+static inline Rect_<_Tp>& operator|=(Rect_<_Tp>& a, const Rect_<_Tp>& b)
+{
+    if (a.empty())
+    {
         a = b;
     }
-    else if (!b.empty()) {
+    else if (!b.empty())
+    {
         _Tp x1 = std::min(a.x, b.x);
         _Tp y1 = std::min(a.y, b.y);
         a.width = std::max(a.x + a.width, b.x + b.width) - x1;
@@ -731,47 +790,55 @@ Rect_<_Tp>& operator |= (Rect_<_Tp>& a, const Rect_<_Tp>& b) {
     return a;
 }
 
-template<typename _Tp> static inline
-bool operator == (const Rect_<_Tp>& a, const Rect_<_Tp>& b) {
+template<typename _Tp>
+static inline bool operator==(const Rect_<_Tp>& a, const Rect_<_Tp>& b)
+{
     return a.x == b.x && a.y == b.y && a.width == b.width && a.height == b.height;
 }
 
-template<typename _Tp> static inline
-bool operator != (const Rect_<_Tp>& a, const Rect_<_Tp>& b) {
+template<typename _Tp>
+static inline bool operator!=(const Rect_<_Tp>& a, const Rect_<_Tp>& b)
+{
     return a.x != b.x || a.y != b.y || a.width != b.width || a.height != b.height;
 }
 
-template<typename _Tp> static inline
-Rect_<_Tp> operator + (const Rect_<_Tp>& a, const Point_<_Tp>& b) {
+template<typename _Tp>
+static inline Rect_<_Tp> operator+(const Rect_<_Tp>& a, const Point_<_Tp>& b)
+{
     return Rect_<_Tp>(a.x + b.x, a.y + b.y, a.width, a.height);
 }
 
-template<typename _Tp> static inline
-Rect_<_Tp> operator - (const Rect_<_Tp>& a, const Point_<_Tp>& b) {
+template<typename _Tp>
+static inline Rect_<_Tp> operator-(const Rect_<_Tp>& a, const Point_<_Tp>& b)
+{
     return Rect_<_Tp>(a.x - b.x, a.y - b.y, a.width, a.height);
 }
 
-template<typename _Tp> static inline
-Rect_<_Tp> operator + (const Rect_<_Tp>& a, const Size_<_Tp>& b) {
+template<typename _Tp>
+static inline Rect_<_Tp> operator+(const Rect_<_Tp>& a, const Size_<_Tp>& b)
+{
     return Rect_<_Tp>(a.x, a.y, a.width + b.width, a.height + b.height);
 }
 
-template<typename _Tp> static inline
-Rect_<_Tp> operator - (const Rect_<_Tp>& a, const Size_<_Tp>& b) {
+template<typename _Tp>
+static inline Rect_<_Tp> operator-(const Rect_<_Tp>& a, const Size_<_Tp>& b)
+{
     const _Tp width = a.width - b.width;
     const _Tp height = a.height - b.height;
     CV_DbgAssert(width >= 0 && height >= 0);
     return Rect_<_Tp>(a.x, a.y, width, height);
 }
 
-template<typename _Tp> static inline
-Rect_<_Tp> operator & (const Rect_<_Tp>& a, const Rect_<_Tp>& b) {
+template<typename _Tp>
+static inline Rect_<_Tp> operator&(const Rect_<_Tp>& a, const Rect_<_Tp>& b)
+{
     Rect_<_Tp> c = a;
     return c &= b;
 }
 
-template<typename _Tp> static inline
-Rect_<_Tp> operator | (const Rect_<_Tp>& a, const Rect_<_Tp>& b) {
+template<typename _Tp>
+static inline Rect_<_Tp> operator|(const Rect_<_Tp>& a, const Rect_<_Tp>& b)
+{
     Rect_<_Tp> c = a;
     return c |= b;
 }
@@ -782,12 +849,14 @@ Rect_<_Tp> operator | (const Rect_<_Tp>& a, const Rect_<_Tp>& b) {
  * computes the complement of the Jaccard Index as described in <https://en.wikipedia.org/wiki/Jaccard_index>.
  * For rectangles this reduces to computing the intersection over the union.
  */
-template<typename _Tp> static inline
-double jaccardDistance(const Rect_<_Tp>& a, const Rect_<_Tp>& b) {
+template<typename _Tp>
+static inline double jaccardDistance(const Rect_<_Tp>& a, const Rect_<_Tp>& b)
+{
     _Tp Aa = a.area();
     _Tp Ab = b.area();
 
-    if ((Aa + Ab) <= std::numeric_limits<_Tp>::epsilon()) {
+    if ((Aa + Ab) <= std::numeric_limits<_Tp>::epsilon())
+    {
         // jaccard_index = 1 -> distance = 0
         return 0.0;
     }

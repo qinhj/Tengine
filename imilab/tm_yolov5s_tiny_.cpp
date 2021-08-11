@@ -34,8 +34,8 @@
 /* imilab includes */
 #include "utils/imi_utils_object.hpp"
 #include "utils/imi_utils_visual.hpp"
-#include "utils/imi_utils_tm.h"     // for: imi_utils_tm_run_graph
-#include "utils/imi_utils_elog.h"   // for: log_xxxx
+#include "utils/imi_utils_tm.h"   // for: imi_utils_tm_run_graph
+#include "utils/imi_utils_elog.h" // for: log_xxxx
 #include "utils/imi_utils_tm_debug.h"
 #include "utils/imi_model_yolov5.hpp"
 
@@ -44,7 +44,7 @@ static float prob_threshold = 0.6f; // 0.25f
 static float nms_threshold = 0.40f; // 0.45f
 
 // example models for show usage
-static const char *models[] = {
+static const char* models[] = {
     "yolov5s-tiny.v5.tmfile", // official model
     "yolov5s-tiny.tmfile",    // imilab model
 };
@@ -60,32 +60,37 @@ static double start_time = 0.;
 // @param:  graph[in]   input yolo graph inst
 // @param:  buffer[in]  output tensor buffer
 // @param:  proposals   output detected boxes
-static int proposals_objects_get(const yolov3 &model,
-    graph_t &graph, const void *buffer[], std::vector<Object> &proposals) {
+static int proposals_objects_get(const yolov3& model,
+                                 graph_t& graph, const void* buffer[], std::vector<Object>& proposals)
+{
     proposals.clear();
 
     /* generate output proposals */
     return imi_utils_yolov3_proposals_generate(model, buffer, proposals, prob_threshold);
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
     int repeat_count = 1;
     int num_thread = 1;
     int target_class = -1;
 
-    const char *model_file = nullptr;
-    const char *image_file = nullptr;
-    const char *output_file = "output.rgb";
+    const char* model_file = nullptr;
+    const char* image_file = nullptr;
+    const char* output_file = "output.rgb";
 
-    yolov3 &model = yolov5s_tiny;
+    yolov3& model = yolov5s_tiny;
     image input = make_empty_image(640, 360, 3);
 
     int ret, frame = 1, fc = 0;
-    while ((ret = getopt(argc, argv, "c:m:i:r:t:w:h:n:o:f:s:u")) != -1) {
-        switch (ret) {
+    while ((ret = getopt(argc, argv, "c:m:i:r:t:w:h:n:o:f:s:u")) != -1)
+    {
+        switch (ret)
+        {
         case 'c':
             target_class = atoi(optarg);
-            if (target_class < 0 || model.class_num <= target_class) {
+            if (target_class < 0 || model.class_num <= target_class)
+            {
                 // reset all invalid argument as -1
                 target_class = -1;
             }
@@ -129,12 +134,14 @@ int main(int argc, char* argv[]) {
     }
 
     /* check files */
-    if (nullptr == model_file || nullptr == image_file) {
+    if (nullptr == model_file || nullptr == image_file)
+    {
         log_error("Tengine model or image file not specified!\n");
         show_usage(argv[0], models);
         return -1;
     }
-    if (!check_file_exist(model_file) || !check_file_exist(image_file)) {
+    if (!check_file_exist(model_file) || !check_file_exist(image_file))
+    {
         return -1;
     }
 
@@ -146,7 +153,8 @@ int main(int argc, char* argv[]) {
     opt.affinity = 0;
 
     /* inital tengine */
-    if (0 != (ret = init_tengine())) {
+    if (0 != (ret = init_tengine()))
+    {
         log_error("Initial tengine failed.\n");
         return -1;
     }
@@ -157,14 +165,16 @@ int main(int argc, char* argv[]) {
 
     /* create graph, load tengine model xxx.tmfile */
     graph_t graph = create_graph(nullptr, "tengine", model_file);
-    if (nullptr == graph) {
+    if (nullptr == graph)
+    {
         log_error("Load model to graph failed\n");
         return -1;
     }
 
     /* get input tensor of graph */
     tensor_t tensor = get_graph_input_tensor(graph, 0, 0);
-    if (nullptr == tensor) {
+    if (nullptr == tensor)
+    {
         log_error("Get input tensor failed\n");
         return -1;
     }
@@ -173,50 +183,59 @@ int main(int argc, char* argv[]) {
     int i, dims[DIM_NUM]; // nchw
     int dim_num = get_tensor_shape(tensor, dims, DIM_NUM);
     log_echo("input tensor shape: %d(", dim_num);
-    for (i = 0; i < dim_num; i++) {
+    for (i = 0; i < dim_num; i++)
+    {
         log_echo(" %d", dims[i]);
     }
     log_echo(")\n");
-    if (DIM_NUM != dim_num) {
+    if (DIM_NUM != dim_num)
+    {
         log_error("Get input tensor shape error\n");
         return -1;
     }
-    if (12 == dims[DIM_IDX_C]) {
+    if (12 == dims[DIM_IDX_C])
+    {
         // revert from focus shape to origin image shape
         dims[DIM_IDX_W] *= 2, dims[DIM_IDX_H] *= 2, dims[DIM_IDX_C] /= 4;
     }
-    else if (3 == dims[DIM_IDX_C]) {
+    else if (3 == dims[DIM_IDX_C])
+    {
         // reset input shape as focus shape
-        int _dims[DIM_NUM] = { dims[0], dims[1] * 4, dims[2] / 2, dims[3] / 2 };
-        if (set_tensor_shape(tensor, _dims, DIM_NUM) < 0) {
+        int _dims[DIM_NUM] = {dims[0], dims[1] * 4, dims[2] / 2, dims[3] / 2};
+        if (set_tensor_shape(tensor, _dims, DIM_NUM) < 0)
+        {
             log_error("Set input tensor shape failed\n");
             return -1;
         }
     }
-    else {
+    else
+    {
         log_error("Unavailable channel number: %d\n", dims[DIM_IDX_C]);
         return -1;
     }
 
-    image &lb = model.lb;
+    image& lb = model.lb;
     lb = make_image(dims[DIM_IDX_W], dims[DIM_IDX_H], dims[DIM_IDX_C]);
     int img_size = lb.w * lb.h * lb.c;
     /* set the data mem to input tensor */
-    if (set_tensor_buffer(tensor, lb.data, img_size * sizeof(float)) < 0) {
+    if (set_tensor_buffer(tensor, lb.data, img_size * sizeof(float)) < 0)
+    {
         log_error("Set input tensor buffer failed\n");
         return -1;
     }
 
     /* prerun graph to infer shape, and set work options(num_thread, cluster, precision) */
-    if (prerun_graph_multithread(graph, opt) < 0) {
+    if (prerun_graph_multithread(graph, opt) < 0)
+    {
         log_error("Prerun multithread graph failed.\n");
         return -1;
     }
     //imi_utils_tm_show_graph(graph, 0, IMI_MASK_NODE_OUTPUT);
 
     /* get output parameter info */
-    const void *buffer[NODE_CNT_YOLOV5S_TINY] = { 0 };
-    if (imi_utils_yolov3_get_output_parameter(graph, buffer, NODE_CNT_YOLOV5S_TINY, 0) < 0) {
+    const void* buffer[NODE_CNT_YOLOV5S_TINY] = {0};
+    if (imi_utils_yolov3_get_output_parameter(graph, buffer, NODE_CNT_YOLOV5S_TINY, 0) < 0)
+    {
         log_error("get output parameter failed\n");
         return -1;
     }
@@ -229,21 +248,31 @@ int main(int argc, char* argv[]) {
     FILE *fp = NULL, *fout = NULL;
 
     // load raw data(non-planar)
-    if (strstr(image_file, "bgra")) input.c = 4, bgr = 1;
-    else if (strstr(image_file, "bgr")) input.c = 3, bgr = 1;
-    else if (strstr(image_file, "rgba")) input.c = 4, bgr = 0;
-    else if (strstr(image_file, "rgb")) input.c = 3, bgr = 0;
-    else { ; }
-    if (-1 != bgr) {
+    if (strstr(image_file, "bgra"))
+        input.c = 4, bgr = 1;
+    else if (strstr(image_file, "bgr"))
+        input.c = 3, bgr = 1;
+    else if (strstr(image_file, "rgba"))
+        input.c = 4, bgr = 0;
+    else if (strstr(image_file, "rgb"))
+        input.c = 3, bgr = 0;
+    else
+    {
+        ;
+    }
+    if (-1 != bgr)
+    {
         fp = fopen(image_file, "rb");
         fout = fopen(output_file, "wb");
-        if (NULL == fp || NULL == fout) {
+        if (NULL == fp || NULL == fout)
+        {
             log_error("open %s or %s failed\n", image_file, output_file);
             goto exit;
         }
-        input.data = (float *)calloc(sizeof(float), input.c * input.w * input.h);
+        input.data = (float*)calloc(sizeof(float), input.c * input.w * input.h);
     }
-    else {
+    else
+    {
         // load encoded image
         input = imread(image_file);
         //input = rgb2bgr_premute(input);
@@ -251,9 +280,11 @@ int main(int argc, char* argv[]) {
 
 read_data:
     /* prepare process input data, set the data mem to input tensor */
-    if (fp) {
+    if (fp)
+    {
         // load raw data from file and convert to bgr planar format
-        if (1 != (ret = imi_utils_yolov5_load_data(fp, input, bgr, lb, (const float (*)[3])model.usr_data, -1, 0))) {
+        if (1 != (ret = imi_utils_yolov5_load_data(fp, input, bgr, lb, (const float(*)[3])model.usr_data, -1, 0)))
+        {
             log_error("%s\n", ret ? "get_input_data error!" : "read input data fin");
             goto exit;
         }
@@ -261,14 +292,16 @@ read_data:
         log_echo("======================================\n");
         log_echo("Frame No.%03d:\n", fc);
     }
-    else {
-        const float *mean = (const float *)model.usr_data;
-        const float *scale = (const float *)model.usr_data + 3;
+    else
+    {
+        const float* mean = (const float*)model.usr_data;
+        const float* scale = (const float*)model.usr_data + 3;
         float lb_scale_w = (float)lb.w / input.w;
         float lb_scale_h = (float)lb.h / input.h;
         int im_rw = lb_scale_w < lb_scale_h ? lb.w : input.w * lb_scale_h;
         int im_rh = lb_scale_w < lb_scale_h ? input.h * lb_scale_w : lb.h;
-        if (im_rw != input.w || im_rh != input.h) {
+        if (im_rw != input.w || im_rh != input.h)
+        {
             // resize to fit letter box
             image resized = resize_image(input, im_rw, im_rh);
             log_echo("resize image from (%d,%d) to (%d,%d)\n", input.w, input.h, im_rw, im_rh);
@@ -277,15 +310,19 @@ read_data:
             // release resized image
             free_image(resized);
         }
-        else {
+        else
+        {
             // attach image to letter box directly
             add_image(input, lb, (lb.w - im_rw) / 2, (lb.h - im_rh) / 2);
         }
         // focus operator: (C, H, W) -> (C*4, H/2, W/2)
-        float *_data = (float *)malloc(img_size * sizeof(float));
-        for (int idx, k = 0; k < lb.c; k++) {
-            for (int i = 0; i < lb.h; i++) {
-                for (int j = 0; j < lb.w; j++) {
+        float* _data = (float*)malloc(img_size * sizeof(float));
+        for (int idx, k = 0; k < lb.c; k++)
+        {
+            for (int i = 0; i < lb.h; i++)
+            {
+                for (int j = 0; j < lb.w; j++)
+                {
                     idx = k * lb.h * lb.w + i * lb.w + j;
                     _data[idx] = (lb.data[idx] - mean[k]) * scale[k];
                 }
@@ -296,12 +333,14 @@ read_data:
     }
 
     /* run graph */
-    if (imi_utils_tm_run_graph(graph, repeat_count) < 0) {
+    if (imi_utils_tm_run_graph(graph, repeat_count) < 0)
+    {
         goto exit;
     }
 
     /* process the detection result */
-    if (proposals_objects_get(model, graph, buffer, proposals) < 0) {
+    if (proposals_objects_get(model, graph, buffer, proposals) < 0)
+    {
         goto exit;
     }
 
@@ -314,11 +353,13 @@ read_data:
     imi_utils_objects_draw(objects, input, target_class, model.class_names);
 
     // save result to output
-    if (-1 != bgr) {
+    if (-1 != bgr)
+    {
         imi_utils_image_save_permute_chw2hwc(fout, input, bgr);
         if (fc < frame) goto read_data;
     }
-    else {
+    else
+    {
         save_image(input, output_file);
     }
 

@@ -30,34 +30,35 @@
 //#define ENABLE_CUSTOMER_SHAPE
 #ifdef ENABLE_CUSTOMER_SHAPE
 #ifndef DFLT_TENSOR_SHAPE
-#define DFLT_TENSOR_SHAPE   1,3,300,300 // nchw
-#endif // DFLT_TENSOR_SHAPE
+#define DFLT_TENSOR_SHAPE 1, 3, 300, 300 // nchw
+#endif                                   // DFLT_TENSOR_SHAPE
 #ifndef INPUT_TENSOR_SHAPE
-#define INPUT_TENSOR_SHAPE  DFLT_TENSOR_SHAPE // 1,3,360,640
-#endif // !INPUT_TENSOR_SHAPE
-#endif // ENABLE_CUSTOMER_SHAPE
+#define INPUT_TENSOR_SHAPE DFLT_TENSOR_SHAPE // 1,3,360,640
+#endif                                       // !INPUT_TENSOR_SHAPE
+#endif                                       // ENABLE_CUSTOMER_SHAPE
 
 /* std c includes */
 #include <stdio.h>  // for: fprintf
 #include <string.h> // for: strstr
 /* imilab includes */
-#include "utils/imi_utils_tm.h"     // for: imi_utils_tm_run_graph
-#include "utils/imi_utils_voc.h"    // for: voc_class_names, ...
-#include "utils/imi_utils_elog.h"   // for: log_xxxx
-#include "utils/imi_utils_image.h"  // for: imi_utils_image_load_bgr
+#include "utils/imi_utils_tm.h"    // for: imi_utils_tm_run_graph
+#include "utils/imi_utils_voc.h"   // for: voc_class_names, ...
+#include "utils/imi_utils_elog.h"  // for: log_xxxx
+#include "utils/imi_utils_image.h" // for: imi_utils_image_load_bgr
 #include "utils/imi_utils_tm_debug.h"
 
-typedef struct Box {
+typedef struct Box
+{
     float x0, y0;
     float x1, y1;
     int class_idx;
     float score;
 } Box_t;
 
-static const char* const *class_names = voc_class_names;
+static const char* const* class_names = voc_class_names;
 
 // example models for show usage
-static const char *models[] = {
+static const char* models[] = {
     "mobilenet_ssd.tmfile",     // online model
     "mobilenet_ssd.imi.tmfile", // imilab model
 };
@@ -66,46 +67,58 @@ static const char *models[] = {
 static double start_time = 0.;
 
 #ifdef TRY_LETTER_BOX
-static float lb_scale = 0.f;    // letter box scale
-static int lb_ow = 0, lb_oh = 0;// letter box offset
-#endif // TRY_LETTER_BOX
+static float lb_scale = 0.f;     // letter box scale
+static int lb_ow = 0, lb_oh = 0; // letter box offset
+#endif                           // TRY_LETTER_BOX
 static image lb;
 
 // @return: box count
-static int post_process_ssd(image im, float threshold, const void *data, int num, int tc) {
-    const float *buf = (const float *)data;
+static int post_process_ssd(image im, float threshold, const void* data, int num, int tc)
+{
+    const float* buf = (const float*)data;
 
     Box_t box;
     int i, cnt = 0;
     int im_w = im.w, im_h = im.h; //im_w *= (640/300), im_h *= (360/300);
-    for (i = 0; i < num; i++) {
-        if (threshold <= buf[1]) {
+    for (i = 0; i < num; i++)
+    {
+        if (threshold <= buf[1])
+        {
             box.class_idx = buf[0];
             box.score = buf[1];
             //log_debug("score: %2.3f%%, box: (%7.3f, %7.3f) (%7.3f, %7.3f), label: %s\n",
             //    box.score * 100, buf[2], buf[3], buf[4], buf[5], class_names[box.class_idx]);
 #ifndef TRY_LETTER_BOX
-            box.x0 = buf[2] < 0 ? 0 : 1 < buf[2] ? im_w : buf[2] * im_w;
-            box.y0 = buf[3] < 0 ? 0 : 1 < buf[3] ? im_h : buf[3] * im_h;
-            box.x1 = buf[4] < 0 ? 0 : 1 < buf[4] ? im_w : buf[4] * im_w;
-            box.y1 = buf[5] < 0 ? 0 : 1 < buf[5] ? im_h : buf[5] * im_h;
-#else // TRY_LETTER_BOX
+            box.x0 = buf[2] < 0 ? 0 : 1 < buf[2] ? im_w
+                                                 : buf[2] * im_w;
+            box.y0 = buf[3] < 0 ? 0 : 1 < buf[3] ? im_h
+                                                 : buf[3] * im_h;
+            box.x1 = buf[4] < 0 ? 0 : 1 < buf[4] ? im_w
+                                                 : buf[4] * im_w;
+            box.y1 = buf[5] < 0 ? 0 : 1 < buf[5] ? im_h
+                                                 : buf[5] * im_h;
+#else  // TRY_LETTER_BOX
             box.x0 = (buf[2] * lb.w - lb_ow) / lb_scale;
             box.y0 = (buf[3] * lb.h - lb_oh) / lb_scale;
             box.x1 = (buf[4] * lb.w - lb_ow) / lb_scale;
             box.y1 = (buf[5] * lb.h - lb_oh) / lb_scale;
-            box.x0 = box.x0 < 0 ? 0 : im_w < box.x0 ? im_w : box.x0;
-            box.y0 = box.y0 < 0 ? 0 : im_h < box.y0 ? im_h : box.y0;
-            box.x1 = box.x1 < 0 ? 0 : im_w < box.x1 ? im_w : box.x1;
-            box.y1 = box.y1 < 0 ? 0 : im_h < box.y1 ? im_h : box.y1;
-#endif // !TRY_LETTER_BOX
-            // draw box to image
-            if (tc < 0 || tc == box.class_idx) {
+            box.x0 = box.x0 < 0 ? 0 : im_w < box.x0 ? im_w
+                                                    : box.x0;
+            box.y0 = box.y0 < 0 ? 0 : im_h < box.y0 ? im_h
+                                                    : box.y0;
+            box.x1 = box.x1 < 0 ? 0 : im_w < box.x1 ? im_w
+                                                    : box.x1;
+            box.y1 = box.y1 < 0 ? 0 : im_h < box.y1 ? im_h
+                                                    : box.y1;
+#endif // !TRY_LETTER_BOX \
+    // draw box to image
+            if (tc < 0 || tc == box.class_idx)
+            {
                 draw_box(im, box.x0, box.y0, box.x1, box.y1, 2, 125, 0, 125);
             }
 
             log_echo("score: %2.3f%%, box: (%7.3f, %7.3f) (%7.3f, %7.3f), label: %s\n",
-                box.score * 100, box.x0, box.y0, box.x1, box.y1, class_names[box.class_idx]);
+                     box.score * 100, box.x0, box.y0, box.x1, box.y1, class_names[box.class_idx]);
             cnt++;
         }
         buf += 6;
@@ -114,25 +127,29 @@ static int post_process_ssd(image im, float threshold, const void *data, int num
     return cnt;
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
     int repeat_count = 1;
     int num_thread = 1;
     int target_class = -1;
     int class_num = voc_class_num;
     float threshold = 0.5f;
 
-    const char *model_file = NULL;
-    const char *image_file = NULL;
-    const char *output_file = "output.rgb";
+    const char* model_file = NULL;
+    const char* image_file = NULL;
+    const char* output_file = "output.rgb";
 
     image im = make_empty_image(640, 360, 3);
 
     int res, frame = 1, fc = 0;
-    while ((res = getopt(argc, argv, "c:m:i:r:t:w:h:n:o:f:s:u")) != -1) {
-        switch (res) {
+    while ((res = getopt(argc, argv, "c:m:i:r:t:w:h:n:o:f:s:u")) != -1)
+    {
+        switch (res)
+        {
         case 'c':
             target_class = atoi(optarg);
-            if (target_class < 0 || class_num <= target_class) {
+            if (target_class < 0 || class_num <= target_class)
+            {
                 // reset all invalid argument as -1
                 target_class = -1;
             }
@@ -176,12 +193,14 @@ int main(int argc, char* argv[]) {
     }
 
     /* check files */
-    if (NULL == model_file || NULL == image_file) {
+    if (NULL == model_file || NULL == image_file)
+    {
         log_error("Tengine model or image file not specified!\n");
         show_usage(argv[0], models);
         return -1;
     }
-    if (!check_file_exist(model_file) || !check_file_exist(image_file)) {
+    if (!check_file_exist(model_file) || !check_file_exist(image_file))
+    {
         return -1;
     }
 
@@ -194,7 +213,8 @@ int main(int argc, char* argv[]) {
 
     /* inital tengine */
     int ret = init_tengine();
-    if (0 != ret) {
+    if (0 != ret)
+    {
         log_error("Initial tengine failed.\n");
         return -1;
     }
@@ -205,14 +225,16 @@ int main(int argc, char* argv[]) {
 
     /* create graph, load tengine model xxx.tmfile */
     graph_t graph = create_graph(NULL, "tengine", model_file);
-    if (NULL == graph) {
+    if (NULL == graph)
+    {
         log_error("Load model to graph failed\n");
         return -1;
     }
 
     /* get input tensor of graph */
     tensor_t tensor = get_graph_input_tensor(graph, 0, 0);
-    if (NULL == tensor) {
+    if (NULL == tensor)
+    {
         log_error("Get input tensor failed\n");
         return -1;
     }
@@ -222,19 +244,22 @@ int main(int argc, char* argv[]) {
     int i, dims[DIM_NUM]; // nchw
     int dim_num = get_tensor_shape(tensor, dims, DIM_NUM);
     log_echo("input tensor shape: %d(", dim_num);
-    for (i = 0; i < dim_num; i++) {
+    for (i = 0; i < dim_num; i++)
+    {
         log_echo(" %d", dims[i]);
     }
     log_echo(")\n");
-    if (DIM_NUM != dim_num) {
+    if (DIM_NUM != dim_num)
+    {
         log_error("Get input tensor shape error\n");
         return -1;
     }
-#else // customer shape
+#else  // customer shape
     int i, dim_num;
     /* set input tensor shape (if necessary) */
-    int dims[DIM_NUM] = { INPUT_TENSOR_SHAPE };
-    if (set_tensor_shape(tensor, dims, DIM_NUM) < 0) {
+    int dims[DIM_NUM] = {INPUT_TENSOR_SHAPE};
+    if (set_tensor_shape(tensor, dims, DIM_NUM) < 0)
+    {
         log_error("Set input tensor shape failed\n");
         return -1;
     }
@@ -243,13 +268,15 @@ int main(int argc, char* argv[]) {
     lb = make_image(dims[DIM_IDX_W], dims[DIM_IDX_H], dims[DIM_IDX_C]);
     int img_size = lb.w * lb.h * lb.c;
     /* set the data mem to input tensor */
-    if (set_tensor_buffer(tensor, lb.data, img_size * sizeof(float)) < 0) {
+    if (set_tensor_buffer(tensor, lb.data, img_size * sizeof(float)) < 0)
+    {
         log_error("Set input tensor buffer failed\n");
         return -1;
     }
 
     /* prerun graph to infer shape, and set work options(num_thread, cluster, precision) */
-    if (prerun_graph_multithread(graph, opt) < 0) {
+    if (prerun_graph_multithread(graph, opt) < 0)
+    {
         log_error("Prerun multithread graph failed.\n");
         return -1;
     }
@@ -257,7 +284,8 @@ int main(int argc, char* argv[]) {
 
     /* get output tensor of graph */
     tensor = get_graph_output_tensor(graph, 0, 0);
-    if (NULL == tensor) {
+    if (NULL == tensor)
+    {
         log_error("Get output tensor failed\n");
         return -1;
     }
@@ -274,12 +302,20 @@ int main(int argc, char* argv[]) {
     // to support read/load video.rgb or video.bgr
     int bgr = -1;
     FILE *fp = NULL, *fout = NULL;
-    if (strstr(image_file, "bgra")) im.c = 4, bgr = 0;
-    else if (strstr(image_file, "bgr")) im.c = 3, bgr = 0;
-    else if (strstr(image_file, "rgba")) im.c = 4, bgr = 1;
-    else if (strstr(image_file, "rgb")) im.c = 3, bgr = 1;
-    else { ; }
-    if (-1 != bgr) {
+    if (strstr(image_file, "bgra"))
+        im.c = 4, bgr = 0;
+    else if (strstr(image_file, "bgr"))
+        im.c = 3, bgr = 0;
+    else if (strstr(image_file, "rgba"))
+        im.c = 4, bgr = 1;
+    else if (strstr(image_file, "rgb"))
+        im.c = 3, bgr = 1;
+    else
+    {
+        ;
+    }
+    if (-1 != bgr)
+    {
         fp = fopen(image_file, "rb");
         fout = fopen(output_file, "wb");
     }
@@ -297,9 +333,11 @@ int main(int argc, char* argv[]) {
 
 read_data:
     /* prepare process input data, set the data mem to input tensor */
-    if (fp) {
+    if (fp)
+    {
         // load raw data from file and convert to bgr planar format
-        if (1 != (ret = imi_utils_image_load_bgr(fp, im, bgr, lb.c))) {
+        if (1 != (ret = imi_utils_image_load_bgr(fp, im, bgr, lb.c)))
+        {
             fprintf(stderr, "%s\n", ret ? "get_input_data error!" : "read input data fin");
             goto exit;
         }
@@ -308,18 +346,19 @@ read_data:
         log_echo("Frame No.%03d:\n", fc);
 
         int i, j, k, idx;
-        const float *_data = im.data;
+        const float* _data = im.data;
 #ifndef TRY_LETTER_BOX
         // strategy: resize to letter box directly
-        if (im.w != lb.w || im.h != lb.h) {
+        if (im.w != lb.w || im.h != lb.h)
+        {
             // resize to network input shape
             tengine_resize_f32(im.data, lb.data, lb.w, lb.h, im.c, im.h, im.w);
             log_debug("resize image from (%d,%d) to (%d,%d)\n", im.w, im.h, lb.w, lb.h);
             _data = lb.data;
         }
         //else { log_debug("I didn't resize the image ^_^\n"); }
-#else // TRY_LETTER_BOX
-        // strategy: resize and attach to letter box
+#else  // TRY_LETTER_BOX \
+       // strategy: resize and attach to letter box
         image resized = resize_image(im, im_rw, im_rh);
         log_debug("resize image from (%d,%d) to (%d,%d)\n", im.w, im.h, im_rw, im_rh);
         // attach resized image to letter box
@@ -328,23 +367,28 @@ read_data:
         free_image(resized);
         // reset data buffer reference
         _data = lb.data;
-#endif // !TRY_LETTER_BOX
-        // nchw pre-process
-        for (k = 0; k < lb.c; k++) {
-            for (i = 0; i < lb.h; i++) {
-                for (j = 0; j < lb.w; j++) {
+#endif // !TRY_LETTER_BOX \
+    // nchw pre-process
+        for (k = 0; k < lb.c; k++)
+        {
+            for (i = 0; i < lb.h; i++)
+            {
+                for (j = 0; j < lb.w; j++)
+                {
                     idx = k * lb.h * lb.w + i * lb.w + j;
                     lb.data[idx] = (_data[idx] - voc_image_cov[0][k]) * voc_image_cov[1][k];
                 }
             }
         }
     }
-    else {
+    else
+    {
         get_input_data(image_file, lb.data, lb.h, lb.w, voc_image_cov[0], voc_image_cov[1]);
     }
 
     /* run graph */
-    if (imi_utils_tm_run_graph(graph, repeat_count) < 0) {
+    if (imi_utils_tm_run_graph(graph, repeat_count) < 0)
+    {
         goto exit;
     }
 
@@ -364,11 +408,13 @@ read_data:
     post_process_ssd(im, threshold, get_tensor_buffer(tensor), dims[1], target_class);
 
     // save result to output
-    if (-1 != bgr) {
+    if (-1 != bgr)
+    {
         imi_utils_image_save_permute_chw2hwc(fout, im, bgr);
         if (fc < frame) goto read_data;
     }
-    else {
+    else
+    {
         save_image(im, output_file);
     }
 
@@ -389,4 +435,3 @@ exit:
     imi_utils_tm_run_status(NULL);
     return 0;
 }
-

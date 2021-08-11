@@ -7,22 +7,21 @@
 #ifndef __IMI_UTILS_VOC_H__
 #define __IMI_UTILS_VOC_H__
 
-static const char *voc_class_names[] = {
+static const char* voc_class_names[] = {
     "background",
-    "aeroplane", "bicycle", "bird", "boat", "bottle",       // 01-05
-    "bus", "car", "cat", "chair", "cow",                    // 06-10
-    "diningtable", "dog", "horse", "motorbike", "person",   // 11-15
-    "pottedplant", "sheep", "sofa", "train", "tvmonitor",   // 16-20
+    "aeroplane", "bicycle", "bird", "boat", "bottle",     // 01-05
+    "bus", "car", "cat", "chair", "cow",                  // 06-10
+    "diningtable", "dog", "horse", "motorbike", "person", // 11-15
+    "pottedplant", "sheep", "sofa", "train", "tvmonitor", // 16-20
 };
 static const int voc_class_num = sizeof(voc_class_names) / sizeof(voc_class_names[0]);
 
 //static const float voc_image_mean[] = { 127.5f, 127.5f, 127.5f };
 //static const float voc_image_scale[] = { 0.007843f, 0.007843f, 0.007843f };
 static const float voc_image_cov[][3] = {
-    { 127.5f, 127.5f, 127.5f }, // mean
-    { 0.007843f, 0.007843f, 0.007843f } // scale
+    {127.5f, 127.5f, 127.5f},         // mean
+    {0.007843f, 0.007843f, 0.007843f} // scale
 };
-
 
 #include "imi_utils_elog.h" // for: log_xxxx
 
@@ -31,8 +30,9 @@ extern "C" {
 #endif // __cplusplus
 
 // @brief:  show usage
-static __inline void show_usage(const char *exe, const char *model[2]) {
-    const char *tests[] = {
+static __inline void show_usage(const char* exe, const char* model[2])
+{
+    const char* tests[] = {
         "imilab_640x360x3_bgr_catdog.rgb24",
         "imilab_640x360x3_bgr_human1.rgb24",
         "imilab_640x360x3_bgr_human2.rgb24",
@@ -55,7 +55,8 @@ static __inline void show_usage(const char *exe, const char *model[2]) {
     log_echo("   %s -m %s -i %s -o output/%s -t 4 -f 500 -n 1 -w 960 -h 512\n", exe, model[1], tests[3], tests[3]);
 }
 
-static __inline int parse_args(void *data) {
+static __inline int parse_args(void* data)
+{
     // todo: ...
     return 0;
 }

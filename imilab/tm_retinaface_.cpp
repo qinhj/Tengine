@@ -42,9 +42,9 @@
 #include <vector>
 #include <string>
 /* imilab includes */
-#include "utils/imi_utils_tm.h"     // for: imi_utils_tm_run_graph
-#include "utils/imi_utils_elog.h"   // for: log_xxxx
-#include "utils/imi_utils_image.h"  // for: imi_utils_image_load_bgr
+#include "utils/imi_utils_tm.h"    // for: imi_utils_tm_run_graph
+#include "utils/imi_utils_elog.h"  // for: log_xxxx
+#include "utils/imi_utils_image.h" // for: imi_utils_image_load_bgr
 #include "utils/imi_utils_object.hpp"
 #include "utils/imi_utils_visual.hpp"
 
@@ -59,34 +59,36 @@
 static float prob_threshold = 0.8f;
 static float nms_threshold = 0.40f;
 
-const char *input_name = "data";
+const char* input_name = "data";
 
-static const char *bbox_name[] = {
+static const char* bbox_name[] = {
     "face_rpn_bbox_pred_stride32",
     "face_rpn_bbox_pred_stride16",
     "face_rpn_bbox_pred_stride8",
 };
-static const char *score_name[3] = {
+static const char* score_name[3] = {
     "face_rpn_cls_prob_reshape_stride32",
     "face_rpn_cls_prob_reshape_stride16",
     "face_rpn_cls_prob_reshape_stride8",
 };
-static const char *landmark_name[3] = {
+static const char* landmark_name[3] = {
     "face_rpn_landmark_pred_stride32",
     "face_rpn_landmark_pred_stride16",
     "face_rpn_landmark_pred_stride8",
 };
 
-const int stride[3] = { 32, 16, 8 };
+const int stride[3] = {32, 16, 8};
 
-const float scales[3][2] = { {32.f, 16.f}, {8.f, 4.f}, {2.f, 1.f} };
+const float scales[3][2] = {{32.f, 16.f}, {8.f, 4.f}, {2.f, 1.f}};
 
-struct Box2f {
+struct Box2f
+{
     float x1, y1;
     float x2, y2;
 };
 
-std::vector<Box2f> generate_anchors(int base_size, const std::vector<float>& ratios, const std::vector<float>& scales) {
+std::vector<Box2f> generate_anchors(int base_size, const std::vector<float>& ratios, const std::vector<float>& scales)
+{
     size_t num_ratio = ratios.size();
     size_t num_scale = scales.size();
 
@@ -95,13 +97,15 @@ std::vector<Box2f> generate_anchors(int base_size, const std::vector<float>& rat
     const float cx = (float)base_size * 0.5f;
     const float cy = (float)base_size * 0.5f;
 
-    for (int i = 0; i < num_ratio; i++) {
+    for (int i = 0; i < num_ratio; i++)
+    {
         float ar = ratios[i];
 
         int r_w = (int)round((float)base_size / sqrt(ar));
-        int r_h = (int)round((float)r_w * ar);    // round(base_size * sqrt(ar));
+        int r_h = (int)round((float)r_w * ar); // round(base_size * sqrt(ar));
 
-        for (int j = 0; j < num_scale; j++) {
+        for (int j = 0; j < num_scale; j++)
+        {
             float scale = scales[j];
 
             float rs_w = (float)r_w * scale;
@@ -120,9 +124,10 @@ std::vector<Box2f> generate_anchors(int base_size, const std::vector<float>& rat
 }
 
 static void generate_proposals(std::vector<Box2f>& anchors, int feat_stride, const float* score_blob,
-    const int score_dims[], const float* bbox_blob, const int bbox_dims[],
-    const float* landmark_blob, const int landmark_dims[], const float& prob_threshold,
-    std::vector<Face2f>& faces) {
+                               const int score_dims[], const float* bbox_blob, const int bbox_dims[],
+                               const float* landmark_blob, const int landmark_dims[], const float& prob_threshold,
+                               std::vector<Face2f>& faces)
+{
     int w = bbox_dims[3];
     int h = bbox_dims[2];
     int offset = w * h;
@@ -130,7 +135,8 @@ static void generate_proposals(std::vector<Box2f>& anchors, int feat_stride, con
     // generate face proposal from bbox deltas and shifted anchors
     const int num_anchors = anchors.size();
 
-    for (int q = 0; q < num_anchors; q++) {
+    for (int q = 0; q < num_anchors; q++)
+    {
         const Box2f& anchor = anchors[q];
 
         const float* score = score_blob + (q + num_anchors) * offset;
@@ -143,15 +149,18 @@ static void generate_proposals(std::vector<Box2f>& anchors, int feat_stride, con
         float anchor_w = anchor.x2 - anchor.x1;
         float anchor_h = anchor.y2 - anchor.y1;
 
-        for (int i = 0; i < h; i++) {
+        for (int i = 0; i < h; i++)
+        {
             float anchor_x = anchor.x1;
 
-            for (int j = 0; j < w; j++) {
+            for (int j = 0; j < w; j++)
+            {
                 int index = i * w + j;
 
                 float prob = score[index];
 
-                if (prob >= prob_threshold) {
+                if (prob >= prob_threshold)
+                {
                     // apply center size
                     float dx = bbox[index + offset * 0];
                     float dy = bbox[index + offset * 1];
@@ -202,9 +211,11 @@ static void generate_proposals(std::vector<Box2f>& anchors, int feat_stride, con
     }
 }
 
-static std::vector<Face2f> get_face_proposals(graph_t &graph) {
+static std::vector<Face2f> get_face_proposals(graph_t& graph)
+{
     std::vector<Face2f> face_proposals;
-    for (int stride_index = 0; stride_index < 3; stride_index++) {
+    for (int stride_index = 0; stride_index < 3; stride_index++)
+    {
         // ==================================================================
         // ========== This part is to get tensor information ================
         // ==================================================================
@@ -212,9 +223,9 @@ static std::vector<Face2f> get_face_proposals(graph_t &graph) {
         tensor_t bbox_blob_tensor = get_graph_tensor(graph, bbox_name[stride_index]);
         tensor_t landmark_blob_tensor = get_graph_tensor(graph, landmark_name[stride_index]);
 
-        int score_blob_dims[MAX_SHAPE_DIM_NUM] = { 0 };
-        int bbox_blob_dims[MAX_SHAPE_DIM_NUM] = { 0 };
-        int landmark_blob_dims[MAX_SHAPE_DIM_NUM] = { 0 };
+        int score_blob_dims[MAX_SHAPE_DIM_NUM] = {0};
+        int bbox_blob_dims[MAX_SHAPE_DIM_NUM] = {0};
+        int landmark_blob_dims[MAX_SHAPE_DIM_NUM] = {0};
 
         get_tensor_shape(score_blob_tensor, score_blob_dims, MAX_SHAPE_DIM_NUM);
         get_tensor_shape(bbox_blob_tensor, bbox_blob_dims, MAX_SHAPE_DIM_NUM);
@@ -238,33 +249,37 @@ static std::vector<Face2f> get_face_proposals(graph_t &graph) {
 
         std::vector<Face2f> face_objects;
         generate_proposals(anchors, feat_stride, score_blob, score_blob_dims, bbox_blob, bbox_blob_dims,
-            landmark_blob, landmark_blob_dims, prob_threshold, face_objects);
+                           landmark_blob, landmark_blob_dims, prob_threshold, face_objects);
 
         face_proposals.insert(face_proposals.end(), face_objects.begin(), face_objects.end());
     }
     return face_proposals;
 }
 
-static void show_usage() {
+static void show_usage()
+{
     log_echo("[Usage]:  [-u]\n");
     log_echo("    [-m model_file] [-i input_file] [-o output_file] [-n device_name]\n");
     log_echo("    [-w width] [-h height] [-s threshold] [-f max_frame]\n");
     log_echo("    [-r repeat_count] [-t thread_count]\n");
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
     int repeat_count = DEFAULT_REPEAT_COUNT;
     int num_thread = DEFAULT_THREAD_COUNT;
 
-    const char *model_file = MODEL_PATH;
-    const char *image_file = IMAGE_PATH;
-    const char *output_file = OUTPUT_PATH;
-    const char *device_name = "";
-    Size2i image_size = { 640, 360 };
+    const char* model_file = MODEL_PATH;
+    const char* image_file = IMAGE_PATH;
+    const char* output_file = OUTPUT_PATH;
+    const char* device_name = "";
+    Size2i image_size = {640, 360};
 
     int res, frame = 1, fc = 0;
-    while ((res = getopt(argc, argv, "m:i:r:t:w:h:n:o:f:s:u")) != -1) {
-        switch (res) {
+    while ((res = getopt(argc, argv, "m:i:r:t:w:h:n:o:f:s:u")) != -1)
+    {
+        switch (res)
+        {
         case 'm':
             model_file = optarg;
             break;
@@ -304,12 +319,14 @@ int main(int argc, char* argv[]) {
     }
 
     /* check files */
-    if (nullptr == model_file || nullptr == image_file) {
+    if (nullptr == model_file || nullptr == image_file)
+    {
         log_error("Tengine model or image file not specified!\n");
         show_usage();
         return -1;
     }
-    if (!check_file_exist(model_file) || !check_file_exist(image_file)) {
+    if (!check_file_exist(model_file) || !check_file_exist(image_file))
+    {
         return -1;
     }
 
@@ -322,7 +339,8 @@ int main(int argc, char* argv[]) {
 
     /* inital tengine */
     int ret = init_tengine();
-    if (0 != ret) {
+    if (0 != ret)
+    {
         log_error("Initial tengine failed.\n");
         return -1;
     }
@@ -330,21 +348,24 @@ int main(int argc, char* argv[]) {
 
     /* create graph, load tengine model xxx.tmfile */
     graph_t graph = create_graph(NULL, "tengine", model_file);
-    if (nullptr == graph) {
+    if (nullptr == graph)
+    {
         log_error("Load model to graph failed\n");
         return -1;
     }
 
     /* set the input shape to initial the graph, and pre-run graph to infer shape */
-    int dims[] = { 1, 3, image_size.height, image_size.width };
+    int dims[] = {1, 3, image_size.height, image_size.width};
 
     tensor_t input_tensor = get_graph_tensor(graph, input_name);
-    if (nullptr == input_tensor) {
+    if (nullptr == input_tensor)
+    {
         log_error("Get input tensor failed\n");
         return -1;
     }
 
-    if (0 != set_tensor_shape(input_tensor, dims, 4)) {
+    if (0 != set_tensor_shape(input_tensor, dims, 4))
+    {
         log_error("Set input tensor shape failed\n");
         return -1;
     }
@@ -352,13 +373,15 @@ int main(int argc, char* argv[]) {
     image img = make_image(image_size.width, image_size.height, 3);
     int img_size = img.w * img.h * img.c, channel = 3, bgr = 0;
     /* set the data mem to input tensor */
-    if (set_tensor_buffer(input_tensor, img.data, img_size * sizeof(float)) < 0) {
+    if (set_tensor_buffer(input_tensor, img.data, img_size * sizeof(float)) < 0)
+    {
         log_error("Set input tensor buffer failed\n");
         return -1;
     }
 
     /* prerun graph, set work options(num_thread, cluster, precision) */
-    if (0 != prerun_graph_multithread(graph, opt)) {
+    if (0 != prerun_graph_multithread(graph, opt))
+    {
         log_error("Prerun multithread graph failed.\n");
         return -1;
     }
@@ -366,8 +389,8 @@ int main(int argc, char* argv[]) {
     std::vector<Face2f> proposals;
     std::vector<Face2f> objects;
 
-    FILE *fout = output_file ? fopen(output_file, "wb") : NULL;
-    FILE *fp = fopen(image_file, "rb");
+    FILE* fout = output_file ? fopen(output_file, "wb") : NULL;
+    FILE* fp = fopen(image_file, "rb");
 
     // benchmark:
     //  tm_retinaface -m /media/workshop/retinaface.tmfile -i /media/workshop/009962.bmp
@@ -377,26 +400,33 @@ int main(int argc, char* argv[]) {
 #elif defined(TEST_IMAGE_DATA_U8C3_PLANAR)
     // e.g. tm_retinaface_ -m /media/workshop/retinaface.tmfile -i image__.dat -w 506 -h 381
     {
-        unsigned char *data = (unsigned char *)malloc(img_size * sizeof(char));
+        unsigned char* data = (unsigned char*)malloc(img_size * sizeof(char));
         fread(data, sizeof(char), img_size, fp);
-        for (int i = 0; i < img_size; i++) {
+        for (int i = 0; i < img_size; i++)
+        {
             img.data[i] = (float)data[i];
         }
         free(data);
     }
 #else
     // load raw data(non-planar)
-    if (strstr(image_file, "bgra")) channel = 4, bgr = 1;
-    else if (strstr(image_file, "bgr")) channel = 3, bgr = 1;
-    else if (strstr(image_file, "rgba")) channel = 4, bgr = 0;
-    else if (strstr(image_file, "rgb")) channel = 3, bgr = 0;
-    else {
+    if (strstr(image_file, "bgra"))
+        channel = 4, bgr = 1;
+    else if (strstr(image_file, "bgr"))
+        channel = 3, bgr = 1;
+    else if (strstr(image_file, "rgba"))
+        channel = 4, bgr = 0;
+    else if (strstr(image_file, "rgb"))
+        channel = 3, bgr = 0;
+    else
+    {
         log_error("unknown test data format!\n");
         goto exit;
     }
 
 read_data:
-    if (1 != (ret = imi_utils_image_load_bgr(fp, img, bgr, channel))) {
+    if (1 != (ret = imi_utils_image_load_bgr(fp, img, bgr, channel)))
+    {
         log_error("%s\n", ret ? "get_input_data error!" : "read input data fin");
         goto exit;
     }
@@ -413,7 +443,8 @@ read_data:
     fc++;
 
     /* run graph */
-    if (imi_utils_tm_run_graph(graph, repeat_count) < 0) {
+    if (imi_utils_tm_run_graph(graph, repeat_count) < 0)
+    {
         goto exit;
     }
 
@@ -429,7 +460,8 @@ read_data:
     imi_utils_faces_draw(objects, img);
 
     // save result to output
-    if (fout) {
+    if (fout)
+    {
         imi_utils_image_save_permute_chw2hwc(fout, img, bgr);
     }
 

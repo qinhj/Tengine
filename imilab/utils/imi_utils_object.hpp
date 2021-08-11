@@ -10,23 +10,26 @@
 /* std c++ includes */
 #include <vector>
 /* imilab includes */
-#include "imi_utils_elog.h" // for: log_xxxx
+#include "imi_utils_elog.h"     // for: log_xxxx
 #include "imi_utils_common.hpp" // for: Object
 
-#define DFLT_THRESHOLD_NMS  0.45f
+#define DFLT_THRESHOLD_NMS 0.45f
 
 // @brief:  qsort_descent_inplace
 // @note:   _Tp must have member "prob"
 template<typename _Tp>
-static __inline void qsort_descent_inplace(std::vector<_Tp> &objects, int left, int right) {
+static __inline void qsort_descent_inplace(std::vector<_Tp>& objects, int left, int right)
+{
     int i = left, j = right;
     float p = (float)objects[(left + right) / 2].prob;
 
-    while (i <= j) {
+    while (i <= j)
+    {
         while (objects[i].prob > p) i++;
         while (objects[j].prob < p) j--;
 
-        if (i <= j) {
+        if (i <= j)
+        {
             // swap
             std::swap(objects[i], objects[j]);
             i++, j--;
@@ -49,7 +52,8 @@ static __inline void qsort_descent_inplace(std::vector<_Tp> &objects, int left, 
 // @brief:  qsort_descent_inplace
 // @note:   _Tp must have member "prob"
 template<typename _Tp>
-void imi_utils_objects_qsort(std::vector<_Tp> &objects, char descent = 1) {
+void imi_utils_objects_qsort(std::vector<_Tp>& objects, char descent = 1)
+{
     if (objects.empty()) return;
     qsort_descent_inplace(objects, 0, objects.size() - 1);
 }
@@ -57,26 +61,30 @@ void imi_utils_objects_qsort(std::vector<_Tp> &objects, char descent = 1) {
 // @brief:  nms sorted bboxes
 // @note:   _Tp must have member "rect"
 template<typename _Tp>
-void imi_utils_objects_nms(const std::vector<_Tp>& objects, std::vector<int>& picked, float nms_threshold) {
+void imi_utils_objects_nms(const std::vector<_Tp>& objects, std::vector<int>& picked, float nms_threshold)
+{
     picked.clear();
 
     const int n = objects.size();
     log_verbose("proposal num: %d\n", n);
 
     std::vector<float> areas(n);
-    for (int i = 0; i < n; i++) {
-        const _Tp &obj = objects[i];
+    for (int i = 0; i < n; i++)
+    {
+        const _Tp& obj = objects[i];
         areas[i] = obj.rect.area();
         log_verbose("object[%d] class[%d] (%.3f, %.3f), w: %.3f, h: %.3f\n",
-            i, obj.label, obj.rect.x, obj.rect.y, obj.rect.width, obj.rect.height);
+                    i, obj.label, obj.rect.x, obj.rect.y, obj.rect.width, obj.rect.height);
     }
 
-    for (int i = 0; i < n; i++) {
-        const _Tp &a = objects[i];
+    for (int i = 0; i < n; i++)
+    {
+        const _Tp& a = objects[i];
 
         int keep = 1;
-        for (int j = 0; j < (int)picked.size() && keep; j++) {
-            const _Tp &b = objects[picked[j]];
+        for (int j = 0; j < (int)picked.size() && keep; j++)
+        {
+            const _Tp& b = objects[picked[j]];
 
             // intersection over union
             float inter_area = (a.rect & b.rect).area();
@@ -84,12 +92,14 @@ void imi_utils_objects_nms(const std::vector<_Tp>& objects, std::vector<int>& pi
             float iou = inter_area / union_area;
             log_verbose("IOU(%d, %d)=%.3f/%.3f=%.3f\n", i, j, inter_area, union_area, iou);
             // float IoU = inter_area / union_area
-            if (iou > nms_threshold) {
+            if (iou > nms_threshold)
+            {
                 keep = 0;
             }
         }
 
-        if (keep) {
+        if (keep)
+        {
             picked.push_back(i);
             log_verbose("push obj(%d) into picked list\n", i);
         }
@@ -98,8 +108,9 @@ void imi_utils_objects_nms(const std::vector<_Tp>& objects, std::vector<int>& pi
 
 // @brief:  filter proposal objects
 template<typename _Tp>
-std::vector<_Tp> imi_utils_proposals_filter(const std::vector<_Tp> &proposals,
-    const Size2i &image_size, const Size2i &letter_box, float nms_threshold = DFLT_THRESHOLD_NMS) {
+std::vector<_Tp> imi_utils_proposals_filter(const std::vector<_Tp>& proposals,
+                                            const Size2i& image_size, const Size2i& letter_box, float nms_threshold = DFLT_THRESHOLD_NMS)
+{
     std::vector<int> picked;
     // apply nms with nms_threshold
     imi_utils_objects_nms(proposals, picked, nms_threshold);
@@ -110,7 +121,8 @@ std::vector<_Tp> imi_utils_proposals_filter(const std::vector<_Tp> &proposals,
     // post process: scale and offset for letter box
     Size2i lb_offset;
     float lb_scale = -1;
-    if (0 < letter_box.width && 0 < letter_box.height) {
+    if (0 < letter_box.width && 0 < letter_box.height)
+    {
         float scale_w = letter_box.width * 1.0 / image_size.width;
         float scale_h = letter_box.height * 1.0 / image_size.height;
         lb_scale = scale_h < scale_w ? scale_h : scale_w;
@@ -119,11 +131,12 @@ std::vector<_Tp> imi_utils_proposals_filter(const std::vector<_Tp> &proposals,
         lb_offset.width = (letter_box.width - lb_offset.width) / 2;
         lb_offset.height = (letter_box.height - lb_offset.height) / 2;
         log_verbose("letter box scale: %3.4f, offset: (%d, %d)\n",
-            lb_scale, lb_offset.width, lb_offset.height);
+                    lb_scale, lb_offset.width, lb_offset.height);
     }
 
     std::vector<_Tp> objects(count);
-    for (int i = 0; i < count; i++) {
+    for (int i = 0; i < count; i++)
+    {
         objects[i] = proposals[picked[i]];
 
         float x0 = (objects[i].rect.x);
@@ -132,7 +145,8 @@ std::vector<_Tp> imi_utils_proposals_filter(const std::vector<_Tp> &proposals,
         float y1 = (objects[i].rect.y + objects[i].rect.height);
 
         // post process: from letter box to input image
-        if (0 < letter_box.width && 0 < letter_box.height) {
+        if (0 < letter_box.width && 0 < letter_box.height)
+        {
             x0 = (x0 - lb_offset.width) / lb_scale;
             y0 = (y0 - lb_offset.height) / lb_scale;
             x1 = (x1 - lb_offset.width) / lb_scale;
