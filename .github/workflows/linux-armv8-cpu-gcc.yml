@@ -44,7 +44,7 @@ jobs:
   linux-armv8-cpu-gcc:
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v2.3.4
+    - uses: actions/checkout@v2.3.5
 
     - name: cache-qemu
       id: cache-qemu
@@ -54,7 +54,7 @@ jobs:
         key: qemu-aarch64-install-1
     - name: checkout-qemu
       if: steps.cache-qemu.outputs.cache-hit != 'true'
-      uses: actions/checkout@v2.3.4
+      uses: actions/checkout@v2.3.5
       with:
         repository: qemu/qemu
         path: qemu
